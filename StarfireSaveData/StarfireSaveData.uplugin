@@ -1,0 +1,49 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.3.1",
+	"FriendlyName": "Starfire Save Data",
+	"Description": "Library for Save data and file management",
+	"Category": "Other",
+	"CreatedBy": "Russell Aasland",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EditorCustomVirtualPath": "Starfire",
+	"Modules": [
+		{
+			"Name": "StarfireSaveData",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireSaveDataDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireSaveDataEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SaveDataExample",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "StarfireAssets",
+			"Enabled": true
+		},
+		{
+			"Name": "StarfireUtilities",
+			"Enabled": true
+		}
+	]
+}

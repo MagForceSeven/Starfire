@@ -1,0 +1,36 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.3.1",
+	"FriendlyName": "Starfire Utilities",
+	"Description": "Grab-bag of utilities useful to any project",
+	"Category": "Other",
+	"CreatedBy": "Russell Aasland",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EditorCustomVirtualPath": "Starfire",
+	"Modules": [
+		{
+			"Name": "StarfireUtilities",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireUtilitiesDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireUtilitiesEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+	]
+}
