@@ -26,7 +26,7 @@ public:
 	virtual void EndAction( void );
 
 	// Accessor to check if the action is running/ticking
-	UE_NODISCARD bool IsRunning( void ) const { return bIsRunning; }
+	[[nodiscard]] bool IsRunning( void ) const { return bIsRunning; }
 
 private:
 	// Flagging whether or not action has been started, prevents multiple starts

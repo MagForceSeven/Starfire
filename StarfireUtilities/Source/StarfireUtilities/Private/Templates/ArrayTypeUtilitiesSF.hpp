@@ -146,3 +146,15 @@ const TArray< TSoftObjectPtr< type_t > >& ArrayDownCast( const TArray< TSoftObje
 {
 	return *reinterpret_cast< const TArray< TSoftObjectPtr< type_t > >* >( &Source );
 }
+
+template < class type_t >
+TArray< type_t* >& ObjectPtrArrayCast( TArray< TObjectPtr< type_t > > &Source )
+{
+	return *reinterpret_cast< TArray< type_t* >* >( &Source );
+}
+
+template < class type_t >
+const TArray< type_t* >& ObjectPtrArrayCast( const TArray< TObjectPtr< type_t > > &Source )
+{
+	return *reinterpret_cast< const TArray< type_t* >* >( &Source );
+}

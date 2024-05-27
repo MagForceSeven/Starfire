@@ -35,7 +35,7 @@ public:
 
 	// Determine the current type of build that is running (since blueprint doesn't have another good way for conditional compiles)
 	UFUNCTION( BlueprintCallable, Category = "Dev Utilities", BlueprintPure )
-	UE_NODISCARD static EBuildType GetCurrentBuildType( );
+	[[nodiscard]] static EBuildType GetCurrentBuildType( );
 
 	// Branch the execution based on the current type of build that is running (since blueprint doesn't have another good way for conditional compiles)
 	UFUNCTION( BlueprintCallable, Category = "Dev Utilities", meta = (ExpandEnumAsExecs = Exec) )

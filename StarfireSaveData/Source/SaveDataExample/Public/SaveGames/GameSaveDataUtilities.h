@@ -71,30 +71,30 @@ class SAVEDATAEXAMPLE_API UGameSaveDataUtilities : public USaveDataUtilities
 public:
 	// Determine the list of filenames currently in use
 	UFUNCTION( BlueprintCallable, Category = "Save Games" )
-	UE_NODISCARD static TArray< FString > EnumerateSlotNames( int32 UserIndex );
+	[[nodiscard]] static TArray< FString > EnumerateSlotNames( int32 UserIndex );
 
 	// Determine a slot name that would work for a particular type of save
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "SaveType") )
-	UE_NODISCARD static FString GetUnusedSlotName( int32 UserIndex, ESaveDataType SaveType );
+	[[nodiscard]] static FString GetUnusedSlotName( int32 UserIndex, ESaveDataType SaveType );
 
 	// Remove a save slot from from the disk
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext") )
-	UE_NODISCARD static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex );
+	[[nodiscard]] static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex );
 	
 	// Determine if a specific save slot name is in use
 	UFUNCTION( BlueprintCallable, Category = "Save Games" )
-	UE_NODISCARD static bool DoesSaveGameExist( const FString &SlotName, int32 UserIndex );
+	[[nodiscard]] static bool DoesSaveGameExist( const FString &SlotName, int32 UserIndex );
 
 	// Check if the game currently allows manual saves to be created
 	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Save Games", meta = (WorldContext = "WorldContext") )
-	UE_NODISCARD static bool IsManualSavingAllowed( const UObject *WorldContext );
+	[[nodiscard]] static bool IsManualSavingAllowed( const UObject *WorldContext );
 
 	// Explicit call to load headers for the available saves
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext") )
 	static void CacheSaveGameHeaders( const UObject *WorldContext, int UserIndex );
 
 	// Save the current state of the game to a file
-	UE_NODISCARD static bool SaveToSlot( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { } );
+	[[nodiscard]] static bool SaveToSlot( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { } );
 	// Save the current state of the game to a file asynchronously
 	static void SaveToSlot_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
 
@@ -104,42 +104,42 @@ public:
 	static void SaveCheckpointToSlot_Async( const UObject *WorldContext, const UGameSaveData *CheckpointData, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
 
 	// Try to load the data from a slot into the save game data structure
-	UE_NODISCARD static ESaveDataLoadResult LoadSaveGameFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData );
+	[[nodiscard]] static ESaveDataLoadResult LoadSaveGameFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData );
 	// Try to load the data from a slot asynchronously and report back when complete with the save data
 	static void LoadSaveGameFromSlot_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const FLoadAsyncCallback &OnCompletion );
 
 	// Find the most recent save (that meets an optional filter requirements) and load it 
-	UE_NODISCARD static bool LoadMostRecentSave( const UObject *WorldContext, int32 UserIndex, FString &outSlotName, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData, const FSaveFilter &Filter = FSaveFilter( ) );
+	[[nodiscard]] static bool LoadMostRecentSave( const UObject *WorldContext, int32 UserIndex, FString &outSlotName, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData, const FSaveFilter &Filter = FSaveFilter( ) );
 	// Find the most recent save (that meets an optional filter requirements) and load it asynchronously and report back when complete
 	static void LoadMostRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const FLoadAsyncCallback &OnCompletion, const FSaveFilter &Filter = FSaveFilter( ) );
 
 	// Load just the header information for a slot
-	UE_NODISCARD static ESaveDataLoadResult LoadSlotHeaderOnly( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader );
+	[[nodiscard]] static ESaveDataLoadResult LoadSlotHeaderOnly( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader );
 	// Load just the header information for a slot, calling the callback when process asynchronously completes
 	static void LoadSlotHeaderOnly_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const FLoadHeaderAsyncCallback &OnCompletion );
 
 	// Check if any saves exist on disk (that meet an optional filter requirement)
-	UE_NODISCARD static bool AnySavesExist( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
+	[[nodiscard]] static bool AnySavesExist( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
 	// Check if any saves exist on disk (that meet an optional filter requirement), calling the callback
 	static void AnySavesExist_Async( const UObject *WorldContext, int32 UserIndex, const FSavesExistAsyncCallback &OnCompletion, const FSaveFilter &Filter = FSaveFilter( ) );
 
 	// Get the headers for all the saves that exist on disk (that meet an optional filter requirement)
-	UE_NODISCARD static TArray< FEnumeratedSaveDataHeader > EnumerateSaveHeaders( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
+	[[nodiscard]] static TArray< FEnumeratedSaveDataHeader > EnumerateSaveHeaders( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
 	// Get the headers for all the saves that exist on disk (that meet an optional filter requirement), calling the callback when process asynchronously completes
 	static void EnumerateSaveHeaders_Async( const UObject *WorldContext, int32 UserIndex, const FEnumerateHeadersComplete &OnCompletion, const FSaveFilter &Filter = FSaveFilter( ), const FLoadHeaderAsyncCallback &OnSingleHeader = { } );
 
 	// Get the slot/header for the most recent save (that meets on optional filter requirement)
-	UE_NODISCARD static FEnumeratedSaveDataHeader FindMostRecentSave( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
+	[[nodiscard]] static FEnumeratedSaveDataHeader FindMostRecentSave( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
 	// Get the slot/header for the most recent save (that meets on optional filter requirement), calling the callback when process asynchronously completes
 	static void FindMostRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const FLoadHeaderAsyncCallback &OnCompletion, const FSaveFilter &Filter = FSaveFilter( ) );
 
 	// Get the slot/header for the least recent save (that meets on optional filter requirement)
-	UE_NODISCARD static FEnumeratedSaveDataHeader FindLeastRecentSave( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
+	[[nodiscard]] static FEnumeratedSaveDataHeader FindLeastRecentSave( const UObject *WorldContext, int32 UserIndex, const FSaveFilter &Filter = FSaveFilter( ) );
 	// Get the slot/header for the least recent save (that meets on optional filter requirement), calling the callback when process asynchronously completes
 	static void FindLeastRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const FLoadHeaderAsyncCallback &OnCompletion, const FSaveFilter &Filter = FSaveFilter( ) );
 
 	// Create an in memory save that represents the state of the game at this moment
-	UE_NODISCARD static const UGameSaveData* CreateCheckpointSave( const UObject *WorldContext );
+	[[nodiscard]] static const UGameSaveData* CreateCheckpointSave( const UObject *WorldContext );
 	// Create an in memory save that will be filled in asynchronously but represents the state of the game from the moment it was called 
 	static void CreateCheckpointSave_Async( const UObject *WorldContext, const FCreateCheckpointComplete &OnCompletion );
 
@@ -162,23 +162,23 @@ public:
 
 protected:
 	// Determine the best name for an auto save, either an unused slot name or the oldest save with the AutoSave type
-	UE_NODISCARD static FString FindBestAutoSaveSlotName( const UObject *WorldContext, int32 UserIndex );
+	[[nodiscard]] static FString FindBestAutoSaveSlotName( const UObject *WorldContext, int32 UserIndex );
 	// Determine the best name for an auto save asynchronously, either an unused slot name or the oldest save with the AutoSave type
 	static void FindBestAutoSaveSlotName_Async( const UObject *WorldContext, int32 UserIndex, const FSaveAsyncCallback &OnCompletion );
 	
 	// Create the save game object and fill all the data requiring immediate synchronous data
-	UE_NODISCARD static UGameSaveData* CreateSaveData( const UObject *WorldContext );
+	[[nodiscard]] static UGameSaveData* CreateSaveData( const UObject *WorldContext );
 	// Fill the save with the data that can be populated asynchronously
-	UE_NODISCARD static bool FillAsyncSaveGameData( UGameSaveData *SaveGameData );
+	[[nodiscard]] static bool FillAsyncSaveGameData( UGameSaveData *SaveGameData );
 	// Fill a save with save data asynchronously
 	static void FillAsyncSaveGameData_Async( const UObject *WorldContext, UGameSaveData *SaveGameData, bool bIncludeCheckpoints, const FCreateCheckpointComplete &OnCompletion );
 	// Fill a checkpoint with data that would not have been available at the time that it was created but should be included when saved to disk
-	UE_NODISCARD static bool FillCheckpointData( const UObject *WorldContext, UGameSaveData *SaveGameData );
+	[[nodiscard]] static bool FillCheckpointData( const UObject *WorldContext, UGameSaveData *SaveGameData );
 	// Fill a checkpoint with data that would not have been available at the time that it was created but should be included when saved to disk
 	static void FillCheckpointData_Async( const UObject *WorldContext, UGameSaveData *SaveGameData, const FCreateCheckpointComplete &OnCompletion );
 	// Create the data that should be saved for the current state of the game
-	UE_NODISCARD static UGameSaveData* CreateAndFillSaveData( const UObject *WorldContext, bool IncludeCheckpointData );
+	[[nodiscard]] static UGameSaveData* CreateAndFillSaveData( const UObject *WorldContext, bool IncludeCheckpointData );
 
 	// Create the header data for the save that is meta-data about the game (mostly for UI purposes)
-	UE_NODISCARD static UGameSaveHeader* CreateSaveGameHeader( const UGameSaveData *SaveGameData, ESaveDataType SaveType, const FString &DisplayName );
+	[[nodiscard]] static UGameSaveHeader* CreateSaveGameHeader( const UGameSaveData *SaveGameData, ESaveDataType SaveType, const FString &DisplayName );
 };

@@ -12,16 +12,16 @@ class STARFIREUTILITIESDEVELOPER_API UK2Node_NativeForEach : public UK2Node
 public:
 
 	// Pin Accessors
-	UE_NODISCARD UEdGraphPin* GetArrayPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetBreakPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetArrayPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetBreakPin( void ) const;
 
-	UE_NODISCARD UEdGraphPin* GetForEachPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetElementPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetArrayIndexPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetCompletedPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetForEachPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetElementPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetArrayIndexPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetCompletedPin( void ) const;
 
 	// K2Node API
-	UE_NODISCARD bool IsNodeSafeToIgnore( ) const override { return true; }
+	[[nodiscard]] bool IsNodeSafeToIgnore( ) const override { return true; }
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;
@@ -38,7 +38,7 @@ private:
 	static const FName CompletedPinName;
 
 	// Determine if there is any configuration options that shouldn't be allowed
-	UE_NODISCARD bool CheckForErrors( const FKismetCompilerContext& CompilerContext );
+	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext& CompilerContext );
 
 	UPROPERTY( )
 	FEdGraphPinType OriginalWildcardType;

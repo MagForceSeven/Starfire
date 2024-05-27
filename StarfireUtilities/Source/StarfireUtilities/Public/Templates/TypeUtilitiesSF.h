@@ -63,7 +63,7 @@ template < CObjectType type_t >
 UClass* GetStaticClass( );
 
 // Utility function for checking if an object is a certain type (taking the difference in interface checks into account)
-UE_NODISCARD FORCEINLINE bool TypeMatch( const UObject *Object, const UClass *Type );
+[[nodiscard]] FORCEINLINE bool TypeMatch( const UObject *Object, const UClass *Type );
 
 #if CPP
 #define TYPE_UTILITIES_SF_HPP

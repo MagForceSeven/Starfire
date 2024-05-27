@@ -102,7 +102,7 @@ void StarfireK2Utilities::DefaultGetMenuActions( const UK2Node *Node, FBlueprint
 UK2Node_CustomEvent* StarfireK2Utilities::CreateCustomEvent( FKismetCompilerContext &CompilerContext, UEdGraphPin *SourcePin, UEdGraph *SourceGraph, UK2Node *Node,
 																UEdGraphPin *ExternalPin )
 {
-	const auto EventNode = CompilerContext.SpawnIntermediateEventNode< UK2Node_CustomEvent >( Node, SourcePin, SourceGraph );
+	const auto EventNode = CompilerContext.SpawnIntermediateNode< UK2Node_CustomEvent >( Node, SourceGraph );
 	EventNode->CustomFunctionName = *FString::Printf( TEXT( "%s_%s" ), *SourcePin->PinName.ToString( ), *CompilerContext.GetGuid( Node ) );
 	EventNode->AllocateDefaultPins( );
 

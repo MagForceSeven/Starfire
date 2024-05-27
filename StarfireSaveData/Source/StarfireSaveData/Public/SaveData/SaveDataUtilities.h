@@ -17,7 +17,7 @@ class STARFIRESAVEDATA_API USaveDataUtilities : public UBlueprintFunctionLibrary
 public:
 	// Convert a result enumeration value to something a bit more human readable
 	UFUNCTION( BlueprintCallable, Category = "Save Data", BlueprintPure = true )
-	UE_NODISCARD static FText GetTextForLoadingResult( ESaveDataLoadResult Result );
+	[[nodiscard]] static FText GetTextForLoadingResult( ESaveDataLoadResult Result );
 
 	// Condensed information for a a save that has been found on disk
 	struct FEnumeratedHeader_Core
@@ -93,16 +93,16 @@ protected:
 	DECLARE_DELEGATE_OneParam( FEnumerateSlotNamesComplete_Core, const TArray< FString > &SlotNames );
 	
 	// Determine if a specific save slot name is in use
-	UE_NODISCARD static bool DoesSaveGameExist( const FString &SlotName, int32 UserIndex );
+	[[nodiscard]] static bool DoesSaveGameExist( const FString &SlotName, int32 UserIndex );
 
 	// Remove a save slot from from the disk
-	UE_NODISCARD static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType );
+	[[nodiscard]] static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType );
 	
 	// Collection of checks on the state of the application to tell if saves are appropriate (editor, commandlets, etc)
-	UE_NODISCARD static bool SaveOperationsAreAllowed( void );
+	[[nodiscard]] static bool SaveOperationsAreAllowed( void );
 
 	// Determine all the slot names currently in use
-	UE_NODISCARD static TArray< FString > EnumerateSlotNames( int32 UserIndex);
+	[[nodiscard]] static TArray< FString > EnumerateSlotNames( int32 UserIndex);
 
 	// Determine all the slot names currently in use asynchronously
 	static void EnumerateSlotNames_Async( const UObject *WorldContext, int32 UserIndex, const FEnumerateSlotNamesComplete_Core &OnCompletion );
@@ -111,49 +111,49 @@ protected:
 	static void CacheAllSaveGameHeaders( const UObject *WorldContext, const TSubclassOf< USaveDataHeader > &HeaderType, int32 UserIndex );
 	
 	// Find the first slot name that is available to be used when saving a new game state
-	UE_NODISCARD static FString GetUnusedSlotName( int32 UserIndex, const FString &Prefix = "Save_", int MaxTries = -1 );
+	[[nodiscard]] static FString GetUnusedSlotName( int32 UserIndex, const FString &Prefix = "Save_", int MaxTries = -1 );
 	// Find the first slot name asynchronously that is available to be used when saving a new game state
-	UE_NODISCARD static void GetUnusedSlotName_Async( const UObject *WorldContextObject, int32 UserIndex, const FSaveAsyncCallback_Core &OnCompletion, const FString &Prefix = "Save_", int MaxTries = -1 );
+	[[nodiscard]] static void GetUnusedSlotName_Async( const UObject *WorldContextObject, int32 UserIndex, const FSaveAsyncCallback_Core &OnCompletion, const FString &Prefix = "Save_", int MaxTries = -1 );
 
 	// Saves the specified data to a file
-	UE_NODISCARD static bool SaveDataToSlot( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
+	[[nodiscard]] static bool SaveDataToSlot( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
 	// Saves the specified data to a file, performing the write to disk in an asynchronous fashion
 	static void SaveDataToSlot_Async( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex, const FSaveAsyncCallback_Core &OnCompletion = FSaveAsyncCallback_Core( ) );
 
 	// Load data from a file into pre-allocated header and save data objects
-	UE_NODISCARD static ESaveDataLoadResult LoadDataFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
+	[[nodiscard]] static ESaveDataLoadResult LoadDataFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
 	// Load data from a file into pre-allocated header and save data objects, calling the callback when process asynchronously completes
 	static void LoadDataFromSlot_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData, const FLoadAsyncCallback_Core &OnCompletion );
 
 	// Load just the header information for a slot
-	UE_NODISCARD static const USaveDataHeader* LoadSlotHeaderOnly( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
+	[[nodiscard]] static const USaveDataHeader* LoadSlotHeaderOnly( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
 	// Load just the header information for a slot, calling the callback when process asynchronously completes
 	static void LoadSlotHeaderOnly_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion );
 
 	// Check if any saves exist on disk (that meets an optional filter requirement)
-	UE_NODISCARD static bool AnySavesExist( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
+	[[nodiscard]] static bool AnySavesExist( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 	// Check if any saves exist on disk (that meets an optional filter requirement), calling the callback when process asynchronously completes
 	static void AnySavesExist_Async( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSavesExistAsyncCallback_Core &OnCompletion, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 
 	// Get the headers for all the saves that exist on disk (that meets an optional filter requirement)
-	UE_NODISCARD static TArray< FEnumeratedHeader_Core > EnumerateSaveHeaders( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
+	[[nodiscard]] static TArray< FEnumeratedHeader_Core > EnumerateSaveHeaders( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 	// Get the headers for all the saves that exist on disk (that meets an optional filter requirement), calling the callback when process asynchronously completes
 	static void EnumerateSaveHeaders_Async( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FEnumerateHeadersComplete_Core &OnCompletion, const FSaveFilter_Core &Filter = FSaveFilter_Core( ), const FLoadHeaderAsyncCallback_Core &OnSingleHeader = { } );
 
 	// Get the slot/header for the most recent save (that meets on optional filter requirement)
-	UE_NODISCARD static FEnumeratedHeader_Core FindMostRecentSave( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
+	[[nodiscard]] static FEnumeratedHeader_Core FindMostRecentSave( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 	// Get the slot/header for the most recent save (that meets on optional filter requirement), calling the callback when process asynchronously completes
 	static void FindMostRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 
 	// Get the slot/header for the least recent save (that meets on optional filter requirement)
-	UE_NODISCARD static FEnumeratedHeader_Core FindLeastRecentSave( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
+	[[nodiscard]] static FEnumeratedHeader_Core FindLeastRecentSave( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 	// Get the slot/header for the least recent save (that meets on optional filter requirement), calling the callback when process asynchronously completes
 	static void FindLeastRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 
 	// Implementation functions for the process that is safe to call from anywhere, once some outer API has validated and controlled the execution
-	UE_NODISCARD static bool SaveDataToSlot_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
-	UE_NODISCARD static ESaveDataLoadResult LoadDataFromSlot_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
-	UE_NODISCARD static const USaveDataHeader* LoadSlotHeaderOnly_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
+	[[nodiscard]] static bool SaveDataToSlot_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
+	[[nodiscard]] static ESaveDataLoadResult LoadDataFromSlot_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
+	[[nodiscard]] static const USaveDataHeader* LoadSlotHeaderOnly_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
 	
 private:
 	// Internal base type for async tasks managed by the Async Manager World Subsystem
@@ -245,7 +245,7 @@ protected:
 
 private:
 	// Utility to prevent excessive dependencies from getting pulled in by the template implementation
-	UE_NODISCARD static bool StartAsyncSaveTask_Internal( const UObject *WorldContext, FSaveDataAsyncTask *Task );
+	[[nodiscard]] static bool StartAsyncSaveTask_Internal( const UObject *WorldContext, FSaveDataAsyncTask *Task );
 
 	// Update the entry for a save game header within the cache
 	static void AddHeaderToCache( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const USaveDataHeader *Header, const TSubclassOf< USaveDataHeader > &HeaderType, const ESaveDataLoadResult &Result );

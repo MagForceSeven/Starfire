@@ -32,14 +32,14 @@ enum class ExecEnum_YesNo : uint8
 
 // Utility functions to get around const problems on native-blueprint boundaries when dealing with arrays of pointers
 template < class type_t >
-UE_NODISCARD TArray< type_t* >& BlueprintCompatibilityCast( TArray< const type_t* > &NativeArray );
+[[nodiscard]] TArray< type_t* >& BlueprintCompatibilityCast( TArray< const type_t* > &NativeArray );
 template < class type_t >
-UE_NODISCARD const TArray< type_t* >& BlueprintCompatibilityCast( const TArray< const type_t* > &NativeArray );
+[[nodiscard]] const TArray< type_t* >& BlueprintCompatibilityCast( const TArray< const type_t* > &NativeArray );
 
 template < class type_t >
-UE_NODISCARD TArray< const type_t* >& NativeCompatibilityCast( TArray< type_t* > &BlueprintArray );
+[[nodiscard]] TArray< const type_t* >& NativeCompatibilityCast( TArray< type_t* > &BlueprintArray );
 template < class type_t >
-UE_NODISCARD const TArray< const type_t* >& NativeCompatibilityCast( const TArray< type_t* > &BlueprintArray );
+[[nodiscard]] const TArray< const type_t* >& NativeCompatibilityCast( const TArray< type_t* > &BlueprintArray );
 
 #if CPP
 #define SF_BLUEPRINT_UTILITIES_HPP

@@ -23,7 +23,7 @@ class STARFIREUTILITIES_API IDevSettingsPreloader
 	GENERATED_BODY( )
 public:
 	// Preload any soft references from developer settings that implement this interface
-	UE_NODISCARD static TSharedPtr< FStreamableHandle > PreloadAll( const UGameInstance *Game );
+	[[nodiscard]] static TSharedPtr< FStreamableHandle > PreloadAll( const UGameInstance *Game );
 	// Allow the references from developer settings to be unloaded
 	static void GameShutdown( const UGameInstance *Game );
 
@@ -33,7 +33,7 @@ protected:
 
 	// Utility for figuring out the type of game mode that will be created
 	// PreloadAll can be called too early for their to be a game mode instance available yet
-	UE_NODISCARD static TSubclassOf< AGameModeBase > GetPendingGameMode( const UWorld *World );
+	[[nodiscard]] static TSubclassOf< AGameModeBase > GetPendingGameMode( const UWorld *World );
 
 	// Add an object to be preloaded by soft path
 	static void Preload( const FSoftObjectPath &SoftPath );

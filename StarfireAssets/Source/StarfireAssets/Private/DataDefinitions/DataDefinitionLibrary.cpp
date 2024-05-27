@@ -523,7 +523,7 @@ void UDataDefinitionLibrary::PostInitialAssetScan( )
 }
 
 // Implementation duplicated from GameFeaturesSubsystem::IsContentActiveWithinActivePlugin
-UE_NODISCARD static bool IsPathInAnyRoot( const FString &Path, const TArray< FString > &Roots )
+[[nodiscard]] static bool IsPathInAnyRoot( const FString &Path, const TArray< FString > &Roots )
 {
 	// Look for the first slash beyond the first one we start with.
 	const auto RootEndIndex = Path.Find( TEXT("/"), ESearchCase::IgnoreCase, ESearchDir::FromStart, 1 );
@@ -566,7 +566,7 @@ void UDataDefinitionLibrary::OnObjectPreSave( UObject *Object, FObjectPreSaveCon
 }
 #endif
 
-static UE_NODISCARD TArray< FPrimaryAssetId > GetNonFeatureAssetList( const UDataDefinitionLibrary *Library, const TArray< FPrimaryAssetTypeInfo > &AssetTypeInfoList )
+[[nodiscard]] static TArray< FPrimaryAssetId > GetNonFeatureAssetList( const UDataDefinitionLibrary *Library, const TArray< FPrimaryAssetTypeInfo > &AssetTypeInfoList )
 {
 	TArray< FPrimaryAssetId > Results;
 
@@ -677,8 +677,8 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::GameInstanceInit( const 
 		const auto &AllDefinitions = LibraryTypeMap.FindOrAdd( UDataDefinition::StaticClass( )->GetFName( ) );
 		const auto &AllExtensions = LibraryTypeMap.FindOrAdd( UDataDefinitionExtension::StaticClass( )->GetFName( ) );
 
-		IVerifiableAsset::VerifyAll( AllDefinitions, Game );
-		IVerifiableAsset::VerifyAll( AllExtensions, Game );
+		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllDefinitions ), Game );
+		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllExtensions ), Game );
 		FMessageLog( "AssetCheck" ).Open( );
 	} );
 

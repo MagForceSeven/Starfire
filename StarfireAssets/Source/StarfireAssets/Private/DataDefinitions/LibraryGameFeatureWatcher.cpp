@@ -12,7 +12,7 @@
 // Core
 #include "Logging/MessageLog.h"
 
-static UE_NODISCARD FString ConvertNameToRoot( const FString &PluginName )
+[[nodiscard]] static FString ConvertNameToRoot( const FString &PluginName )
 {
 	return "/" + PluginName;
 }

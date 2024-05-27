@@ -36,7 +36,7 @@ void RedscreenImpl( const UObject *WorldContext, bool bOnce, const char *File, i
 
 	while (Result == -1)
 	{
-		GET_VARARGS_RESULT( Buffer, BufferSize, BufferSize - 1, Fmt, Fmt, Result );
+		GET_TYPED_VARARGS_RESULT( TCHAR, Buffer, BufferSize, BufferSize - 1, Fmt, Fmt, Result );
 
 		if (Result == -1)
 		{

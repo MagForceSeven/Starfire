@@ -25,10 +25,10 @@ public:
 
 protected:
 	// Hook for determining if a given function is compatible with the associated blueprint node delegate
-	UE_NODISCARD virtual bool IsFunctionCompatible( const UFunction *Function ) const;
+	[[nodiscard]] virtual bool IsFunctionCompatible( const UFunction *Function ) const;
 
 	// Hook for determining the name of a created delegate handler
-	UE_NODISCARD virtual FString GetDesiredHandlerName( const UK2Node *InNode ) const { return { }; }
+	[[nodiscard]] virtual FString GetDesiredHandlerName( const UK2Node *InNode ) const { return { }; }
 	
 	// Hook to allow derived graph nodes the chance to modify new function graphs created by the user
 	virtual void OnNewGraph( UEdGraph *NewGraph ) const { }
@@ -38,16 +38,16 @@ protected:
 
 protected:
 	// Build a string description of a function definition
-	UE_NODISCARD static FText FunctionDescription( const UFunction* Function, const bool bOnlyDescribeSignature = false, const int32 CharacterLimit = 32 );
+	[[nodiscard]] static FText FunctionDescription( const UFunction* Function, const bool bOnlyDescribeSignature = false, const int32 CharacterLimit = 32 );
 
 	// Determine the description for the currently selected function
-	UE_NODISCARD FText GetCurrentFunctionDescription( ) const;
+	[[nodiscard]] FText GetCurrentFunctionDescription( ) const;
 
 	// Adds a FunctionItemData with a given description to the array of FunctionDataItems. 
 	TSharedPtr< FString > AddDefaultFunctionDataOption( const FText& DisplayName );
 
 	// Utility to create a searchable combo box
-	UE_NODISCARD TSharedRef< SWidget > MakeFunctionOptionComboWidget( TSharedPtr< FString > InItem );
+	[[nodiscard]] TSharedRef< SWidget > MakeFunctionOptionComboWidget( TSharedPtr< FString > InItem );
 
 	// Callback for when the function selection has changed from the dropdown
 	void OnFunctionSelected( TSharedPtr< FString > FunctionItemData, ESelectInfo::Type SelectInfo );

@@ -52,10 +52,10 @@ public:
 	void FillCoreData( const USaveData *SaveData, const FString &InDisplayName );
 
 	// Hooks for file version-ing support
-	UE_NODISCARD virtual uint32 GetVersion( void ) const PURE_VIRTUAL( GetVersion, return -1; );
-	UE_NODISCARD virtual bool IsCompatible( uint32 HeaderVersion ) const { return true; }
-	UE_NODISCARD virtual int32 GetFileTypeTag( void ) const;
+	[[nodiscard]] virtual uint32 GetVersion( void ) const PURE_VIRTUAL( GetVersion, return -1; );
+	[[nodiscard]] virtual bool IsCompatible( uint32 HeaderVersion ) const { return true; }
+	[[nodiscard]] virtual int32 GetFileTypeTag( void ) const;
 
 	// Hook for controlling the compression applied when saving the file
-	UE_NODISCARD virtual ESaveDataCompressionType GetCompressionType( void ) const;
+	[[nodiscard]] virtual ESaveDataCompressionType GetCompressionType( void ) const;
 };

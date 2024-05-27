@@ -47,7 +47,7 @@ public:
 
 	// Determine if there are nullptrs in the array and remove them (when there's a valid world context)
 	template < class type_t >
-	UE_NODISCARD static bool SanitizeArray( TArray< type_t* > &Array, const UObject *WorldContext );
+	[[nodiscard]] static bool SanitizeArray( TArray< type_t* > &Array, const UObject *WorldContext );
 };
 
 // Static class for instanced sub-objects which support verifying their data with Asset Check calls

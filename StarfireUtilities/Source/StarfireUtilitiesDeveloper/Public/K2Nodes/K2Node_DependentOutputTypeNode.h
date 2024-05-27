@@ -17,26 +17,26 @@ public:
 	UK2Node_DependentOutputTypeNode( );
 
 	// Pin Accessors
-	UE_NODISCARD UEdGraphPin* GetPrimaryInputPin( ) const;
-	UE_NODISCARD UEdGraphPin* GetPrimaryOutputPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetPrimaryInputPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetPrimaryOutputPin( ) const;
 
 	// ReSharper disable once CppHidingFunction
-	UE_NODISCARD UEdGraphPin* GetExecPin( ) const;
-	UE_NODISCARD UEdGraphPin* GetValidPin( ) const;
-	UE_NODISCARD UEdGraphPin* GetInvalidPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetExecPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetValidPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetInvalidPin( ) const;
 
 	// K2Node API
-	UE_NODISCARD bool IsNodeSafeToIgnore( ) const override { return true; }
-	UE_NODISCARD bool IsNodePure( ) const override { return bIsPureNode; }
+	[[nodiscard]] bool IsNodeSafeToIgnore( ) const override { return true; }
+	[[nodiscard]] bool IsNodePure( ) const override { return bIsPureNode; }
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;
 	void PinConnectionListChanged( UEdGraphPin* Pin ) override;
 	void ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph ) override;
-	UE_NODISCARD FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
-	UE_NODISCARD FText GetTooltipText( ) const override;
-	UE_NODISCARD FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
+	[[nodiscard]] FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
+	[[nodiscard]] FText GetTooltipText( ) const override;
+	[[nodiscard]] FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
 	void GetNodeContextMenuActions( UToolMenu* Menu, UGraphNodeContextMenuContext* Context ) const override;
 
 protected:
@@ -61,14 +61,14 @@ protected:
 	void TogglePurity( );
 
 	// Hooks for get desired type information from the derived node types
-	UE_NODISCARD virtual UClass* GetPrimaryInputType( ) const PURE_VIRTUAL( GetPrimaryInputType, return nullptr; )
-	UE_NODISCARD virtual UClass* GetPrimaryOutputType( ) const PURE_VIRTUAL( GetPrimaryOutputType, return nullptr; )
+	[[nodiscard]] virtual UClass* GetPrimaryInputType( ) const PURE_VIRTUAL( GetPrimaryInputType, return nullptr; )
+	[[nodiscard]] virtual UClass* GetPrimaryOutputType( ) const PURE_VIRTUAL( GetPrimaryOutputType, return nullptr; )
 
 	// Hook for determining what the type of the output pin should be based on the state of the input pin
-	UE_NODISCARD virtual TWeakObjectPtr<UObject> GetOutputTypeFromInputLink( const UEdGraphPin *LinkedTo ) const PURE_VIRTUAL( GetOutputTypeFromInputLink, return nullptr; )
+	[[nodiscard]] virtual TWeakObjectPtr<UObject> GetOutputTypeFromInputLink( const UEdGraphPin *LinkedTo ) const PURE_VIRTUAL( GetOutputTypeFromInputLink, return nullptr; )
 
 	// Hook for derived types to determine if there are any configuration errors during node expansion
-	UE_NODISCARD virtual bool CheckForErrors( FKismetCompilerContext& CompilerContext ) const;
+	[[nodiscard]] virtual bool CheckForErrors( FKismetCompilerContext& CompilerContext ) const;
 
 	// Hook for derived types to wire additional input parameters to the accessor function call
 	virtual void ExpandAdditionalAccessorPin( FKismetCompilerContext& CompilerContext, UK2Node_CallFunction *CallAccessor ) const { }

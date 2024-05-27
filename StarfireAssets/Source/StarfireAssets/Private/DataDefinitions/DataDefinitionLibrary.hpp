@@ -13,7 +13,7 @@ const type_t* UDataDefinitionLibrary::GetDefinition( const FPrimaryAssetId &Asse
 	return CastChecked< type_t >( UAssetManager::GetPrimaryAssetObject( AssetID ), ECastCheckedType::NullAllowed );
 }
 template < CInterfaceType type_t >
-UE_NODISCARD const type_t* UDataDefinitionLibrary::GetDefinition( const FPrimaryAssetId &AssetID ) const
+[[nodiscard]] const type_t* UDataDefinitionLibrary::GetDefinition( const FPrimaryAssetId &AssetID ) const
 {
 	return CastChecked< type_t >( UAssetManager::GetPrimaryAssetObject( AssetID ), ECastCheckedType::NullAllowed );
 }
@@ -29,7 +29,7 @@ TArray< const type_t* > UDataDefinitionLibrary::GetAllDefinitions( void ) const
 }
 
 template < CInterfaceType type_t >
-UE_NODISCARD TArray< const type_t* > UDataDefinitionLibrary::GetAllDefinitions( void ) const
+[[nodiscard]] TArray< const type_t* > UDataDefinitionLibrary::GetAllDefinitions( void ) const
 {
 	TArray< const UDataDefinition* > BaseArray;
 	GetAllDefinitionsForType( GetStaticClass< type_t >( ), BaseArray );

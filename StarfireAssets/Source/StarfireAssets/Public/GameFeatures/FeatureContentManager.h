@@ -27,35 +27,35 @@ class STARFIREASSETS_API UFeatureContentManager : public UGameInstanceSubsystem,
 	GENERATED_BODY( )
 public:
 	// Static accessor to the subsystem through a standard WorldContext object
-	UE_NODISCARD static UFeatureContentManager* GetSubsystem( const UObject *WorldContext );
-	UE_NODISCARD static UFeatureContentManager* GetSubsystem( const UGameInstance *GameInstance );
+	[[nodiscard]] static UFeatureContentManager* GetSubsystem( const UObject *WorldContext );
+	[[nodiscard]] static UFeatureContentManager* GetSubsystem( const UGameInstance *GameInstance );
 
 	// Find a content entitlement by the asset name
-	UE_NODISCARD const UStarfireFeatureData* FindFeature( const FString &PluginName ) const;
-	UE_NODISCARD TSet< const UStarfireFeatureData* > FindAllFeatures( const TSet< FString > &PluginNames ) const;
+	[[nodiscard]] const UStarfireFeatureData* FindFeature( const FString &PluginName ) const;
+	[[nodiscard]] TSet< const UStarfireFeatureData* > FindAllFeatures( const TSet< FString > &PluginNames ) const;
 
 	// Check if an entitlement is currently owned (and therefore allowed to be enabled)
 	UFUNCTION( BlueprintCallable, Category = "Feature Content" )
-	UE_NODISCARD bool IsFeatureOwned( const UStarfireFeatureData *Feature ) const;
+	[[nodiscard]] bool IsFeatureOwned( const UStarfireFeatureData *Feature ) const;
 	// Check if an entitlement is currently enabled and meant to affect gameplay
 	UFUNCTION( BlueprintCallable, Category = "Feature Content" )
-	UE_NODISCARD bool IsFeatureEnabled( const UStarfireFeatureData *Feature ) const;
+	[[nodiscard]] bool IsFeatureEnabled( const UStarfireFeatureData *Feature ) const;
 
 	// Get the collection of entitlements that are currently owned
 	UFUNCTION( BlueprintCallable, CustomThunk, Category = "Feature Content" )
-	UE_NODISCARD TArray< const UStarfireFeatureData* > GetOwnedFeatures( ) const;
+	[[nodiscard]] TArray< const UStarfireFeatureData* > GetOwnedFeatures( ) const;
 	// Get the primary asset ids for all of the content entitlements that are currently owned
 	UFUNCTION( BlueprintCallable, Category = "Feature Content" )
-	UE_NODISCARD TArray< FPrimaryAssetId > GetOwnedFeatureIDs( ) const;
+	[[nodiscard]] TArray< FPrimaryAssetId > GetOwnedFeatureIDs( ) const;
 
 	// Get the collection of entitlements that are enabled for affecting gameplay
 	UFUNCTION( BlueprintCallable, CustomThunk, Category = "Plugin Content" )
-	UE_NODISCARD TArray< const UStarfireFeatureData* > GetEnabledFeatures( ) const;
+	[[nodiscard]] TArray< const UStarfireFeatureData* > GetEnabledFeatures( ) const;
 	// Get the names for the set of entitlements that are enabled for affecting gameplay
-	UE_NODISCARD TArray< FString > GetEnabledFeatureNames( void ) const;
+	[[nodiscard]] TArray< FString > GetEnabledFeatureNames( void ) const;
 
 	// Get the entire collection of features that could be owned/enabled
-	UE_NODISCARD TArray< const UStarfireFeatureData* > GetKnownFeatures( ) const;
+	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( ) const;
 
 	// Turn on an entitlement so that it can affect gameplay
 	void EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles );
@@ -83,22 +83,22 @@ public:
 	TSet< const UStarfireFeatureData* > DisownAllFeatures( bool bIgnoreBuiltIns = false );
 
 	// Determine if all the specified packages have made it to the active state
-	UE_NODISCARD bool AreAllFeaturesActive( const TArray< const UStarfireFeatureData* > &Features ) const;
-	UE_NODISCARD bool AreAllFeaturesActive( const TArray< FString > &PluginNames ) const;
+	[[nodiscard]] bool AreAllFeaturesActive( const TArray< const UStarfireFeatureData* > &Features ) const;
+	[[nodiscard]] bool AreAllFeaturesActive( const TArray< FString > &PluginNames ) const;
 	// Determine if all the packages that have been been enabled have made it to the active state
-	UE_NODISCARD bool AreEnabledFeaturesActive( void ) const;
+	[[nodiscard]] bool AreEnabledFeaturesActive( void ) const;
 
 	// Check the status of a plugin package
-	UE_NODISCARD EPluginStatus GetFeaturePluginStatus( const UStarfireFeatureData *Feature ) const;
-	UE_NODISCARD EPluginStatus GetFeaturePluginStatus( const FString &PluginName ) const;
+	[[nodiscard]] EPluginStatus GetFeaturePluginStatus( const UStarfireFeatureData *Feature ) const;
+	[[nodiscard]] EPluginStatus GetFeaturePluginStatus( const FString &PluginName ) const;
 
 	// Determine what GameFeaturePlugin (if any) an object is a part of
-	UE_NODISCARD FString GetObjectFeaturePluginName( const TSoftObjectPtr< UObject > &Content ) const;
-	UE_NODISCARD FString GetObjectFeaturePluginName( const FSoftObjectPath &ContentPath ) const;
+	[[nodiscard]] FString GetObjectFeaturePluginName( const TSoftObjectPtr< UObject > &Content ) const;
+	[[nodiscard]] FString GetObjectFeaturePluginName( const FSoftObjectPath &ContentPath ) const;
 
-	//
-	UE_NODISCARD const UStarfireFeatureData* GetObjectFeaturePlugin( const TSoftObjectPtr< UObject > &Content ) const;
-	UE_NODISCARD const UStarfireFeatureData* GetObjectFeaturePlugin( const FSoftObjectPath &ContentPath ) const;
+	// Determine the GameFeature associated with any particular object
+	[[nodiscard]] const UStarfireFeatureData* GetObjectFeaturePlugin( const TSoftObjectPtr< UObject > &Content ) const;
+	[[nodiscard]] const UStarfireFeatureData* GetObjectFeaturePlugin( const FSoftObjectPath &ContentPath ) const;
 
 #if !UE_BUILD_SHIPPING
 	// Enable the features specified by the DeveloperSettings as those that should be enabled for PIE

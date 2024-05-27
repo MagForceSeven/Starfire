@@ -16,25 +16,25 @@ public:
 	UK2Node_MapForEach( );
 
 	// Pin Accessors
-	UE_NODISCARD UEdGraphPin* GetMapPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetBreakPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetMapPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetBreakPin( void ) const;
 
-	UE_NODISCARD UEdGraphPin* GetForEachPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetKeyPin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetValuePin( void ) const;
-	UE_NODISCARD UEdGraphPin* GetCompletedPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetForEachPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetKeyPin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetValuePin( void ) const;
+	[[nodiscard]] UEdGraphPin* GetCompletedPin( void ) const;
 
 	// K2Node API
-	UE_NODISCARD bool IsNodeSafeToIgnore( ) const override { return true; }
+	[[nodiscard]] bool IsNodeSafeToIgnore( ) const override { return true; }
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
-	UE_NODISCARD FText GetMenuCategory( ) const override;
+	[[nodiscard]] FText GetMenuCategory( ) const override;
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;
 	void ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph ) override;
-	UE_NODISCARD FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
-	UE_NODISCARD FText GetTooltipText( ) const override;
-	UE_NODISCARD FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
+	[[nodiscard]] FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
+	[[nodiscard]] FText GetTooltipText( ) const override;
+	[[nodiscard]] FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
 	void PinConnectionListChanged( UEdGraphPin* Pin ) override;
 	bool ShouldShowNodeProperties( ) const override { return true; }
 	void PostPasteNode( ) override;
@@ -53,7 +53,7 @@ private:
 	static const FName CompletedPinName;
 
 	// Determine if there is any configuration options that shouldn't be allowed
-	UE_NODISCARD bool CheckForErrors( const FKismetCompilerContext& CompilerContext );
+	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext& CompilerContext );
 
 	// Memory of what the input pin type is when it's a wildcard
 	UPROPERTY( )

@@ -14,8 +14,8 @@ class UGameSaveDataSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY( )
 public:
 	// Subsystem Accessor Utilities
-	UE_NODISCARD static UGameSaveDataSubsystem* Get( const UObject *WorldContext );
-	UE_NODISCARD static UGameSaveDataSubsystem* Get( const UGameInstance *GameInstance );
+	[[nodiscard]] static UGameSaveDataSubsystem* Get( const UObject *WorldContext );
+	[[nodiscard]] static UGameSaveDataSubsystem* Get( const UGameInstance *GameInstance );
 
 	// The save data that should be used to populate game objects when the map is loaded
 	UPROPERTY( )

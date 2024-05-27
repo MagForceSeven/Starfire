@@ -24,22 +24,22 @@ public:
 // Non-const, fail-able casting
 template < class dest_type_t, class src_type_t >
 	requires std::derived_from< dest_type_t, src_type_t >
-UE_NODISCARD dest_type_t* StructCast( src_type_t &Struct );
+[[nodiscard]] dest_type_t* StructCast( src_type_t &Struct );
 
 // Const, fail-able casting
 template < class dest_type_t, class src_type_t >
 	requires std::derived_from< dest_type_t, src_type_t >
-UE_NODISCARD const dest_type_t* StructCast( const src_type_t &Struct );
+[[nodiscard]] const dest_type_t* StructCast( const src_type_t &Struct );
 
 // Non-const, un-fail-able casting
 template < class dest_type_t, class src_type_t >
 	requires std::derived_from< dest_type_t, src_type_t >
-UE_NODISCARD dest_type_t& StructCastChecked( src_type_t &Struct );
+[[nodiscard]] dest_type_t& StructCastChecked( src_type_t &Struct );
 
 // Const, un-fail-able casting
 template < class dest_type_t, class src_type_t >
 	requires std::derived_from< dest_type_t, src_type_t >
-UE_NODISCARD const dest_type_t& StructCastChecked( const src_type_t &Struct );
+[[nodiscard]] const dest_type_t& StructCastChecked( const src_type_t &Struct );
 
 #if CPP
 #define CASTABLE_STRUCTURE_HPP

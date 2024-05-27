@@ -34,18 +34,18 @@ struct FSaveDataVersionData
 namespace SaveDataMemoryUtilities
 {
 	// Fill out header information from a data stream accessible through an existing archive
-	UE_NODISCARD ESaveDataLoadResult LoadHeaderFromArchive( FArchive &Archive, FSaveDataFileDescription &outDescription, FSaveDataVersionData &outVersionData, USaveDataHeader *outHeader, const UObject *WorldContext );
+	[[nodiscard]] ESaveDataLoadResult LoadHeaderFromArchive( FArchive &Archive, FSaveDataFileDescription &outDescription, FSaveDataVersionData &outVersionData, USaveDataHeader *outHeader, const UObject *WorldContext );
 
 	// Convert a header/save game into a byte stream
-	UE_NODISCARD bool SaveGameDataToMemory( const USaveDataHeader *Header, const USaveData *SaveData, TArray< uint8 > &outFileData );
+	[[nodiscard]] bool SaveGameDataToMemory( const USaveDataHeader *Header, const USaveData *SaveData, TArray< uint8 > &outFileData );
 	// Write arbitrary bytes to a file
-	UE_NODISCARD bool SaveFileDataToSlot( const FString &SlotName, int32 UserIndex, const TArray< uint8 > &FileData );
+	[[nodiscard]] bool SaveFileDataToSlot( const FString &SlotName, int32 UserIndex, const TArray< uint8 > &FileData );
 
 	// Convert arbitrary bytes into useful save game data
-	UE_NODISCARD bool SerializeSaveGameData( const TArray< uint8 > &SaveData, USaveData *outSaveData );
+	[[nodiscard]] bool SerializeSaveGameData( const TArray< uint8 > &SaveData, USaveData *outSaveData );
 	// Convert arbitrary bytes into the header data and the uncompressed bytes for the save data
-	UE_NODISCARD ESaveDataLoadResult LoadDataFromMemory( const TArray< uint8 > &FileData, USaveDataHeader *outHeader, TArray< uint8 > &outSaveDataBytes, UClass *SaveDataClass, const UObject *WorldContext );
+	[[nodiscard]] ESaveDataLoadResult LoadDataFromMemory( const TArray< uint8 > &FileData, USaveDataHeader *outHeader, TArray< uint8 > &outSaveDataBytes, UClass *SaveDataClass, const UObject *WorldContext );
 	// Load a file into a stream of arbitrary bytes
-	UE_NODISCARD bool LoadFileDataFromSlot( const FString &SlotName, int32 UserIndex, TArray< uint8 > &outFileData );
+	[[nodiscard]] bool LoadFileDataFromSlot( const FString &SlotName, int32 UserIndex, TArray< uint8 > &outFileData );
 
 }

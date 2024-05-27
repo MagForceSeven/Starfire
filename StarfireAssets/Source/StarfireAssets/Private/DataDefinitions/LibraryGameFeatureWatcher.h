@@ -14,13 +14,13 @@ class UDefinitionLibrary_GameFeatureWatcher : public UEngineSubsystem, public IG
 	GENERATED_BODY( )
 public:
 	// Simplified global accessor
-	static UE_NODISCARD UDefinitionLibrary_GameFeatureWatcher* Get( void );
+	[[nodiscard]] static UDefinitionLibrary_GameFeatureWatcher* Get( void );
 	
 	// Retrieve the collection of IDs that are the data definitions associated with a game feature
-	UE_NODISCARD TArray< FPrimaryAssetId > GetFeatureAssetIDs( const UGameFeatureData *GameFeatureToLoad ) const;
+	[[nodiscard]] TArray< FPrimaryAssetId > GetFeatureAssetIDs( const UGameFeatureData *GameFeatureToLoad ) const;
 
 	// Retrieve the list of currently registered feature plugins
-	UE_NODISCARD TArray< FString > GetFeatureNames( void ) const;
+	[[nodiscard]] TArray< FString > GetFeatureNames( void ) const;
 
 	// Update the cache of data definitions associated with the game feature
 	void UpdateFeatureCache( const UGameFeatureData *GameFeatureData );

@@ -22,6 +22,6 @@ class STARFIREASSETS_API IDataDefinitionSource
 public:
 	// Hook for getting the definition most strongly related to this object
 	UFUNCTION( BlueprintNativeEvent )
-	UE_NODISCARD const UDataDefinition* GetSourceDefinition( ) const;
-	virtual const UDataDefinition* GetSourceDefinition_Implementation( ) const PURE_VIRTUAL( GetSourceDefinition_Implementation, return nullptr; );
+	[[nodiscard]] const UDataDefinition* GetSourceDefinition( ) const;
+	[[nodiscard]] virtual const UDataDefinition* GetSourceDefinition_Implementation( ) const PURE_VIRTUAL( GetSourceDefinition_Implementation, return nullptr; );
 };

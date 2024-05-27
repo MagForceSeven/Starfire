@@ -1,11 +1,14 @@
 # Starfire
 A collection of UE5 plugins that I've developed over the course of my hobby development. Some of which has also been used professionally in some version.
 
-Current Engine version supported: 5.3.2 (though this isn't quite accurate as I've backported a change that fixes UHT so that the UFUNCTION and UE_NODISCARD macro work properly on the same function)
+Current Engine version supported: 5.4.1
 
-Minimum Engine version required: 5.3.2
+Minimum Engine version required: 5.4.1 (this should only be for the use of [[nodiscard]] which 5.4 finally gets right with UHT. Can be used with earlier versions if you make a few edits).
 
-These plugins are generally intended to be used directly by placing them in the Project or Engine Plugins folder.
+There are branches for version of the plugins compatible with earlier versions. However they are archives and not updated with any of the improvements that can be found in 'main'.
+These braches are created when this Minimum Engine requirement is ever changed.
+
+These plugins are intended to be used directly by placing them in the Project or Engine Plugins folder.
 
 I'm happy to take pull requests and any bug reports or feature requests.
 

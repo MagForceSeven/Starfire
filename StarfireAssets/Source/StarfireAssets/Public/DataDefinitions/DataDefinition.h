@@ -48,7 +48,7 @@ public:
 
 #if WITH_EDITOR
 	// Function called by the thumbnail renderer for possibly showing an icon in the content browser
-	UE_NODISCARD virtual const UTexture2D* GetThumbnail( ) const { return nullptr; }
+	[[nodiscard]] virtual const UTexture2D* GetThumbnail( ) const { return nullptr; }
 #endif
 
 protected:

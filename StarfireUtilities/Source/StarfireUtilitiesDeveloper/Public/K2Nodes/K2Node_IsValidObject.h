@@ -13,23 +13,23 @@ class STARFIREUTILITIESDEVELOPER_API UK2Node_IsValidObject : public UK2Node
 public:
 
 	// Pin Accessors
-	UE_NODISCARD UEdGraphPin* GetValidPin( ) const;
-	UE_NODISCARD UEdGraphPin* GetInvalidPin( ) const;
-	UE_NODISCARD UEdGraphPin* GetOutputPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetValidPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetInvalidPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetOutputPin( ) const;
 
-	UE_NODISCARD UEdGraphPin* GetInputPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetInputPin( ) const;
 
 	// K2Node API
-	UE_NODISCARD bool IsNodeSafeToIgnore( ) const override { return true; }
+	[[nodiscard]] bool IsNodeSafeToIgnore( ) const override { return true; }
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;
 	void PinConnectionListChanged( UEdGraphPin* Pin ) override;
 	void ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph ) override;
-	UE_NODISCARD FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
-	UE_NODISCARD FText GetTooltipText( ) const override;
-	UE_NODISCARD FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
+	[[nodiscard]] FText GetNodeTitle( ENodeTitleType::Type TitleType ) const override;
+	[[nodiscard]] FText GetTooltipText( ) const override;
+	[[nodiscard]] FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
 
 private:
 	// Static pin names for the pins constructed by this node
@@ -38,7 +38,7 @@ private:
 	static const FName OutputPinName;
 
 	// Determine if there are any configuration errors during node expansion
-	UE_NODISCARD bool CheckForErrors( const FKismetCompilerContext& CompilerContext ) const;
+	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext& CompilerContext ) const;
 	
 	// The type of object that should be output by the output pin (separate property for serialization purposes)
 	UPROPERTY( )

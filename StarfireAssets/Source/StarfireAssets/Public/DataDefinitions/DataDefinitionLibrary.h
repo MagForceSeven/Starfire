@@ -17,27 +17,27 @@ class STARFIREASSETS_API UDataDefinitionLibrary : public UAssetManager
 
 public:
 	// Accessor for the active instance of the Definition Library
-	UE_NODISCARD static UDataDefinitionLibrary* GetInstance( void );
+	[[nodiscard]] static UDataDefinitionLibrary* GetInstance( void );
 
 	// Get a definition based on asset ID
 	template < CDefinitionType type_t >
-	UE_NODISCARD const type_t* GetDefinition( const FPrimaryAssetId &AssetID ) const;
+	[[nodiscard]] const type_t* GetDefinition( const FPrimaryAssetId &AssetID ) const;
 	template < CInterfaceType type_t >
-	UE_NODISCARD const type_t* GetDefinition( const FPrimaryAssetId &AssetID ) const;
+	[[nodiscard]] const type_t* GetDefinition( const FPrimaryAssetId &AssetID ) const;
 
 	// Get all the definitions that are of a particular type
 	template < CDefinitionType type_t >
-	UE_NODISCARD TArray< const type_t* > GetAllDefinitions( void ) const;
+	[[nodiscard]] TArray< const type_t* > GetAllDefinitions( void ) const;
 	template < CInterfaceType type_t >
-	UE_NODISCARD TArray< const type_t* > GetAllDefinitions( void ) const;
+	[[nodiscard]] TArray< const type_t* > GetAllDefinitions( void ) const;
 
 	// Get all the asset ids for the definitions of a particular type
 	template < CDefinitionType type_t >
-	UE_NODISCARD TArray< FPrimaryAssetId > GetAllDefinitionIDs( void ) const;
+	[[nodiscard]] TArray< FPrimaryAssetId > GetAllDefinitionIDs( void ) const;
 
 	// Find a definition of the right type with a specific asset name
 	template < CDefinitionType type_t >
-	UE_NODISCARD const type_t* DEBUG_FindDefinition( const FName &AssetName );
+	[[nodiscard]] const type_t* DEBUG_FindDefinition( const FName &AssetName );
 
 	// Do some custom game instance startup, such as loading non-feature and active feature definitions and toggling the pre-load bundles
 	TSharedPtr< FStreamableHandle > GameInstanceInit( const UGameInstance *Game );
@@ -50,8 +50,8 @@ public:
 	TSharedPtr< FStreamableHandle > ChangeBundleStateForPrimaryAssetsAndDependencies( const TArray< FPrimaryAssetId > &AssetsToChange, const TArray< FName > &AddBundles, const TArray< FName > &RemoveBundles, bool bFilterMaps = false, FStreamableDelegate DelegateToCall = FStreamableDelegate( ), TAsyncLoadPriority Priority = FStreamableManager::DefaultAsyncLoadPriority  );
 
 	// Asset Manager API
-	UE_NODISCARD UObject* GetPrimaryAssetObject( const FPrimaryAssetId &AssetID ) const override;
-	UE_NODISCARD bool GetPrimaryAssetObjectList( FPrimaryAssetType PrimaryAssetType, TArray< UObject* > &ObjectList ) const override;
+	[[nodiscard]] UObject* GetPrimaryAssetObject( const FPrimaryAssetId &AssetID ) const override;
+	[[nodiscard]] bool GetPrimaryAssetObjectList( FPrimaryAssetType PrimaryAssetType, TArray< UObject* > &ObjectList ) const override;
 	TSharedPtr<FStreamableHandle> LoadPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToLoad, const TArray<FName>& LoadBundles= TArray<FName>(), FStreamableDelegate DelegateToCall = FStreamableDelegate(), TAsyncLoadPriority Priority = FStreamableManager::DefaultAsyncLoadPriority) override;
 	TSharedPtr<FStreamableHandle> ChangeBundleStateForPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToChange, const TArray<FName>& AddBundles, const TArray<FName>& RemoveBundles, bool bRemoveAllBundles = false, FStreamableDelegate DelegateToCall = FStreamableDelegate(), TAsyncLoadPriority Priority = FStreamableManager::DefaultAsyncLoadPriority) override;
 
@@ -73,10 +73,10 @@ private:
 	// Internal utility for getting all the asset ids for the definitions of a particular type
 	void GetAllDefinitionIDsForType( const UClass *ClassType, TArray< FPrimaryAssetId > &outArray ) const;
 	// Internal utility for finding an asset of a specific name and proper sub-typing
-	UE_NODISCARD const UDataDefinition* FindDefinition( const UClass *ClassType, const FName &AssetName ) const;
+	[[nodiscard]] const UDataDefinition* FindDefinition( const UClass *ClassType, const FName &AssetName ) const;
 
 	// All of the definitions loaded by the project, broken down into buckets by type
-	typedef TArray< const UDataDefinition* > DefinitionSet;
+	typedef TArray< TObjectPtr< const UDataDefinition > > DefinitionSet;
 	TMap< FName, DefinitionSet > LibraryTypeMap;
 
 	// A lookup table for all the definitions that are in the TypeMap
@@ -86,7 +86,7 @@ private:
 	// Collections of extensions that may have tried to be applied but the definition wasn't loaded yet
 	// This could happen due to out-of-order feature activation (ie, not based on feature dependencies)
 	// or a feature could be extending an asset in an optional feature that hasn't been activated
-	typedef TArray< const UDataDefinitionExtension* > ExtensionSet;
+	typedef TArray< TObjectPtr< const UDataDefinitionExtension > > ExtensionSet;
 	TMap< TSoftObjectPtr< const UDataDefinition >, ExtensionSet > PendingExtensions;
 
 	// The game instances that have been started and caused definitions & their preload bundles to be loaded
@@ -146,11 +146,11 @@ public:
 	FDataDefinitionIterator& operator=( const FDataDefinitionIterator &rhs ) = default;
 
 	// Check if there is any further iteration possible
-	UE_NODISCARD operator bool( void ) const;
+	[[nodiscard]] operator bool( void ) const;
 
 	// Indirection operators
-	UE_NODISCARD const UDataDefinition* operator*( void ) const;
-	UE_NODISCARD const UDataDefinition* operator->( void ) const;
+	[[nodiscard]] const UDataDefinition* operator*( void ) const;
+	[[nodiscard]] const UDataDefinition* operator->( void ) const;
 
 	// Pre & Post Increment operators
 	FDataDefinitionIterator& operator++( void );
@@ -181,8 +181,8 @@ public:
 	TDataDefinitionIterator& operator=( const TDataDefinitionIterator &rhs ) = default;
 
 	// Updated dereference operators
-	UE_NODISCARD const type_t* operator*( void ) const;
-	UE_NODISCARD const type_t* operator->( void ) const;
+	[[nodiscard]] const type_t* operator*( void ) const;
+	[[nodiscard]] const type_t* operator->( void ) const;
 };
 
 #if CPP

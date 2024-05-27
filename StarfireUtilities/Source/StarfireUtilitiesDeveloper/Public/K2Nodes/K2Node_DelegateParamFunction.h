@@ -13,17 +13,17 @@ class STARFIREUTILITIESDEVELOPER_API UK2Node_DelegateParamFunction : public UK2N
 	GENERATED_BODY( )
 public:
 	// K2Node API
-	UE_NODISCARD void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
+	[[nodiscard]] void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;
 	void ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph ) override;
-	UE_NODISCARD FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
-	UE_NODISCARD UObject* GetJumpTargetForDoubleClick( ) const override;
+	[[nodiscard]] FSlateIcon GetIconAndTint( FLinearColor& OutColor ) const override;
+	[[nodiscard]] UObject* GetJumpTargetForDoubleClick( ) const override;
 	bool CanJumpToDefinition( ) const override;
 	void JumpToDefinition( ) const override;
 	void AddSearchMetaDataInfo( TArray< FSearchTagDataPair >& OutTaggedMetaData ) const override;
-	UE_NODISCARD TSharedPtr< SGraphNode > CreateVisualWidget( ) override;
+	[[nodiscard]] TSharedPtr< SGraphNode > CreateVisualWidget( ) override;
 
 	// Interface Select Delegate API
 	void SetDelegateFunction( FName Name ) override;
@@ -34,7 +34,7 @@ public:
 
 private:
 	// Determine if the function is compatible with the signature
-	UE_NODISCARD bool IsValid( FString *OutMsg = nullptr, bool bDontUseSkeletalClassForSelf = false ) const;
+	[[nodiscard]] bool IsValid( FString *OutMsg = nullptr, bool bDontUseSkeletalClassForSelf = false ) const;
 
 	// The function name that is should be registered
 	UPROPERTY( meta = (BlueprintSearchable = true) )

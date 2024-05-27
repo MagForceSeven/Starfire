@@ -466,7 +466,7 @@ const UStarfireFeatureData* UFeatureContentManager::GetObjectFeaturePlugin( cons
 }
 
 #if !UE_BUILD_SHIPPING
-UE_NODISCARD TArray< FString > GetFeaturePluginDependencies( TSharedPtr< IPlugin > Plugin, const TMap< FString, const UStarfireFeatureData* > &ContentLookup )
+[[nodiscard]] static TArray< FString > GetFeaturePluginDependencies( TSharedPtr< IPlugin > Plugin, const TMap< FString, const UStarfireFeatureData* > &ContentLookup )
 {
 	if (!Plugin.IsValid( ))
 		return { };

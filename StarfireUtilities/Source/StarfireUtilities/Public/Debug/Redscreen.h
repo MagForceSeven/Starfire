@@ -28,4 +28,4 @@ STARFIREUTILITIES_API void RedscreenImpl( const UObject *WorldContext, bool bOnc
 	RedscreenImpl( WorldContext, true, __FILE__, __LINE__, Format, ##__VA_ARGS__ ); \
 	} while (false)
 
-STARFIREUTILITIES_API UE_NODISCARD FString GetBlueprintCallerFunctionName( void );
+[[nodiscard]] STARFIREUTILITIES_API FString GetBlueprintCallerFunctionName( void );

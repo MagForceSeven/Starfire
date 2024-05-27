@@ -29,10 +29,10 @@ public:
 
 protected:
 	template< class type_t, class ... Args_t >
-	UE_NODISCARD static type_t* CreateAndAddAction( const UObject *WorldContextObject, const FLatentActionInfo &LatentInfo, Args_t&&... Args );
+	[[nodiscard]] static type_t* CreateAndAddAction( const UObject *WorldContextObject, const FLatentActionInfo &LatentInfo, Args_t&&... Args );
 
 	// Hook for derived types to implement their per-frame updates and decide how to respond
-	UE_NODISCARD virtual ELatentActionResponse Update( void ) = 0;
+	[[nodiscard]] virtual ELatentActionResponse Update( void ) = 0;
 
 private:
 	

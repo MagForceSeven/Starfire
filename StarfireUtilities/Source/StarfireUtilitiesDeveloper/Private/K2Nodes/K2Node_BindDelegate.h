@@ -20,7 +20,7 @@ public:
 	UEdGraphPin* GetObjectInPin( ) const;
 
 	// K2Node API
-	UE_NODISCARD bool IsNodeSafeToIgnore( ) const override { return true; }
+	[[nodiscard]] bool IsNodeSafeToIgnore( ) const override { return true; }
 	void PostReconstructNode( ) override;
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar &ActionRegistrar ) const override;
 	FText GetMenuCategory( ) const override;
@@ -61,7 +61,7 @@ private:
 	static const FName TargetPinName;
 
 	// Determine if their are any configuration problems with this node instance
-	UE_NODISCARD bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) const;
+	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) const;
 
 	// Check the validity of the delegate binding
 	bool IsValid( FString *OutMsg = nullptr, bool bDontUseSkeletalClassForSelf = false ) const;

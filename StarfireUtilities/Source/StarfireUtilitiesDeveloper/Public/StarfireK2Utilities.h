@@ -21,7 +21,7 @@ namespace StarfireK2Utilities
 	STARFIREUTILITIESDEVELOPER_API void RefreshAllowedConnections( const UK2Node *K2Node, UEdGraphPin *Pin );
 
 	// Get the pin that is acting as an input to the specified pin
-	UE_NODISCARD STARFIREUTILITIESDEVELOPER_API UEdGraphPin* GetInputPinLink( UEdGraphPin *Pin );
+	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API UEdGraphPin* GetInputPinLink( UEdGraphPin *Pin );
 
 	// Set the tooltip for a pin and prepends the type information to specified tooltip
 	STARFIREUTILITIESDEVELOPER_API void SetPinToolTip( UEdGraphPin *MutablePin, const FText &PinDescription = FText( ) );
@@ -47,15 +47,15 @@ namespace StarfireK2Utilities
 	STARFIREUTILITIESDEVELOPER_API void ExpandFunctionPins( const UK2Node *Node, const UFunction *Signature, EEdGraphPinDirection Dir, const FGetPinName &GetPinName, const FDoPinExpansion &DoPinExpansion );
 
 	// Attach pins created by CreateEventDispatcherPins to the object
-	UE_NODISCARD STARFIREUTILITIESDEVELOPER_API UEdGraphPin* ExpandDispatcherPins( FKismetCompilerContext &CompilerContext, UEdGraph *SourceGraph, UK2Node *Node, UEdGraphPin *ExecPin, const UClass *Class, UEdGraphPin *InstancePin, const TFunction< bool( UEdGraphPin* ) > &IsGeneratedPin );
+	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API UEdGraphPin* ExpandDispatcherPins( FKismetCompilerContext &CompilerContext, UEdGraph *SourceGraph, UK2Node *Node, UEdGraphPin *ExecPin, const UClass *Class, UEdGraphPin *InstancePin, const TFunction< bool( UEdGraphPin* ) > &IsGeneratedPin );
 
 	// Change the order of a pin within the Node pins
 	STARFIREUTILITIESDEVELOPER_API void ReorderPin( UK2Node *Node, UEdGraphPin *Pin, int NewIndex );
 
 	// Retrieve the standard UE4 icon and color for a regular function
-	UE_NODISCARD STARFIREUTILITIESDEVELOPER_API FSlateIcon GetFunctionIconAndTint( FLinearColor& OutColor );
+	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API FSlateIcon GetFunctionIconAndTint( FLinearColor& OutColor );
 	// Retrieve the standard UE4 icon and color for a pure function
-	UE_NODISCARD STARFIREUTILITIESDEVELOPER_API FSlateIcon GetPureFunctionIconAndTint( FLinearColor& OutColor );
+	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API FSlateIcon GetPureFunctionIconAndTint( FLinearColor& OutColor );
 
 	// Utility that makes sure that the visuals of the graph and property panels refresh. Optionally can mark the blueprint dirty to trigger a save later on
 	STARFIREUTILITIESDEVELOPER_API void HandleGraphChange( const UK2Node *Node, bool bMarkDirty = false );
