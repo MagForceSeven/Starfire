@@ -7,9 +7,10 @@
 #include "K2Node_DelegateParamFunction.generated.h"
 
 // A utility node that can be used to create a replacement function node that replaces a single delegate pin with a drop down selection node.
-// To use, derive a new node from this one and set UK2Node_CallFunction::FunctionReference to the function that you wish to call that has a delegate parameter.
+// To use, derive a new node from this one and set UK2Node_CallFunction::FunctionReference to the UFUNCTION that you wish to call that has a delegate parameter.
 // The signature of the delegate is not relevant (other than restricting the functions that will appear in the dropdown).
 // This function doesn't/can't implement any display functions, so your derived type should also implement GetMenuCategory, GetNodeTitle & GetTooltipText.
+// The function should also be marked as BlueprintInternalUseOnly (similar to AsyncTask functions) or else you'll have both the custom node and regular call function node.
 UCLASS( )
 class STARFIREUTILITIESDEVELOPER_API UK2Node_DelegateParamFunction : public UK2Node_CallFunction, public IK2Interface_SelectDelegate
 {
