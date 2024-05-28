@@ -22,13 +22,13 @@ public:
 	virtual void SetDelegateFunction( FName Name ) = 0;
 
 	// Get the name of the function that is currently bound to this event
-	virtual FName GetDelegateFunctionName( void ) const = 0;
+	[[nodiscard]] virtual FName GetDelegateFunctionName( void ) const = 0;
 
 	// Get the class that contains the possible functions to choose from
-	virtual UClass* GetScopeClass( bool bDontUseSkeletalClassForSelf = false ) const = 0;
+	[[nodiscard]] virtual UClass* GetScopeClass( bool bDontUseSkeletalClassForSelf = false ) const = 0;
 
 	// Get the function object that defines the function signature
-	virtual UFunction* GetDelegateSignature( void ) const = 0;
+	[[nodiscard]] virtual UFunction* GetDelegateSignature( void ) const = 0;
 
 	// Update for any change that have occurred but without affecting the blueprint graph
 	virtual bool HandleAnyChangeWithoutNotifying( void ) = 0;
