@@ -80,7 +80,7 @@ _ExecSF.h/hpp/cpp_
 
 A utility that leverages the self registering execs to provide another (sometimes easier) way to do console commands than having to mess around with the cheat manager or reflection limitations.
 
-It has the downside that the input params are directly visible when triggering the exec and that the input is a string, but the code includes utilities to make that less painful and sufficiently typesafe. The conversion from string to value is also extensible through template "trickery" for any project/plugin specific types. See _Exec_DataDefinition.h/cpp_ in Starfire Assets for an example of such an extension.
+It has the downside that the input params aren't directly visible when triggering the exec and that the input is a string, but the code includes utilities to make that less painful and sufficiently typesafe. The conversion from string to value is also extensible through template "trickery" for any project/plugin specific types. See _Exec_DataDefinition.h/cpp_ in Starfire Assets for an example of such an extension.
 
 ### Type Utilities
 _TypeUtilities.h/hpp/cpp_
