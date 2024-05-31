@@ -39,6 +39,8 @@ In addition to the dependencies on plugins from the Engine, Starfire Assets is a
 
 Currently this plugin requires the pull request found [here](https://github.com/EpicGames/UnrealEngine/pull/11604). I still need to make an option that gets around this, but really the engine change is the superior solution to the timing problem that is happening. Otherwise it is very difficult to ensure that all of the features can be known about and that we're tracking the proper state.
 
+It also requires the pull request found [here](https://github.com/EpicGames/UnrealEngine/pull/11952). Need to provide a way around this.
+
 ## Components
 
 ### Runtime
