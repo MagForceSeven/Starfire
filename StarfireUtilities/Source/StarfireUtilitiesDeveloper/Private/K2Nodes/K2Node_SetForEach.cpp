@@ -1,5 +1,5 @@
 
-#include "K2Nodes/K2Node_MapForEach.h"
+#include "K2Nodes/K2Node_SetForEach.h"
 
 #include "StarfireK2Utilities.h"
 #include "Kismet/BlueprintContainerExtensions.h"
@@ -14,28 +14,18 @@
 #include "K2Node_IfThenElse.h"
 #include "K2Node_TemporaryVariable.h"
 
-// UnrealEd
-#include "Kismet2/BlueprintEditorUtils.h"
-
 // Engine
-#include "Kismet/BlueprintMapLibrary.h"
+#include "Kismet/BlueprintSetLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#define LOCTEXT_NAMESPACE "K2Node_MapForEach"
+#define LOCTEXT_NAMESPACE "K2Node_SetForEach"
 
-const FName UK2Node_MapForEach::MapPinName( TEXT( "MapPin" ) );
-const FName UK2Node_MapForEach::BreakPinName( TEXT( "BreakPin" ) );
-const FName UK2Node_MapForEach::KeyPinName( TEXT( "KeyPin" ) );
-const FName UK2Node_MapForEach::ValuePinName( TEXT( "ValuePin" ) );
-const FName UK2Node_MapForEach::CompletedPinName( TEXT( "CompletedPin" ) );
+const FName UK2Node_SetForEach::SetPinName( TEXT( "SetPin" ) );
+const FName UK2Node_SetForEach::BreakPinName( TEXT( "BreakPin" ) );
+const FName UK2Node_SetForEach::ValuePinName( TEXT( "ValuePin" ) );
+const FName UK2Node_SetForEach::CompletedPinName( TEXT( "CompletedPin" ) );
 
-UK2Node_MapForEach::UK2Node_MapForEach( )
-{
-	KeyName = LOCTEXT( "KeyPin_FriendlyName", "Map Key" ).ToString( );
-	ValueName = LOCTEXT( "ValuePin_FriendlyName", "Map Value" ).ToString( );
-}
-
-void UK2Node_MapForEach::AllocateDefaultPins( )
+void UK2Node_SetForEach::AllocateDefaultPins( )
 {
 	Super::AllocateDefaultPins( );
 
@@ -43,13 +33,13 @@ void UK2Node_MapForEach::AllocateDefaultPins( )
 	CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute );
 
 	UEdGraphNode::FCreatePinParams PinParams;
-	PinParams.ContainerType = EPinContainerType::Map;
+	PinParams.ContainerType = EPinContainerType::Set;
 	PinParams.ValueTerminalType.TerminalCategory = UEdGraphSchema_K2::PC_Wildcard;
 
-	const auto MapPin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, MapPinName, PinParams );
-	MapPin->PinType.bIsConst = true;
-	MapPin->PinType.bIsReference = true;
-	MapPin->PinFriendlyName = LOCTEXT( "MapPin_FriendlyName", "Map" );
+	const auto SetPin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, SetPinName, PinParams );
+	SetPin->PinType.bIsConst = true;
+	SetPin->PinType.bIsReference = true;
+	SetPin->PinFriendlyName = LOCTEXT( "SetPin_FriendlyName", "Set" );
 
 	const auto BreakPin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Exec, BreakPinName );
 	BreakPin->PinFriendlyName = LOCTEXT( "BreakPin_FriendlyName", "Break" );
@@ -59,49 +49,43 @@ void UK2Node_MapForEach::AllocateDefaultPins( )
 	const auto ForEachPin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Then );
 	ForEachPin->PinFriendlyName = LOCTEXT( "ForEachPin_FriendlyName", "Loop Body" );
 
-	const auto KeyPin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, KeyPinName );
-	KeyPin->PinFriendlyName = FText::FromString( KeyName );
-
 	const auto ValuePin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, ValuePinName );
-	ValuePin->PinFriendlyName = FText::FromString( ValueName );
+	ValuePin->PinFriendlyName = LOCTEXT( "ValuePin_FriendlyName", "Value" );
 
 	const auto CompletedPin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Exec, CompletedPinName );
 	CompletedPin->PinFriendlyName = LOCTEXT( "CompletedPin_FriendlyName", "Completed" );
-	CompletedPin->PinToolTip = LOCTEXT( "CompletedPin_Tooltip", "Execution once all array elements have been visited" ).ToString( );
+	CompletedPin->PinToolTip = LOCTEXT( "CompletedPin_Tooltip", "Execution once all elements have been visited" ).ToString( );
 
 	if (bOneTimeInit)
 	{
-		InputWildcardType = MapPin->PinType;
+		InputWildcardType = SetPin->PinType;
 		OutputWildcardType = ValuePin->PinType;
 
-		InputCurrentType = MapPin->PinType;
-		KeyCurrentType = KeyPin->PinType;
-		ValueCurrentType = ValuePin->PinType;
+		InputCurrentType = SetPin->PinType;
+		OutputCurrentType = ValuePin->PinType;
 
 		bOneTimeInit = false;
 	}
 	else
 	{
-		MapPin->PinType = InputCurrentType;
-		KeyPin->PinType = KeyCurrentType;
-		ValuePin->PinType = ValueCurrentType;
+		SetPin->PinType = InputCurrentType;
+		ValuePin->PinType = OutputCurrentType;
 	}
 
-	StarfireK2Utilities::SetPinToolTip( MapPin, LOCTEXT( "MapPin_Tooltip", "Map to visit all elements of" ) );
-	StarfireK2Utilities::SetPinToolTip( KeyPin, LOCTEXT( "KeyPin_Tooltip", "Key of Value into Map" ) );
-	StarfireK2Utilities::SetPinToolTip( ValuePin, LOCTEXT( "ValuePin_Tooltip", "Value of the Map" ) );
+	StarfireK2Utilities::SetPinToolTip( SetPin, LOCTEXT( "SetPin_Tooltip", "Set to visit all elements of" ) );
+	StarfireK2Utilities::SetPinToolTip( ValuePin, LOCTEXT( "ValuePin_Tooltip", "Value from the Set" ) );
 
 	if (AdvancedPinDisplay == ENodeAdvancedPins::NoPins)
 		AdvancedPinDisplay = ENodeAdvancedPins::Hidden;
 }
 
-void UK2Node_MapForEach::PostPasteNode( )
+void UK2Node_SetForEach::PostPasteNode( )
 {
 	Super::PostPasteNode( );
 
-	if (const auto MapPin = GetMapPin( ))
+	if (const auto SetPin = GetSetPin( ))
 	{
-		if (MapPin->LinkedTo.Num( ) == 0)
+		if (SetPin->LinkedTo.Num( ) == 0)
 			bOneTimeInit = true;
 	}
 	else
@@ -110,34 +94,7 @@ void UK2Node_MapForEach::PostPasteNode( )
 	}
 }
 
-#if WITH_EDITOR
-void UK2Node_MapForEach::PostEditChangeProperty( FPropertyChangedEvent &PropertyChangedEvent )
-{
-	Super::PostEditChangeProperty( PropertyChangedEvent );
-
-	bool bRefresh = false;
-
-	if (PropertyChangedEvent.GetPropertyName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_MapForEach, KeyName ))
-	{
-		GetKeyPin( )->PinFriendlyName = FText::FromString( KeyName );
-		bRefresh = true;
-	}
-	else if (PropertyChangedEvent.GetPropertyName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_MapForEach, ValueName ))
-	{
-		GetValuePin( )->PinFriendlyName = FText::FromString( ValueName );
-		bRefresh = true;
-	}
-
-	if (bRefresh)
-	{
-		// Poke the graph to update the visuals based on the above changes
-		GetGraph( )->NotifyGraphChanged( );
-		FBlueprintEditorUtils::MarkBlueprintAsModified( GetBlueprint( ) );
-	}
-}
-#endif
-
-void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph )
+void UK2Node_SetForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph )
 {
 	Super::ExpandNode( CompilerContext, SourceGraph );
 
@@ -153,11 +110,10 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	///////////////////////////////////////////////////////////////////////////////////
 	// Cache off versions of all our important pins
 	const auto ForEach_Exec = GetExecPin( );
-	const auto ForEach_Map = GetMapPin( );
+	const auto ForEach_Set = GetSetPin( );
 	const auto ForEach_Break = GetBreakPin( );
 
 	const auto ForEach_ForEach = GetForEachPin( );
-	const auto ForEach_Key = GetKeyPin( );
 	const auto ForEach_Value = GetValuePin( );
 	const auto ForEach_Completed = GetCompletedPin( );
 
@@ -184,7 +140,7 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	Init_Value->DefaultValue = TEXT( "0" );
 
 	///////////////////////////////////////////////////////////////////////////////////
-	// Branch on comparing the loop index with the size of the map
+	// Branch on comparing the loop index with the size of the set
 	const auto BranchOnIndex = CompilerContext.SpawnIntermediateNode< UK2Node_IfThenElse >( this, SourceGraph );
 	BranchOnIndex->AllocateDefaultPins( );
 
@@ -207,18 +163,18 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	Branch_Input->MakeLinkTo( Compare_Return );
 	Temp_Variable->MakeLinkTo( Compare_A );
 
-	const auto GetMapLength = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
-	GetMapLength->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintMapLibrary, Map_Length ), UBlueprintMapLibrary::StaticClass( ) );
-	GetMapLength->AllocateDefaultPins( );
+	const auto GetSetLength = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
+	GetSetLength->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintSetLibrary, Set_Length ), UBlueprintSetLibrary::StaticClass( ) );
+	GetSetLength->AllocateDefaultPins( );
 
-	const auto MapLength_Map = GetMapLength->FindPinChecked( TEXT( "TargetMap" ) );
-	const auto MapLength_Return = GetMapLength->GetReturnValuePin( );
+	const auto SetLength_Set = GetSetLength->FindPinChecked( TEXT( "TargetSet" ) );
+	const auto SetLength_Return = GetSetLength->GetReturnValuePin( );
 
 	// Coerce the wildcard pin types
-	MapLength_Map->PinType = ForEach_Map->PinType;
+	SetLength_Set->PinType = ForEach_Set->PinType;
 
-	Compare_B->MakeLinkTo( MapLength_Return );
-	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Map, *MapLength_Map );
+	Compare_B->MakeLinkTo( SetLength_Return );
+	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Set, *SetLength_Set );
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Sequence the loop body and incrementing the loop counter
@@ -232,24 +188,21 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	Branch_Then->MakeLinkTo( Sequence_Exec );
 	CompilerContext.MovePinLinksToIntermediate( *ForEach_ForEach, *Sequence_One );
 
-	const auto GetMapPair = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
-	GetMapPair->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintContainerExtensions, Map_Get ), UBlueprintContainerExtensions::StaticClass( ) );
-	GetMapPair->AllocateDefaultPins( );
+	const auto GetSetElement = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
+	GetSetElement->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintContainerExtensions, Set_Get ), UBlueprintContainerExtensions::StaticClass( ) );
+	GetSetElement->AllocateDefaultPins( );
 
-	const auto GetPair_Map = GetMapPair->FindPinChecked( TEXT( "TargetMap" ) );
-	const auto GetPair_Index = GetMapPair->FindPinChecked( TEXT( "Index" ) );
-	const auto GetPair_Key = GetMapPair->FindPinChecked( TEXT( "Key" ) );
-	const auto GetPair_Value = GetMapPair->FindPinChecked( TEXT( "Value" ) );
+	const auto GetElement_Set = GetSetElement->FindPinChecked( TEXT( "TargetSet" ) );
+	const auto GetElement_Index = GetSetElement->FindPinChecked( TEXT( "Index" ) );
+	const auto GetElement_Value = GetSetElement->FindPinChecked( TEXT( "Item" ) );
 
 	// Coerce the wildcard pin types
-	GetPair_Map->PinType = ForEach_Map->PinType;
-	GetPair_Key->PinType = ForEach_Key->PinType;
-	GetPair_Value->PinType = ForEach_Value->PinType;
+	GetElement_Set->PinType = ForEach_Set->PinType;
+	GetElement_Value->PinType = ForEach_Value->PinType;
 
-	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Map, *GetPair_Map );
-	GetPair_Index->MakeLinkTo( Temp_Variable );
-	CompilerContext.MovePinLinksToIntermediate( *ForEach_Key, *GetPair_Key );
-	CompilerContext.MovePinLinksToIntermediate( *ForEach_Value, *GetPair_Value );
+	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Set, *GetElement_Set );
+	GetElement_Index->MakeLinkTo( Temp_Variable );
+	CompilerContext.MovePinLinksToIntermediate( *ForEach_Value, *GetElement_Value );
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Increment the loop counter by one
@@ -290,16 +243,16 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	CompilerContext.MovePinLinksToIntermediate( *ForEach_Break, *Set_Exec );
 	K2Schema->TryCreateConnection( Temp_Variable, Set_Variable );
 
-	const auto GetMapLastIndex = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
-	GetMapLastIndex->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintContainerExtensions, Map_LastIndex ), UBlueprintContainerExtensions::StaticClass( ) );
-	GetMapLastIndex->AllocateDefaultPins( );
+	const auto GetSetLastIndex = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
+	GetSetLastIndex->FunctionReference.SetExternalMember( GET_FUNCTION_NAME_CHECKED( UBlueprintContainerExtensions, Set_LastIndex ), UBlueprintContainerExtensions::StaticClass( ) );
+	GetSetLastIndex->AllocateDefaultPins( );
 
-	const auto GetIndex_Map = GetMapLastIndex->FindPinChecked( TEXT( "TargetMap" ) );
-	const auto GetIndex_Return = GetMapLastIndex->GetReturnValuePin( );
+	const auto GetIndex_Set = GetSetLastIndex->FindPinChecked( TEXT( "TargetSet" ) );
+	const auto GetIndex_Return = GetSetLastIndex->GetReturnValuePin( );
 
 	// Coerce the wildcard pin types
-	GetIndex_Map->PinType = ForEach_Map->PinType;
-	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Map, *GetIndex_Map );
+	GetIndex_Set->PinType = ForEach_Set->PinType;
+	CompilerContext.CopyPinLinksToIntermediate( *ForEach_Set, *GetIndex_Set );
 
 	GetIndex_Return->MakeLinkTo( Set_Value );
 
@@ -308,30 +261,29 @@ void UK2Node_MapForEach::ExpandNode( FKismetCompilerContext& CompilerContext, UE
 	BreakAllNodeLinks( );
 }
 
-bool UK2Node_MapForEach::CheckForErrors( const FKismetCompilerContext& CompilerContext )
+bool UK2Node_SetForEach::CheckForErrors( const FKismetCompilerContext& CompilerContext )
 {
 	bool bError = false;
 
-	if (GetMapPin( )->LinkedTo.Num( ) == 0)
+	if (GetSetPin( )->LinkedTo.Num( ) == 0)
 	{
-		CompilerContext.MessageLog.Error( *LOCTEXT( "MissingMap_Error", "For Each (Map) node @@ must have a Map to iterate." ).ToString( ), this );
+		CompilerContext.MessageLog.Error( *LOCTEXT( "MissingSet_Error", "For Each (Set) node @@ must have a Set to iterate." ).ToString( ), this );
 		bError = true;
 	}
 
 	return bError;
 }
 
-void UK2Node_MapForEach::PinConnectionListChanged( UEdGraphPin* Pin )
+void UK2Node_SetForEach::PinConnectionListChanged( UEdGraphPin* Pin )
 {
 	Super::PinConnectionListChanged( Pin );
 
 	if (Pin == nullptr)
 		return;
 
-	if (Pin->PinName == MapPinName)
+	if (Pin->PinName == SetPinName)
 	{
 		const auto ValuePin = GetValuePin( );
-		const auto KeyPin = GetKeyPin( );
 
 		if (Pin->LinkedTo.Num( ) > 0)
 		{
@@ -339,81 +291,71 @@ void UK2Node_MapForEach::PinConnectionListChanged( UEdGraphPin* Pin )
 
 			Pin->PinType = LinkedPin->PinType;
 
-			KeyPin->PinType = FEdGraphPinType::GetTerminalTypeForContainer( LinkedPin->PinType );
-
-			ValuePin->PinType = FEdGraphPinType::GetPinTypeForTerminalType( LinkedPin->PinType.PinValueType );
+			ValuePin->PinType = FEdGraphPinType::GetTerminalTypeForContainer( LinkedPin->PinType );
 		}
 		else
 		{
 			Pin->PinType = InputWildcardType;
 
-			KeyPin->PinType = ValuePin->PinType = OutputWildcardType;
+			ValuePin->PinType = OutputWildcardType;
 		}
 
 		InputCurrentType = Pin->PinType;
-		KeyCurrentType = KeyPin->PinType;
-		ValueCurrentType = ValuePin->PinType;
+		OutputCurrentType = ValuePin->PinType;
 
-		StarfireK2Utilities::RefreshAllowedConnections( this, KeyPin );
 		StarfireK2Utilities::RefreshAllowedConnections( this, ValuePin );
 
-		StarfireK2Utilities::SetPinToolTip( Pin, LOCTEXT( "MapPin_Tooltip", "Map to visit all elements of" ) );
-		StarfireK2Utilities::SetPinToolTip( KeyPin, LOCTEXT( "KeyPin_Tooltip", "Key of Value into Map" ) );
-		StarfireK2Utilities::SetPinToolTip( ValuePin, LOCTEXT( "ValuePin_Tooltip", "Value of the Map" ) );
+		StarfireK2Utilities::SetPinToolTip( Pin, LOCTEXT( "SetPin_Tooltip", "Set to visit all the elements of" ) );
+		StarfireK2Utilities::SetPinToolTip( ValuePin, LOCTEXT( "ValuePin_Tooltip", "Value from the Set" ) );
 	}
 }
 
-UEdGraphPin* UK2Node_MapForEach::GetMapPin( void ) const
+UEdGraphPin* UK2Node_SetForEach::GetSetPin( void ) const
 {
-	return FindPinChecked( MapPinName );
+	return FindPinChecked( SetPinName );
 }
 
-UEdGraphPin* UK2Node_MapForEach::GetBreakPin( void ) const
+UEdGraphPin* UK2Node_SetForEach::GetBreakPin( void ) const
 {
 	return FindPinChecked( BreakPinName );
 }
 
-UEdGraphPin* UK2Node_MapForEach::GetForEachPin( void ) const
+UEdGraphPin* UK2Node_SetForEach::GetForEachPin( void ) const
 {
 	return FindPinChecked( UEdGraphSchema_K2::PN_Then );
 }
 
-UEdGraphPin* UK2Node_MapForEach::GetKeyPin( void ) const
-{
-	return FindPinChecked( KeyPinName );
-}
-
-UEdGraphPin* UK2Node_MapForEach::GetValuePin( void ) const
+UEdGraphPin* UK2Node_SetForEach::GetValuePin( void ) const
 {
 	return FindPinChecked( ValuePinName );
 }
 
-UEdGraphPin* UK2Node_MapForEach::GetCompletedPin( void ) const
+UEdGraphPin* UK2Node_SetForEach::GetCompletedPin( void ) const
 {
 	return FindPinChecked( CompletedPinName );
 }
 
-FText UK2Node_MapForEach::GetNodeTitle( ENodeTitleType::Type TitleType ) const
+FText UK2Node_SetForEach::GetNodeTitle( ENodeTitleType::Type TitleType ) const
 {
-	return LOCTEXT( "NodeTitle_NONE", "For Each Loop (Map)" );
+	return LOCTEXT( "NodeTitle_NONE", "For Each Loop (Set)" );
 }
 
-FText UK2Node_MapForEach::GetTooltipText( ) const
+FText UK2Node_SetForEach::GetTooltipText( ) const
 {
-	return LOCTEXT( "NodeToolTip", "Loop over each element of a map" );
+	return LOCTEXT( "NodeToolTip", "Loop over each element of a set" );
 }
 
-FText UK2Node_MapForEach::GetMenuCategory( ) const
+FText UK2Node_SetForEach::GetMenuCategory( ) const
 {
 	return LOCTEXT( "NodeMenu", "Core Utilities" );
 }
 
-FSlateIcon UK2Node_MapForEach::GetIconAndTint( FLinearColor& OutColor ) const
+FSlateIcon UK2Node_SetForEach::GetIconAndTint( FLinearColor& OutColor ) const
 {
 	return FSlateIcon( "EditorStyle", "GraphEditor.Macro.ForEach_16x" );
 }
 
-void UK2Node_MapForEach::GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const
+void UK2Node_SetForEach::GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const
 {
 	StarfireK2Utilities::DefaultGetMenuActions( this, ActionRegistrar );
 }

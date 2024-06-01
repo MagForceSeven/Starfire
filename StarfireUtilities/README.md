@@ -31,6 +31,12 @@ A collection of standardized enumerations that work really, really well with the
 
 A collection of array casting utilities to get around issues with arrays of const pointers because Blueprint assumes they're always arrays of non-const pointers. This generates compilation issues in the generated code for blueprint callable functions. Generally used in conjuction with blueprint only functions or CustomThunks.
 
+_BlueprintContainerExtensions.h/cpp_
+
+A couple blueprint internal-use-only functions for TSet and TMap containers with custom functions that support the custom ForEach nodes written for each container type.
+
+This code is also pending as pull requests [here](https://github.com/EpicGames/UnrealEngine/pull/10355) and [here](https://github.com/EpicGames/UnrealEngine/pull/11622).
+
 _BlueprintDevUtilities.h/cpp_
 
 I found it amazing that there weren't any ways to check the build configuration from blueprint so I created a few functions for that.
@@ -122,7 +128,7 @@ _NativeGameplayTags_SF.h_
 
 Another variant of the Native Gameplay Tag declaration macro that allows them to be declared in a `struct` or `class` scope.
 
-Is also pending as an Engine pull request (https://github.com/EpicGames/UnrealEngine/pull/10365).
+This is also pending as an Engine [pull request](https://github.com/EpicGames/UnrealEngine/pull/10365).
 
 ### Array Caster
 _SF_ArrayCaster.h_
@@ -144,11 +150,19 @@ A reimplementation of the For Each macro for iterating a TArray. Since Epic impl
 ### TMap For Each
 ![image](https://github.com/MagForceSeven/Starfire/assets/30977279/976aff6f-8bff-4c14-8abe-bf23e8808c94)
 
-_K2Node_MapForEach.h/cpp_, Array For Each, Starfire K2 Utilities
+_K2Node_MapForEach.h/cpp_, Starfire K2 Utilities, Blueprint Container Extensions
 
 A K2 node implementation that provides a similar For Each iteration method for TMaps as already exists for TArrays. A `Break` input exec is built into the node as an advanced property so that it's hidden unless you want to use it. This keeps things down to a single node to maintain instead of multiple as in the implementation of other blueprint for-loops.
 
-I also have this code pending as a pull request directly to Epic (https://github.com/EpicGames/UnrealEngine/pull/10355) but it does not require an engine change to be available in a project.
+I also have this code pending as a [pull request](https://github.com/EpicGames/UnrealEngine/pull/10355) but it does not require an engine change to be available in a project.
+
+### TSet For Each
+
+_K2Node_SetForEach.h/cpp_, Starfire K2 Utilities, Blueprint Container Extensions
+
+A K2 node implementation that provides a similar For Each iteration method for TSets as already exists for TArrays. A `Break` input exec is built into the node as an advanced property so that it's hidden unless you want to use it. This keeps things down to a single node to maintain instead of multiple as in the implementation of other blueprint for-loops.
+
+I also have this code pending as a [pull request]( ) to someone else's related TSet [pull request](https://github.com/EpicGames/UnrealEngine/pull/11622) but it does not require an engine change to be available in a project.
 
 ### Delegate Param Function
 ![image](https://github.com/MagForceSeven/Starfire/assets/30977279/ed8e1255-0db9-4dd0-99d9-c1ab458f9652)
