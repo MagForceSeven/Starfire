@@ -417,28 +417,18 @@ EPluginStatus UFeatureContentManager::GetFeaturePluginStatus( const FString &Plu
 	return GetFeaturePluginStatus( *Package );
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 FString UFeatureContentManager::GetObjectFeaturePluginName( const TSoftObjectPtr< UObject > &Content ) const
 {
-	if (Content.IsNull( ))
-		return { };
-	
-	return GetObjectFeaturePluginName( Content.ToSoftObjectPath(  ) );
+	const auto &FeatureSubsystem = UGameFeaturesSubsystem::Get( );
+	return FeatureSubsystem.FindPluginContainingAsset( Content );
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
 FString UFeatureContentManager::GetObjectFeaturePluginName( const FSoftObjectPath &ContentPath ) const
 {
-	if (ContentPath.IsNull( ))
-		return { };
-	
-	const auto PackagePath = ContentPath.GetLongPackageName( );
-
-	for (const auto &Entry : DataMapping)
-	{
-		if (PackagePath.StartsWith( "/" + Entry.Key ))
-			return Entry.Key;
-	}
-
-	return { };
+	const auto &FeatureSubsystem = UGameFeaturesSubsystem::Get( );
+	return FeatureSubsystem.FindPluginContainingAsset( ContentPath );
 }
 
 const UStarfireFeatureData* UFeatureContentManager::GetObjectFeaturePlugin( const TSoftObjectPtr< UObject > &Content ) const
@@ -446,23 +436,19 @@ const UStarfireFeatureData* UFeatureContentManager::GetObjectFeaturePlugin( cons
 	if (Content.IsNull( ))
 		return { };
 	
-	return GetObjectFeaturePlugin( Content.ToSoftObjectPath(  ) );
+	return GetObjectFeaturePlugin( Content.ToSoftObjectPath( ) );
 }
 
 const UStarfireFeatureData* UFeatureContentManager::GetObjectFeaturePlugin( const FSoftObjectPath &ContentPath ) const
 {
-	if (ContentPath.IsNull( ))
+	const auto &FeatureSubsystem = UGameFeaturesSubsystem::Get( );
+	const auto PluginName = FeatureSubsystem.FindPluginContainingAsset( ContentPath );
+
+	const auto FoundPlugin = DataMapping.Find( PluginName );
+	if (FoundPlugin == nullptr)
 		return nullptr;
-	
-	const auto PackagePath = ContentPath.GetLongPackageName( );
 
-	for (const auto &Entry : DataMapping)
-	{
-		if (PackagePath.StartsWith( "/" + Entry.Key ))
-			return Entry.Value;
-	}
-
-	return nullptr;
+	return *FoundPlugin;
 }
 
 #if !UE_BUILD_SHIPPING
