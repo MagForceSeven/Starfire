@@ -3,10 +3,22 @@
 
 #include "Templates/Casts.h"
 
+// PS5 is known to be missing these concepts
+// if another platform is missing concepts from it's std implementation,
+// either add another platform case or add "STARFIRE_PLATFORM_MISSING_CONCEPTS=1" as a project definition in your Target.cs
+
+#if defined(PLATFORM_PS5) && PLATFORM_PS5
+	#define SF_CUSTOM_CONCEPTS 1
+#elif defined (STARFIRE_PLATFORM_MISSING_CONCEPTS) && STARFIRE_PLATFORM_MISSING_CONCEPTS
+	#define SF_CUSTOM_CONCEPTS 1
+#else
+	#define SF_CUSTOM_CONCEPTS 0
+#endif
+
 // Work around missing header/implementations on some platforms
 namespace SFstd
 {
-#if 0 // PLATFORM_PS5
+#if SF_CUSTOM_CONCEPTS
 	// Copied from Epic's TypedElementQueryBuilder.inl source for implementations
 	namespace detail
 	{

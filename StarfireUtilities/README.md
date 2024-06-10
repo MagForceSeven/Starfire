@@ -91,7 +91,7 @@ It has the downside that the input params aren't directly visible when triggerin
 ### Type Utilities
 _TypeUtilities.h/hpp/cpp_
 
-A collection of type related helpers: concepts for interfaces, uobjects and actors, template accessors to StaticClass's and implementations of a few standard library concepts for platforms that don't properly support the ones that are desired for writing other concepts.
+A collection of type related helpers: concepts for interfaces, uobjects and actors, template accessors to StaticClass's and implementations of a few standard library concepts for platforms that don't properly support the ones that are desired for writing other concepts. The PS5 I know needs this so it enables it for that platform. Other platforms can be added directly or by adding "STARFIRE_PLATFORM_MISSING_CONCEPTS=1" as a project definition to your Target.cs.
 
 _ArrayTypeUtilities.h/hpp/cpp_
 
