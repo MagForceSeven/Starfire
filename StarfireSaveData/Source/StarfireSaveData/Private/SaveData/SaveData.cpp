@@ -8,6 +8,8 @@
 // CoreUObject
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(SaveData)
+
 void USaveData::ConfigureArchiveVersions( FArchive &Ar ) const
 {
 	Ar.SetUEVer( FPackageFileVersion( VER_LATEST_ENGINE_UE4, (EUnrealEngineObjectUE5Version)PackageVersion ) );

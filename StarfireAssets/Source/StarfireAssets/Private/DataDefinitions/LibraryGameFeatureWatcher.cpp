@@ -12,6 +12,8 @@
 // Core
 #include "Logging/MessageLog.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(LibraryGameFeatureWatcher)
+
 [[nodiscard]] static FString ConvertNameToRoot( const FString &PluginName )
 {
 	return "/" + PluginName;

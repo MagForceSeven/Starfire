@@ -7,6 +7,8 @@
 // UnrealEd
 #include "Kismet2/BlueprintEditorUtils.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Interface_SelectDelegate)
+
 void IK2Interface_SelectDelegate::HandleAnyChange( bool bForceModify )
 {
 	const auto NodeThis = CastChecked< UK2Node >( this );

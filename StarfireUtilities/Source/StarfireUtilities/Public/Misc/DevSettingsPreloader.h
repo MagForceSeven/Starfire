@@ -3,7 +3,7 @@
 
 #include "UObject/Interface.h"
 
-#include "Templates/ArrayTypeUtilitiesSF.h"
+#include "Templates/TypeUtilitiesSF.h"
 
 #include "DevSettingsPreloader.generated.h"
 

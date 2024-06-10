@@ -4,6 +4,8 @@
 // Core
 #include "Logging/StructuredLog.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(SplatTaskManager)
+
 DEFINE_LOG_CATEGORY( LogSplatTaskManager );
 
 USplatTaskManager* USplatTaskManager::GetSubsystem( const UObject *WorldContext )

@@ -17,6 +17,8 @@
 // KismetCompiler
 #include "KismetCompiler.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_NativeForEach)
+
 #define LOCTEXT_NAMESPACE "K2Node_NativeForEach"
 
 const FName UK2Node_NativeForEach::ArrayPinName( TEXT( "ArrayPin" ) );

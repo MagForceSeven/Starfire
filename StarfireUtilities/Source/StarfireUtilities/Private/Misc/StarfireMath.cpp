@@ -1,6 +1,8 @@
 
 #include "Misc/StarfireMath.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(StarfireMath)
+
 int UStarfireMath::RoundToInt( float A, ERoundingStyle Style )
 {
 	switch (Style)

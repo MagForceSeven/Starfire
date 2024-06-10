@@ -3,6 +3,8 @@
 
 #include "DataDefinitions/LibraryGameFeatureWatcher.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(StarfireGameFeaturePolicy)
+
 TArray< FPrimaryAssetId > UStarfire_GameFeaturesProjectPolicy::GetPreloadAssetListForGameFeature( const UGameFeatureData *GameFeatureToLoad, bool bIncludeLoadedAssets ) const
 {
 	const auto Subsystem = GEngine->GetEngineSubsystem< UDefinitionLibrary_GameFeatureWatcher >( );

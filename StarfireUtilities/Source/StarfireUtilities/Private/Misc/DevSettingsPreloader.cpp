@@ -5,6 +5,8 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DevSettingsPreloader)
+
 TArray< TStrongObjectPtr< const UGameInstance > > IDevSettingsPreloader::RefScopes;
 TSet< FSoftObjectPath > IDevSettingsPreloader::PreloadedAssets;
 TSharedPtr< FStreamableHandle > IDevSettingsPreloader::ResourcesHandle;

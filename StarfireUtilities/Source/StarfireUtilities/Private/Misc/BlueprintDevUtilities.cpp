@@ -1,6 +1,8 @@
 
 #include "Misc/BlueprintDevUtilities.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(BlueprintDevUtilities)
+
 void UBlueprintDevUtilities::Ensure( bool Condition, const FString &Message )
 {
 	if (Message.IsEmpty( ))

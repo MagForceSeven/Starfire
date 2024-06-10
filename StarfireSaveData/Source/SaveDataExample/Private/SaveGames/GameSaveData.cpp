@@ -5,6 +5,8 @@
 #include "SaveGames/GameSaveDataUtilities.h"
 #include "SaveGames/GameSaveDataSubsystem.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveData)
+
 UGameSaveData* UGameSaveDataUtilities::CreateSaveData( const UObject *WorldContext )
 {
 	check( IsInGameThread( ) );

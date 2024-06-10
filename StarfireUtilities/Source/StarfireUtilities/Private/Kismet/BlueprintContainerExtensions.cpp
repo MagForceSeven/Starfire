@@ -1,6 +1,8 @@
 
 #include "Kismet/BlueprintContainerExtensions.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(BlueprintContainerExtensions)
+
 DEFINE_FUNCTION( UBlueprintContainerExtensions::execSet_Get )
 {
 	Stack.MostRecentProperty = nullptr;

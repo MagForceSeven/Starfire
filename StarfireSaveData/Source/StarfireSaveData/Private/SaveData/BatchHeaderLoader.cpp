@@ -3,6 +3,8 @@
 
 #include "SaveData/SaveDataHeader.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(BatchHeaderLoader)
+
 void UBatchHeaderLoader::Start( int32 Index, const TSubclassOf< USaveDataHeader > &InHeaderType, const USaveDataUtilities::FEnumerateHeadersComplete_Core &InOnCompletion, const USaveDataUtilities::FSaveFilter_Core &InFilter, const USaveDataUtilities::FLoadHeaderAsyncCallback_Core &InOnSingleHeader )
 {
 	UserIndex = Index;

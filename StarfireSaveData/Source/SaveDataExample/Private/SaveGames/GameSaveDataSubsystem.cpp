@@ -1,8 +1,7 @@
 
 #include "SaveGames/GameSaveDataSubsystem.h"
 
-// Engine
-#include "Engine.h"
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataSubsystem)
 
 UGameSaveDataSubsystem* UGameSaveDataSubsystem::Get( const UObject *WorldContext )
 {

@@ -5,6 +5,8 @@
 #include "SaveGames/GameSaveDataUtilities.h"
 #include "SaveGames/GameSaveDataVersion.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataHeader)
+
 int32 UGameSaveHeader::GetFileTypeTag( void ) const
 {
 	return 'GAME';

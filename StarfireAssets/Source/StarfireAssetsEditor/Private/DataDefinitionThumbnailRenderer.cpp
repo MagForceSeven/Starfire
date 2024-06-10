@@ -7,6 +7,8 @@
 #include "CanvasItem.h"
 #include "Engine/Texture.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DataDefinitionThumbnailRenderer)
+
 bool UDataDefinitionThumbnailRenderer::CanVisualizeAsset( UObject *Object )
 {
 	const auto Definition = Cast< UDataDefinition >( Object );

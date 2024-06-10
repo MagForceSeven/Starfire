@@ -13,6 +13,8 @@
 // Engine
 #include "Kismet/KismetSystemLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_IsValidObject)
+
 #define LOCTEXT_NAMESPACE "K2Node_IsValidObject"
 
 const FName UK2Node_IsValidObject::InvalidExecPinName( TEXT( "InvalidExecPin" ) );

@@ -5,11 +5,11 @@
 #include "SaveData/SaveDataHeader.h"
 #include "SaveData/SaveDataMemoryUtilities.h"
 
-//#include "Control/CoreTechGameState.h"
-
 // Engine
 #include "PlatformFeatures.h"
 #include "SaveGameSystem.h"
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(SaveDataUtilities)
 
 DEFINE_LOG_CATEGORY( LogStarfireSaveData );
 

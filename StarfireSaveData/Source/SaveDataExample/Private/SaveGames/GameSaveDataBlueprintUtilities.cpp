@@ -3,6 +3,8 @@
 
 #include "SaveGames/GameSaveDataUtilities.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataBlueprintUtilities)
+
 UEnumerateSaveDataHeaders_AsyncAction* UEnumerateSaveDataHeaders_AsyncAction::EnumerateSaveGameHeaders( int UserIndex, const FSaveGameFilter &SaveFilter, UObject *WorldContext )
 {
 	const auto Action = NewObject< UEnumerateSaveDataHeaders_AsyncAction >( WorldContext );

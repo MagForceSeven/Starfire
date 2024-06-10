@@ -8,6 +8,8 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Subsystems/AssetEditorSubsystem.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DefaultEventsManager)
+
 TArray< FClassDefaultEvents > UDefaultEventsManager::UpdateClasses;
 
 void UDefaultEventsManager::Initialize( FSubsystemCollectionBase &Collection )

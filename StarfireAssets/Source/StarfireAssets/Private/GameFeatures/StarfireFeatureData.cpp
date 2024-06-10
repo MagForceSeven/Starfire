@@ -9,6 +9,8 @@
 // Engine
 #include "Engine/AssetManagerTypes.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(StarfireFeatureData)
+
 UE_DEFINE_GAMEPLAY_TAG_COMMENT( UStarfireFeatureData::ContentType_Root, "Content.Type", "Type IDs Root" );
 UE_DEFINE_GAMEPLAY_TAG_COMMENT( UStarfireFeatureData::ContentFlag_Root, "Content.Flag", "Content Flags Root" );
 UE_DEFINE_GAMEPLAY_TAG_COMMENT( UStarfireFeatureData::ContentFlag_BuiltIn, "Content.Flag.BuiltIn", "This bundle is always treated as owned by the player" );

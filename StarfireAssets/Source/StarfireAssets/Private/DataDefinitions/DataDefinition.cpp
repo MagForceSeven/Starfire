@@ -9,6 +9,8 @@
 // CoreUObject
 #include "UObject/Class.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DataDefinition)
+
 FPrimaryAssetId UDataDefinition::GetPrimaryAssetId( ) const
 {
 	return FPrimaryAssetId( UDataDefinition::StaticClass( )->GetFName( ), GetFName( ) );

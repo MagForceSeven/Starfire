@@ -21,6 +21,8 @@
 #include "Kismet/BlueprintMapLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_MapForEach)
+
 #define LOCTEXT_NAMESPACE "K2Node_MapForEach"
 
 const FName UK2Node_MapForEach::MapPinName( TEXT( "MapPin" ) );

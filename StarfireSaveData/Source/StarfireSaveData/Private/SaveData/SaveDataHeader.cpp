@@ -9,6 +9,8 @@
 #include "Internationalization/Internationalization.h"
 #include "Internationalization/Culture.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(SaveDataHeader)
+
 void USaveDataHeader::FillCoreData( const USaveData *SaveData, const FString &InDisplayName )
 {
 	TimeStamp = FDateTime::Now( );

@@ -13,6 +13,8 @@
 // Core
 #include "UObject/GarbageCollection.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataUtilities)
+
 static const FString AutoSavePrefix = "AutoSave_";
 extern const FString DevSavePrefix = "Dev_"; // extern'd to GameSaveGameBlueprintUtilities
 

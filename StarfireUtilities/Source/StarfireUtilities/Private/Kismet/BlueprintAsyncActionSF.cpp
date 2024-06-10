@@ -5,6 +5,8 @@
 #include "Engine/Engine.h"
 #include "Tickable.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(BlueprintAsyncActionSF)
+
 // Helper class to hook the async action instance to the tick-pump
 class FAsyncTickHook : public FTickableGameObject
 {

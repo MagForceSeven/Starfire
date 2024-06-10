@@ -18,6 +18,8 @@
 #include "Kismet/BlueprintSetLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_SetForEach)
+
 #define LOCTEXT_NAMESPACE "K2Node_SetForEach"
 
 const FName UK2Node_SetForEach::SetPinName( TEXT( "SetPin" ) );

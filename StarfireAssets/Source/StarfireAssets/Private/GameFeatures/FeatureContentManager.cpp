@@ -19,6 +19,8 @@
 // Core
 #include "Logging/MessageLog.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(FeatureContentManager)
+
 void UFeatureContentManager::Initialize( FSubsystemCollectionBase &Collection )
 {
 	Super::Initialize( Collection );

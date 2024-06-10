@@ -13,6 +13,8 @@
 // Engine
 #include "Engine/Engine.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(RedscreenManager)
+
 DEFINE_LOG_CATEGORY_STATIC( LogRedscreen, Warning, Warning );
 
 void Redscreens::Init( const UObject *WorldContext )

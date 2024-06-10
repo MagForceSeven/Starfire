@@ -18,6 +18,8 @@
 // KismetCompiler
 #include "KismetCompiler.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_DelegateParamFunction)
+
 #define LOCTEXT_NAMESPACE "K2Node_DelegateParamFunction"
 
 void UK2Node_DelegateParamFunction::AllocateDefaultPins( )

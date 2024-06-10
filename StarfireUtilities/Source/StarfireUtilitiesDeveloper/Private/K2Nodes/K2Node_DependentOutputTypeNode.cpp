@@ -17,6 +17,8 @@
 // ToolMenus
 #include "ToolMenu.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_DependentOutputTypeNode)
+
 #define LOCTEXT_NAMESPACE "K2Node_DependentOutputTypeNode"
 
 const FName UK2Node_DependentOutputTypeNode::PrimaryInputPinName( TEXT( "PrimaryInput" ) );

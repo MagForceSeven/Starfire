@@ -3,6 +3,8 @@
 
 #include "SaveData/SaveDataHeader.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(SaveDataHeaderCache)
+
 void USaveDataHeaderCache::AddHeader( const FString &SlotName, int32 UserIndex, const USaveDataHeader *Header, const TSubclassOf< USaveDataHeader > &HeaderType, const ESaveDataLoadResult &Result )
 {
 	if (!ensureAlways( !SlotName.IsEmpty( ) ))
