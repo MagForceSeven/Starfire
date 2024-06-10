@@ -21,6 +21,8 @@
 #include "Logging/MessageLog.h"
 #include "Logging/StructuredLog.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(DataDefinitionLibrary)
+
 DEFINE_LOG_CATEGORY_STATIC( LogDefinitionLibrary, Log, All );
 
 UDataDefinitionLibrary* UDataDefinitionLibrary::GetInstance( void )
@@ -122,6 +124,8 @@ void UDataDefinitionLibrary::RemoveDefinitionInternal( const UDataDefinition *De
 
 void UDataDefinitionLibrary::AddDefinitionExtension( const UDataDefinitionExtension *Extension )
 {
+	ActiveExtensions.Add( Extension );
+
 	for (const auto &AssetPtr : Extension->AssetsToExtend)
 	{
 		const auto Asset = AssetPtr.Get( );
@@ -155,6 +159,8 @@ void UDataDefinitionLibrary::RemoveDefinitionExtensions( const UDataDefinitionEx
 				PendingExtensions.Remove( AssetPtr );
 		}
 	}
+
+	ActiveExtensions.Remove( Extension );
 }
 
 void UDataDefinitionLibrary::GetAllDefinitionsForType( const UClass *ClassType, TArray< const UDataDefinition* > &outArray ) const
@@ -510,6 +516,9 @@ void UDataDefinitionLibrary::AddReferencedObjects( UObject *InThis, FReferenceCo
 
 		for (auto &Entry : Library->PendingExtensions)
 			Collector.AddReferencedObjects( Entry.Value, InThis );
+
+		Collector.AddReferencedObjects( Library->ActiveDefinitions, InThis );
+		Collector.AddReferencedObjects( Library->ActiveExtensions, InThis );
 	}
 
 	Super::AddReferencedObjects( InThis, Collector );
@@ -675,7 +684,7 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::GameInstanceInit( const 
 		}
 
 		const auto &AllDefinitions = LibraryTypeMap.FindOrAdd( UDataDefinition::StaticClass( )->GetFName( ) );
-		const auto &AllExtensions = LibraryTypeMap.FindOrAdd( UDataDefinitionExtension::StaticClass( )->GetFName( ) );
+		const auto &AllExtensions = ActiveExtensions.Array( );
 
 		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllDefinitions ), Game );
 		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllExtensions ), Game );
@@ -697,15 +706,14 @@ void UDataDefinitionLibrary::GameInstanceShutdown( const UGameInstance *Game )
 	if (!GameScopes.IsEmpty( ))
 		return;
 
-	const auto &AllDefinitions = LibraryTypeMap.FindOrAdd( UDataDefinition::StaticClass( )->GetFName( ) );
-	const auto &AllExtensions = LibraryTypeMap.FindOrAdd( UDataDefinitionExtension::StaticClass( )->GetFName( ) );
-
 	TArray< FPrimaryAssetId > PrimaryAssetIDs;
-	for (const auto &Asset : AllDefinitions)
+	for (const auto &Asset : ActiveDefinitions)
 		PrimaryAssetIDs.Push( Asset->GetPrimaryAssetId(  ) );
-	for (const auto &Asset : AllExtensions)
+	for (const auto &Asset : ActiveExtensions)
 		PrimaryAssetIDs.Push( Asset->GetPrimaryAssetId( ) );
 
+	ActiveDefinitions.Empty( );
+	ActiveExtensions.Empty( );
 	LibraryTypeMap.Empty( );
 	PrimaryAssetBundleCounts.Empty( );
 

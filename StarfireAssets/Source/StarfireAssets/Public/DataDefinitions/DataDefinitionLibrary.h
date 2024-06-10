@@ -75,19 +75,21 @@ private:
 	// Internal utility for finding an asset of a specific name and proper sub-typing
 	[[nodiscard]] const UDataDefinition* FindDefinition( const UClass *ClassType, const FName &AssetName ) const;
 
-	// All of the definitions loaded by the project, broken down into buckets by type
+	// All the definitions loaded by the project, broken down into buckets by type
 	typedef TArray< TObjectPtr< const UDataDefinition > > DefinitionSet;
 	TMap< FName, DefinitionSet > LibraryTypeMap;
 
-	// A lookup table for all the definitions that are in the TypeMap
-	// ReSharper disable once CppUE4ProbableMemoryIssuesWithUObjectsInContainer
-	TSet< const UDataDefinition* > ActiveDefinitions;
+	// A hashed lookup for all the definitions that are part of currently active plugins
+	TSet< TObjectPtr< const UDataDefinition > > ActiveDefinitions;
 
 	// Collections of extensions that may have tried to be applied but the definition wasn't loaded yet
 	// This could happen due to out-of-order feature activation (ie, not based on feature dependencies)
 	// or a feature could be extending an asset in an optional feature that hasn't been activated
 	typedef TArray< TObjectPtr< const UDataDefinitionExtension > > ExtensionSet;
 	TMap< TSoftObjectPtr< const UDataDefinition >, ExtensionSet > PendingExtensions;
+
+	// A hashed lookup for all the extensions that are part of currently active plugins
+	TSet< TObjectPtr< const UDataDefinitionExtension > > ActiveExtensions;
 
 	// The game instances that have been started and caused definitions & their preload bundles to be loaded
 	TArray< TStrongObjectPtr< const UGameInstance > > GameScopes;
