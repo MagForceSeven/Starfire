@@ -15,11 +15,11 @@ class STARFIRESAVEDATA_API USaveDataUtilities : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY( )
 public:
-	// Convert a result enumeration value to something a bit more human readable
+	// Convert a result enumeration value to something a bit more human-readable
 	UFUNCTION( BlueprintCallable, Category = "Save Data", BlueprintPure = true )
 	[[nodiscard]] static FText GetTextForLoadingResult( ESaveDataLoadResult Result );
 
-	// Condensed information for a a save that has been found on disk
+	// Condensed information for a save that has been found on disk
 	struct FEnumeratedHeader_Core
 	{
 		// The name of the save slot associated with the save
@@ -95,10 +95,10 @@ protected:
 	// Determine if a specific save slot name is in use
 	[[nodiscard]] static bool DoesSaveGameExist( const FString &SlotName, int32 UserIndex );
 
-	// Remove a save slot from from the disk
+	// Remove a save slot from the disk
 	[[nodiscard]] static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType );
 	
-	// Collection of checks on the state of the application to tell if saves are appropriate (editor, commandlets, etc)
+	// Collection of checks on the state of the application to tell if saves are appropriate (editor, commandlets, etc.)
 	[[nodiscard]] static bool SaveOperationsAreAllowed( void );
 
 	// Determine all the slot names currently in use
@@ -113,7 +113,7 @@ protected:
 	// Find the first slot name that is available to be used when saving a new game state
 	[[nodiscard]] static FString GetUnusedSlotName( int32 UserIndex, const FString &Prefix = "Save_", int MaxTries = -1 );
 	// Find the first slot name asynchronously that is available to be used when saving a new game state
-	[[nodiscard]] static void GetUnusedSlotName_Async( const UObject *WorldContextObject, int32 UserIndex, const FSaveAsyncCallback_Core &OnCompletion, const FString &Prefix = "Save_", int MaxTries = -1 );
+	static void GetUnusedSlotName_Async( const UObject *WorldContextObject, int32 UserIndex, const FSaveAsyncCallback_Core &OnCompletion, const FString &Prefix = "Save_", int MaxTries = -1 );
 
 	// Saves the specified data to a file
 	[[nodiscard]] static bool SaveDataToSlot( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
