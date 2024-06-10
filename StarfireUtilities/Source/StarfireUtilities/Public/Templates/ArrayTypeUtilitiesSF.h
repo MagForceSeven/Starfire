@@ -83,10 +83,10 @@ template < CInterfaceType interface_t, CObjectType source_t >
 //**********************************************************************************************************************
 // Utilities for casting arrays of TObjectPtr
 
-template < class type_t >
+template < CObjectType type_t >
 [[nodiscard]] TArray< type_t* >& ObjectPtrArrayCast( TArray< TObjectPtr< type_t > > &Source );
 
-template < class type_t >
+template < CObjectType type_t >
 [[nodiscard]] const TArray< type_t* >& ObjectPtrArrayCast( const TArray< TObjectPtr< type_t > > &Source );
 
 #if CPP
