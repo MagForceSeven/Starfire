@@ -3,7 +3,11 @@
 
 #include "K2Nodes/K2Node_BindDelegate.h"
 
+// Tool Widgets
 #include "SSearchableComboBox.h"
+
+// Unreal Ed
+#include "ScopedTransaction.h"
 
 #define LOCTEXT_NAMESPACE "GraphNodeK2BindDelegate"
 

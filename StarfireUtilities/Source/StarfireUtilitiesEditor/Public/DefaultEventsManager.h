@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "EditorSUbsystem.h"
+#include "EditorSubsystem.h"
 
 #include "DefaultEventsManager.generated.h"
 

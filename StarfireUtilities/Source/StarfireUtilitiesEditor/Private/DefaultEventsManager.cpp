@@ -52,20 +52,19 @@ void UDefaultEventsManager::OnEditorOpening( const TArray< UObject* > &Assets, I
 	const auto CollateBlueprintEvents = [ ]( const UBlueprint *Blueprint ) -> TSet< FName >
 	{
 		TSet< FName > BlueprintEvents;
-		
-		for (const auto U : Blueprint->UbergraphPages)
+
+		for (const auto& U : Blueprint->UbergraphPages)
 		{
-			for (const auto N : U->Nodes)
+			for (const auto& N : U->Nodes)
 			{
 				if (const auto E = Cast< UK2Node_Event >( N ))
 					BlueprintEvents.Add( E->GetFunctionName( ) );
 			}
 		}
 
-		for (const auto F : Blueprint->FunctionGraphs)
+		for (const auto& F : Blueprint->FunctionGraphs)
 			BlueprintEvents.Add( F->GetFName( ) );
 
-		
 		return BlueprintEvents;
 	};
 
