@@ -28,6 +28,10 @@ void RedscreenImpl( const UObject *WorldContext, bool bOnce, const char *File, i
 			break;
 	}
 
+	const auto RedscreenManager = URedscreenManager::GetSubsystem( WorldContext );
+	if (RedscreenManager == nullptr)
+		return;
+	
 	int32 BufferSize = STARTING_BUFFER_SIZE;
 	TCHAR StartingBuffer[ STARTING_BUFFER_SIZE ];
 	TCHAR *Buffer = StartingBuffer;
@@ -52,9 +56,6 @@ void RedscreenImpl( const UObject *WorldContext, bool bOnce, const char *File, i
 
 	// add the filename and line to the display string
 	Message = FString::Printf( TEXT( "(%s, %d): " ), *FPaths::GetCleanFilename( File ), Line ) + Message;
-
-	const auto RedscreenManager = URedscreenManager::GetSubsystem( WorldContext );
-	check( RedscreenManager != nullptr );
 
 	RedscreenManager->AddRedscreen( Message, bOnce );
 
