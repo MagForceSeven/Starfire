@@ -17,20 +17,24 @@ void USaveData::ConfigureArchiveVersions( FArchive &Ar ) const
 	Ar.SetCustomVersion( SaveDataVersion, GameVersion, TEXT( "SaveData" ) );
 }
 
-void USaveData::SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes ) const
+void USaveData::SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options ) const
 {
 	FMemoryWriter MemWriter( Bytes, true );
 	FObjectAndNameAsStringProxyArchive Archive( MemWriter, false );
 	ConfigureArchiveVersions( Archive );
+	Archive.SetWantBinaryPropertySerialization( Options.bWantBinary );
+	Archive.ArIsSaveGame = Options.bSaveGame;
 
 	Object->Serialize( Archive );
 }
 
-void USaveData::SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes ) const
+void USaveData::SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options ) const
 {
 	FMemoryReader MemReader( Bytes, true );
 	FObjectAndNameAsStringProxyArchive Archive( MemReader, true );
 	ConfigureArchiveVersions( Archive );
+	Archive.SetWantBinaryPropertySerialization( Options.bWantBinary );
+	Archive.ArIsSaveGame = Options.bSaveGame;
 
 	Object->Serialize( Archive );
 }

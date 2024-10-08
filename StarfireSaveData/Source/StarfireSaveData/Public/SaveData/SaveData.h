@@ -5,6 +5,16 @@
 
 #include "SaveData.generated.h"
 
+// Options available for modifying the Serialize To/From Bytes calls
+struct FSerializeBytesOptions
+{
+	// Configures the 'WantsBinarySerialization' option of FArchive
+	bool bWantBinary = false;
+
+	// Configures the 'ArIsSaveGame' option of FArchive
+	bool bSaveGame = false;
+};
+
 // Base class for save game data compatible with custom core save utilities
 UCLASS( Abstract )
 class STARFIRESAVEDATA_API USaveData : public UObject
@@ -31,14 +41,14 @@ public:
 	void FillCoreData( const UObject *WorldContext, uint32 InGameVersion );
 
 	// Hooks for save game version-ing information
-	virtual bool IsCompatible( uint32 InVersion ) const { return true; }
+	[[nodiscard]] virtual bool IsCompatible( uint32 InVersion ) const { return true; }
 
 	// Configure an archive with all the applicable version information
 	void ConfigureArchiveVersions( FArchive &Ar ) const;
 	// Utility to convert an object into a collection of bytes
-	void SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes ) const;
+	void SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options = { } ) const;
 	// Utility to convert a collection of bytes back into an object
-	void SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes ) const;
+	void SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options = { } ) const;
 
 	// UObject API
 	bool IsPostLoadThreadSafe( ) const override { return true; }

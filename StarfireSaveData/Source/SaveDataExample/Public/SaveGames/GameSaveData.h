@@ -12,7 +12,7 @@ class SAVEDATAEXAMPLE_API UGameSaveData : public USaveData
 	GENERATED_BODY( )
 public:
 	// Core Save Header API
-	bool IsCompatible( uint32 InVersion ) const override;
+	[[nodiscard]] bool IsCompatible( uint32 InVersion ) const override;
 
 	// Apply this save game to the game data
 	bool ApplySaveData( const UObject *WorldContext ) const;
