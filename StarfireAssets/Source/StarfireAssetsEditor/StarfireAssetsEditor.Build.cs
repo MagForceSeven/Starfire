@@ -18,6 +18,7 @@ public class StarfireAssetsEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[ ]
 			{
+				"AssetDefinition",
 				"CoreUObject"
 				// ... add other public dependencies that you statically link with here ...
 			} );
@@ -28,6 +29,7 @@ public class StarfireAssetsEditor : ModuleRules
 				"Core",
 				"UnrealEd",
 				"Engine",
+				"SlateCore",
 				
 				"StarfireAssets",
 				// ... add private dependencies that you statically link with here ...	

@@ -1,15 +1,8 @@
 
 #include "Module/StarfireAssetsEditor.h"
 
-#include "DataDefinitions/DataDefinition.h"
-
 #include "AssetValidation/VerifiableContent.h"
 #include "AssetValidation/AssetChecks.h"
-
-#include "DataDefinitionThumbnailRenderer.h"
-
-// UnrealEd
-#include "ThumbnailRendering/ThumbnailManager.h"
 
 // Core
 #include "Logging/MessageLog.h"
@@ -19,9 +12,6 @@
 void FStarfireAssetsEditor::StartupModule( )
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	UThumbnailManager &ThumbnailManager = UThumbnailManager::Get( );
-	ThumbnailManager.RegisterCustomRenderer( UDataDefinition::StaticClass( ), UDataDefinitionThumbnailRenderer::StaticClass( ) );
-
 	VerifiableOnSaveHandle = FCoreUObjectDelegates::OnObjectPreSave.AddRaw( this, &FStarfireAssetsEditor::OnSaveVerifiableAsset );
 }
 

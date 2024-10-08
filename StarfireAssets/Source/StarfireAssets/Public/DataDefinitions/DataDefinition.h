@@ -46,11 +46,6 @@ public:
 	void AppendAllExtensionsByClass( TArray< const type_t* > &OutExtensions, bool bIncludeDuplicates = true ) const;
 	void AppendAllExtensionsByClass( const TSubclassOf< UDataDefinitionExtension > &Type, TArray< const UDataDefinitionExtension* > &OutExtensions, bool bIncludeDuplicates = true ) const;
 
-#if WITH_EDITOR
-	// Function called by the thumbnail renderer for possibly showing an icon in the content browser
-	[[nodiscard]] virtual const UTexture2D* GetThumbnail( ) const { return nullptr; }
-#endif
-
 protected:
 	friend class UDataDefinitionLibrary;
 	
@@ -66,6 +61,14 @@ private:
 	// Get all the extensions of a certain type for this asset
 	UFUNCTION( BlueprintCallable, BlueprintPure = false, Category = "Data Definition|Extensions", meta = (DeterminesOutputType = "Type", DynamicOutputParam = "Extensions", DisplayName = "Get All Extensions By Class", WorldContext = "WorldContext") )
 	void GetAllExtensions_BP( TSubclassOf< UDataDefinitionExtension > Type, TArray< UDataDefinitionExtension* > &Extensions, const UObject *WorldContext ) const;
+
+#if WITH_EDITORONLY_DATA
+	friend class UDataDefinition_AssetDefinition;
+	TSharedPtr< FSlateBrush > IconBrush;
+
+	// Function called by the asset definition for optionally showing an icon in the content browser
+	[[nodiscard]] virtual const UTexture2D* GetThumbnail( ) const { return nullptr; }
+#endif
 };
 
 // Utility concept for templates needing to restrict to Data Definition subtypes

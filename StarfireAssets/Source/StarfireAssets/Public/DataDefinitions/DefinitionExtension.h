@@ -20,4 +20,13 @@ public:
 	// The set of assets that this extension should affect while it's active
 	UPROPERTY( EditDefaultsOnly, Category = "Data Definition Extension", meta = (DisplayThumbnail = false) )
 	TArray< TSoftObjectPtr< const UDataDefinition > > AssetsToExtend;
+
+private:
+#if WITH_EDITORONLY_DATA
+	friend class UDataDefinitionExtension_AssetDefinition;
+	TSharedPtr< FSlateBrush > IconBrush;
+
+	// Function called by the asset definition for optionally showing an icon in the content browser
+	[[nodiscard]] virtual const UTexture2D* GetThumbnail( ) const { return nullptr; }
+#endif
 };
