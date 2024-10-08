@@ -146,7 +146,7 @@ void UDataDefinitionLibrary::RemoveDefinitionExtensions( const UDataDefinitionEx
 	for (const auto &AssetPtr : Extension->AssetsToExtend)
 	{
 		const auto Asset = AssetPtr.Get( );
-		if ((Asset != nullptr) && ActiveDefinitions.Contains( Asset ))
+		if ((Asset != nullptr) && Asset->ActiveExtensions.Contains( Extension ))
 		{
 			const_cast< UDataDefinition* >( Asset )->ActiveExtensions.Remove( Extension );
 		}
@@ -694,7 +694,12 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::GameInstanceInit( const 
 	const auto &FeatureSubsystem = UGameFeaturesSubsystem::Get( );
 	const auto PreloadBundles = FeatureSubsystem.GetPolicy< UGameFeaturesProjectPolicies >( ).GetPreloadBundleStateForGameFeature( );
 
-	return LoadPrimaryAssets( LoadedAssetIDs, PreloadBundles, OnLoadComplete );
+	// if the content is already loaded, the load callback won't be called so do that manually :(
+	const auto Request = LoadPrimaryAssets( LoadedAssetIDs, PreloadBundles, OnLoadComplete );
+	if (Request.IsValid( ) && Request->HasLoadCompleted( ))
+		OnLoadComplete.Execute( );
+
+	return Request;
 }
 
 void UDataDefinitionLibrary::GameInstanceShutdown( const UGameInstance *Game )
