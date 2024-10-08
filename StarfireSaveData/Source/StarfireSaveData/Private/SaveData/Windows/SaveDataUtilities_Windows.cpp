@@ -5,9 +5,7 @@
 #include "Misc/Paths.h"
 
 #include "Windows/AllowWindowsPlatformTypes.h"
-#include "Windows/PreWindowsApi.h"
-#include "Windows/MinWindows.h"
-#include "Windows/PostWindowsApi.h"
+#include "Windows/WindowsHWrapper.h"
 
 TArray< FString > USaveDataUtilities::EnumerateSlotNames( int32 UserIndex )
 {
