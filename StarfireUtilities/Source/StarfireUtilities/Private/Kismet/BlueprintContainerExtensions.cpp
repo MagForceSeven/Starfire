@@ -176,11 +176,13 @@ void UBlueprintContainerExtensions::GenericMap_Get( void *TargetMap, const FMapP
 		
 		FProperty *KeyProp = MapProperty->KeyProp;
 		FProperty *ValueProp = MapProperty->ValueProp;
+
+		const auto Iterator = MapHelper.CreateIterator( Index );
 		
-		if (MapHelper.IsValidIndex( Index ))
+		if (MapHelper.IsValidIndex( Iterator.GetInternalIndex( ) ))
 		{
-			KeyProp->CopySingleValueToScriptVM( Key, MapHelper.GetKeyPtr( Index ) );
-			ValueProp->CopySingleValueToScriptVM( Item, MapHelper.GetValuePtr( Index ) );
+			KeyProp->CopySingleValueToScriptVM( Key, MapHelper.GetKeyPtr( Iterator.GetInternalIndex( ) ) );
+			ValueProp->CopySingleValueToScriptVM( Item, MapHelper.GetValuePtr( Iterator.GetInternalIndex( ) ) );
 		}
 		else
 		{
