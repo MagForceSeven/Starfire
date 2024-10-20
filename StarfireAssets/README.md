@@ -105,10 +105,10 @@ Contains the namespace/functions that should be used to report any errors or war
 
 ### Editor
 
-#### Thumbnail Renderer
-_DataDefinitionThumbnailRenderer.h/cpp_
+#### Asset Definition
+_DataDefinition_AssetDefinition.h/cpp_
 
-This provides simple support for any DataDefinition to display a texture as it's thumbnail image in the content browser. (There is a known issue where the thumbnail doesn't display properly for assets that aren't currently loaded.)
+This provides simple support for any DataDefinition to display a texture as its thumbnail image in the content browser.
 
 ### Developer
 
