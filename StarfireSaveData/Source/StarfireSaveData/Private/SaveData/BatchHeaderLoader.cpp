@@ -55,7 +55,12 @@ void UBatchHeaderLoader::OnHeaderLoaded( const FString &SlotName, int32 Index, E
 	if (SlotNames.Num( ) == 0)
 	{
 		OnCompletion.Execute( Headers );
-		RemoveFromRoot( );
+
+		const auto World = GEngine->GetWorldFromContextObject( this, EGetWorldErrorMode::LogAndReturnNull );
+		check( World != nullptr );
+
+		const auto GameInstance = World->GetGameInstance( );
+		GameInstance->UnregisterReferencedObject( this );
 	}
 }
 
@@ -81,8 +86,18 @@ void USaveDataUtilities::EnumerateSaveHeaders_Async( const UObject *WorldContext
 		return;
 	}
 
+	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
+	if (!ensureAlways( World != nullptr ))
+	{
+		OnCompletion.Execute( { } );
+		return;
+	}
+
+	const auto GameInstance = World->GetGameInstance( );
+	check( GameInstance != nullptr );
+
 	const auto BatchLoader = NewObject< UBatchHeaderLoader >( const_cast< UObject* >( WorldContext ) );
-	BatchLoader->AddToRoot( );
+	GameInstance->RegisterReferencedObject( BatchLoader );
 
 	BatchLoader->Start( UserIndex, HeaderType, OnCompletion, Filter, OnSingleHeader );
 }
