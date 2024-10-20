@@ -10,6 +10,9 @@
 #include "K2Node_CustomEvent.h"
 #include "K2Node_AddDelegate.h"
 
+// Unreal Ed
+#include "Settings/EditorStyleSettings.h"
+
 // Engine
 #include "EdGraph/EdGraphPin.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -314,6 +317,24 @@ FSlateIcon StarfireK2Utilities::GetPureFunctionIconAndTint( FLinearColor& OutCol
 	OutColor = GetDefault< UGraphEditorSettings >( )->PureFunctionCallNodeTitleColor;
 	static FSlateIcon Icon( "EditorStyle", "Kismet.AllClasses.FunctionIcon" );
 	return Icon;
+}
+
+void StarfireK2Utilities::AdjustNodePositionForPurityChange( UK2Node *Node, bool bIsPure )
+{
+	// Move the node up slightly if it's becoming impure so that the
+	// rest of the pins remain visually where they were
+	static const int32 EstimatedExecutionPinHeight = 28;
+	const int32 GridSnapSize = GetDefault< UEditorStyleSettings >( )->GridSnapSize;
+	const bool bWasSnappedToGrid = (Node->NodePosX == (GridSnapSize * (Node->NodePosX / GridSnapSize))) && (Node->NodePosY == (GridSnapSize * (Node->NodePosY / GridSnapSize)));
+
+	if (bIsPure)
+		Node->NodePosY += EstimatedExecutionPinHeight * 1.5; // not sure why this isn't symmetric, but empirically it's not
+	else
+		Node->NodePosY -= EstimatedExecutionPinHeight;
+
+	// If the node seemed to be snapped to the grid before, then re-snap again it after moving so we don't make a mess of the graph
+	if (bWasSnappedToGrid)
+		Node->SnapToGrid( GridSnapSize );
 }
 
 void StarfireK2Utilities::HandleGraphChange( const UK2Node *Node, bool bMarkDirty )

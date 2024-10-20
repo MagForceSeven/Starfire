@@ -57,6 +57,9 @@ namespace StarfireK2Utilities
 	// Retrieve the standard UE4 icon and color for a pure function
 	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API FSlateIcon GetPureFunctionIconAndTint( FLinearColor& OutColor );
 
+	// Utility to shift the location of a node up/down so that as exec pins are visually added/removed, the other pins remain in the same location
+	STARFIREUTILITIESDEVELOPER_API void AdjustNodePositionForPurityChange( UK2Node *Node, bool bIsPure );
+
 	// Utility that makes sure that the visuals of the graph and property panels refresh. Optionally can mark the blueprint dirty to trigger a save later on
 	STARFIREUTILITIESDEVELOPER_API void HandleGraphChange( const UK2Node *Node, bool bMarkDirty = false );
 }
