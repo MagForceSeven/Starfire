@@ -288,6 +288,13 @@ void UK2Node_DelegateParamFunction::GetMenuActions( FBlueprintActionDatabaseRegi
 		StarfireK2Utilities::DefaultGetMenuActions( this, ActionRegistrar );
 }
 
+void UK2Node_DelegateParamFunction::ClearCachedBlueprintData( UBlueprint *Blueprint )
+{
+	Super::ClearCachedBlueprintData( Blueprint );
+
+	ReconstructNode( );
+}
+
 FSlateIcon UK2Node_DelegateParamFunction::GetIconAndTint( FLinearColor& OutColor ) const
 {
 	return StarfireK2Utilities::GetFunctionIconAndTint( OutColor );

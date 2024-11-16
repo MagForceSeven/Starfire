@@ -347,6 +347,13 @@ void UK2Node_BindDelegate::PostReconstructNode( )
 	HandleAnyChange( );
 }
 
+void UK2Node_BindDelegate::ClearCachedBlueprintData( UBlueprint *Blueprint )
+{
+	Super::ClearCachedBlueprintData( Blueprint );
+
+	ReconstructNode( );
+}
+
 UFunction* UK2Node_BindDelegate::GetDelegateSignature( ) const
 {
 	if (SelectedDelegateName == NAME_None)

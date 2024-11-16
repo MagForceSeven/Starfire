@@ -18,6 +18,7 @@ class STARFIREUTILITIESDEVELOPER_API UK2Node_DelegateParamFunction : public UK2N
 public:
 	// K2Node API
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar& ActionRegistrar ) const override;
+	void ClearCachedBlueprintData( UBlueprint *Blueprint ) override;
 
 	// EdGraphNode API
 	void AllocateDefaultPins( ) override;

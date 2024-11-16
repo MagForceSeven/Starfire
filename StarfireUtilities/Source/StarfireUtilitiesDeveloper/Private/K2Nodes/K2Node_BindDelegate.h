@@ -25,6 +25,7 @@ public:
 	void GetMenuActions( FBlueprintActionDatabaseRegistrar &ActionRegistrar ) const override;
 	FText GetMenuCategory( ) const override;
 	int32 GetNodeRefreshPriority( ) const override { return EBaseNodeRefreshPriority::Low_ReceivesDelegateSignature; }
+	void ClearCachedBlueprintData( UBlueprint *Blueprint ) override;
 
 	// Ed Graph Node API
 	void AllocateDefaultPins( ) override;
