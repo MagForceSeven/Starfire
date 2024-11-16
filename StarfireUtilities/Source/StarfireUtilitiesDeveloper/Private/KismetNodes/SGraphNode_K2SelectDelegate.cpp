@@ -9,6 +9,10 @@
 // BlueprintGraph
 #include "BlueprintEventNodeSpawner.h"
 #include "K2Node_CustomEvent.h"
+#include "K2Node_FunctionEntry.h"
+
+// Kismet
+#include "BlueprintCompilationManager.h"
 
 // EditorWidgets
 #include "SSearchableComboBox.h"
@@ -48,6 +52,8 @@ void SGraphNode_K2SelectDelegate::CreateBelowPinControls( TSharedPtr< SVerticalB
 			// Only signatures with no output parameters can be events
 			if (!UEdGraphSchema_K2::HasFunctionAnyOutputParameter( FunctionSignature ))
 				CreateMatchingEventData = AddDefaultFunctionDataOption( LOCTEXT( "CreateMatchingEventOption", "[Create a matching event]" ) );
+
+			AddExtraDefaultOptions( FunctionSignature );
 
 			struct FFunctionItemData
 			{
@@ -251,6 +257,8 @@ void SGraphNode_K2SelectDelegate::OnFunctionSelected( TSharedPtr< FString > Func
 			const auto SelectDelegate = CastChecked< IK2Interface_SelectDelegate >( Node );
 
 			const auto NodeBP = Node->GetBlueprint( );
+			const auto Class = NodeBP->GeneratedClass;
+			const auto SkeletonClass = NodeBP->SkeletonGeneratedClass;
 			const auto SourceGraph = Node->GetGraph( );
 			check( (NodeBP != nullptr) && (SourceGraph != nullptr) );
 
@@ -258,70 +266,84 @@ void SGraphNode_K2SelectDelegate::OnFunctionSelected( TSharedPtr< FString > Func
 			NodeBP->Modify( );
 			Node->Modify( );
 
+			FName FunctionToBind = **FunctionItemData.Get( );
+			const UObject *NewObject = nullptr;
+
 			if (FunctionItemData == CreateMatchingFunctionData)
 			{
 				// Get a valid name for the function graph
 				const auto DesiredName = GetDesiredHandlerName( Node );
 				const auto ProposedFuncName = DesiredName.IsEmpty( ) ? NodeBP->GetName( ) + "_AutoGenFunc" : DesiredName;
-				const auto NewFuncName = FBlueprintEditorUtils::GenerateUniqueGraphName( NodeBP, ProposedFuncName );
+				FunctionToBind = FBlueprintEditorUtils::GenerateUniqueGraphName( NodeBP, ProposedFuncName );
 
-				const auto NewGraph = FBlueprintEditorUtils::CreateNewGraph( NodeBP, NewFuncName, SourceGraph->GetClass( ), SourceGraph->GetSchema( ) ? SourceGraph->GetSchema( )->GetClass( ) : GetDefault< UEdGraphSchema_K2 >( )->GetClass( ) );
-				if (NewGraph != nullptr)
-				{
-					FBlueprintEditorUtils::AddFunctionGraph< UFunction >( NodeBP, NewGraph, true, SelectDelegate->GetDelegateSignature( ) );
-					FKismetEditorUtilities::BringKismetToFocusAttentionOnObject( NewGraph );
+				const auto NewGraph = FBlueprintEditorUtils::CreateNewGraph( NodeBP, FunctionToBind, SourceGraph->GetClass( ), SourceGraph->GetSchema( ) ? SourceGraph->GetSchema( )->GetClass( ) : GetDefault< UEdGraphSchema_K2 >( )->GetClass( ) );
+				if (!ensureAlways( NewGraph != nullptr ))
+					return;
+				
+				FBlueprintEditorUtils::AddFunctionGraph< UFunction >( NodeBP, NewGraph, true, SelectDelegate->GetDelegateSignature( ) );
 
-					OnNewGraph( NewGraph );
-				}
+				NewObject = NewGraph;
 
-				SelectDelegate->SetDelegateFunction( NewFuncName );
+				TArray< UK2Node_FunctionEntry* > EntryNodes;
+				NewGraph->GetNodesOfClass( EntryNodes );
+				check( EntryNodes.Num( ) == 1 );
+
+				OnNewGraph( NewGraph, EntryNodes[ 0 ] );
+
+				EntryNodes[ 0 ]->ReconstructNode( );
 			}
 			else if (FunctionItemData == CreateMatchingEventData)
 			{
 				// Get a valid name for the function graph
 				const auto DesiredName = GetDesiredHandlerName( Node );
-				const auto NewEventName = FBlueprintEditorUtils::FindUniqueKismetName( NodeBP, DesiredName.IsEmpty( ) ? "CustomEvent" : DesiredName );
+				FunctionToBind = FBlueprintEditorUtils::FindUniqueKismetName( NodeBP, DesiredName.IsEmpty( ) ? "CustomEvent" : DesiredName );
 
-				const auto Spawner = UBlueprintEventNodeSpawner::Create( UK2Node_CustomEvent::StaticClass( ), NewEventName );
-
-				// Get a good spawn location for the new event
-				auto NodeGraph = Node->GetGraph( );
-				check( NodeGraph );
+				const auto Spawner = UBlueprintEventNodeSpawner::Create( UK2Node_CustomEvent::StaticClass( ), FunctionToBind );
 
 				// If the node graph isn't an ubergraph, we can't actually put a custom event there.
-				// Instead place the event in the first one (which should be the built-in and un-deletable one)
-				const auto GraphSchema = NodeGraph->GetSchema( );
-				const auto GraphType = GraphSchema->GetGraphType( NodeGraph );
+				// Instead, place the event in the first one (which should be the built-in and un-deletable one)
+				auto DestinationGraph = SourceGraph;
+				const auto GraphSchema = SourceGraph->GetSchema( );
+				const auto GraphType = GraphSchema->GetGraphType( SourceGraph );
 				if (GraphType != EGraphType::GT_Ubergraph)
 				{
 					check( NodeBP->UbergraphPages.Num( ) > 0 );
-					NodeGraph = NodeBP->UbergraphPages[ 0 ];
+					DestinationGraph = NodeBP->UbergraphPages[ 0 ];
 				}
 
-				const auto SpawnPos = NodeGraph->GetGoodPlaceForNewNode( );
+				const auto SpawnPos = DestinationGraph->GetGoodPlaceForNewNode( );
 
-				const auto NewNode = Spawner->Invoke( NodeGraph, IBlueprintNodeBinder::FBindingSet( ), SpawnPos );
+				const auto NewNode = Spawner->Invoke( DestinationGraph, IBlueprintNodeBinder::FBindingSet( ), SpawnPos );
+				const auto NewEventNode = Cast< UK2Node_CustomEvent >( NewNode );
+				if (!ensureAlways( NewEventNode != nullptr ))
+					return;
 
-				if (const auto NewEventNode = Cast< UK2Node_CustomEvent >( NewNode ))
-				{
-					NewEventNode->SetDelegateSignature( SelectDelegate->GetDelegateSignature( ) );
+				NewEventNode->SetDelegateSignature( SelectDelegate->GetDelegateSignature( ) );
+				NewEventNode->bIsEditable = true;
 
-					OnNewCustomEvent( NewEventNode );
+				OnNewCustomEvent( NewEventNode );
 
-					// Reconstruct to get the new parameters to show in the editor
-					NewEventNode->ReconstructNode( );
-					NewEventNode->bIsEditable = true;
-					FKismetEditorUtilities::BringKismetToFocusAttentionOnObject( NewEventNode );
-				}
-
-				SelectDelegate->SetDelegateFunction( NewEventName );
-				FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified( NodeBP );
+				// Reconstruct to get the new parameters to show in the editor
+				NewEventNode->ReconstructNode( );
+				NewObject = NewEventNode;
 			}
-			else
+
+			// Handle the creation of a new object in the graph
+			if (NewObject != nullptr)
 			{
-				const FName FuncName( **FunctionItemData.Get( ) );
-				SelectDelegate->SetDelegateFunction( FuncName );
+				FKismetEditorUtilities::BringKismetToFocusAttentionOnObject( NewObject );
+
+				FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified( NodeBP );
+				FBlueprintCompilationManager::CompileSynchronously( FBPCompileRequest( NodeBP, EBlueprintCompileOptions::None, nullptr ) );
+
+				if (const auto Function = Class->FindFunctionByName( FunctionToBind, EIncludeSuperFlag::ExcludeSuper ))
+					OnNewFunction( Function );
+				
+				if (const auto SkeletonFunction = SkeletonClass->FindFunctionByName( FunctionToBind, EIncludeSuperFlag::ExcludeSuper ))
+					OnNewFunction( SkeletonFunction );
 			}
+
+			SelectDelegate->SetDelegateFunction( FunctionToBind );
 
 			SelectDelegate->HandleAnyChange( true );
 

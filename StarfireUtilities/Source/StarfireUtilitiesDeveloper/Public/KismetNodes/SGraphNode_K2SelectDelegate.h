@@ -10,6 +10,7 @@ class STableViewBase;
 class SVerticalBox;
 class UK2Node;
 class UK2Node_CustomEvent;
+class UK2Node_FunctionEntry;
 
 // Common graph node that supports a dropdown for selecting functions compatible with a signature
 class STARFIREUTILITIESDEVELOPER_API SGraphNode_K2SelectDelegate : public SGraphNodeK2Base
@@ -31,10 +32,13 @@ protected:
 	[[nodiscard]] virtual FString GetDesiredHandlerName( const UK2Node *InNode ) const { return { }; }
 	
 	// Hook to allow derived graph nodes the chance to modify new function graphs created by the user
-	virtual void OnNewGraph( UEdGraph *NewGraph ) const { }
+	virtual void OnNewGraph( UEdGraph *NewGraph, UK2Node_FunctionEntry *FunctionEntry ) const { }
 
 	// Hook to allow derived graph nodes the chance to modify new custom events created by the user
 	virtual void OnNewCustomEvent( UK2Node_CustomEvent *NewEventNode ) const { }
+
+	// Hook to allow derived graph nodes the chance to adjust the new UFunction that's been created
+	virtual void OnNewFunction( UFunction *NewFunction ) const { }
 
 protected:
 	// Build a string description of a function definition
@@ -43,19 +47,22 @@ protected:
 	// Determine the description for the currently selected function
 	[[nodiscard]] FText GetCurrentFunctionDescription( ) const;
 
-	// Adds a FunctionItemData with a given description to the array of FunctionDataItems. 
+	// Hook for derived types to add more default options to the dropdown
+	virtual void AddExtraDefaultOptions( UFunction* FunctionSignature ) { }
+
+	// Adds a FunctionItemData with a given description to the array of FunctionDataItems 
 	TSharedPtr< FString > AddDefaultFunctionDataOption( const FText& DisplayName );
 
 	// Utility to create a searchable combo box
 	[[nodiscard]] TSharedRef< SWidget > MakeFunctionOptionComboWidget( TSharedPtr< FString > InItem );
 
 	// Callback for when the function selection has changed from the dropdown
-	void OnFunctionSelected( TSharedPtr< FString > FunctionItemData, ESelectInfo::Type SelectInfo );
+	virtual void OnFunctionSelected( TSharedPtr< FString > FunctionItemData, ESelectInfo::Type SelectInfo );
 
 	// Data that can be used to create a matching function based on the parameters of a create event node
 	TSharedPtr< FString > CreateMatchingFunctionData;
 
-	// Data that can be used to create a matching event based on based on the parameters of a create event node
+	// Data that can be used to create a matching event based on the parameters of a create event node
 	TSharedPtr< FString > CreateMatchingEventData;
 
 	// Combo box for selecting the function to bind to the delegate
