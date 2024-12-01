@@ -9,6 +9,7 @@
 #include "BlueprintNodeSpawner.h"
 #include "K2Node_CustomEvent.h"
 #include "K2Node_AddDelegate.h"
+#include "K2Node_Knot.h"
 
 // Unreal Ed
 #include "Settings/EditorStyleSettings.h"
@@ -349,4 +350,35 @@ void StarfireK2Utilities::HandleGraphChange( const UK2Node *Node, bool bMarkDirt
 
 	if (bMarkDirty)
 		FBlueprintEditorUtils::MarkBlueprintAsModified( Node->GetBlueprint( ) );
+}
+
+[[nodiscard]] static UEdGraphPin* FindInputLinkage( UEdGraphPin *LinkedPin )
+{
+	check( LinkedPin != nullptr );
+	check( LinkedPin->Direction == EGPD_Output );
+
+	while (const auto Knot = Cast< UK2Node_Knot >( LinkedPin->GetOwningNode( ) ))
+	{
+		const auto KnotInput = Knot->GetInputPin( );
+
+		if (KnotInput->LinkedTo.IsEmpty( ))
+			return nullptr;
+
+		ensureAlwaysMsgf( KnotInput->LinkedTo.Num( ) == 1, TEXT( "Reroute input pin unexpectedly connected to multiple outputs." ) );
+
+		LinkedPin = KnotInput->LinkedTo[ 0 ];
+	}
+
+	return LinkedPin;
+}
+
+UEdGraphPin * StarfireK2Utilities::FindTrueInputLinkage( const UEdGraphPin *Pin )
+{
+	if (Pin->Direction == EGPD_Output)
+		return nullptr;
+	
+	if (Pin->LinkedTo.Num( ) != 1)
+		return nullptr;
+
+	return FindInputLinkage( Pin->LinkedTo[ 0 ] );
 }

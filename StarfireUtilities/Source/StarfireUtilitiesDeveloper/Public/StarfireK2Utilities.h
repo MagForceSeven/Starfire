@@ -62,4 +62,9 @@ namespace StarfireK2Utilities
 
 	// Utility that makes sure that the visuals of the graph and property panels refresh. Optionally can mark the blueprint dirty to trigger a save later on
 	STARFIREUTILITIESDEVELOPER_API void HandleGraphChange( const UK2Node *Node, bool bMarkDirty = false );
+
+	// Find the "real" pin that Pin is connected to. Skipping reroute nodes.
+	// Returns nullptr if Pin is not connected to anything or connected to multiple sources.
+	// Returns nullptr in Pin is an Output Pin.
+	[[nodiscard]] STARFIREUTILITIESDEVELOPER_API UEdGraphPin* FindTrueInputLinkage( const UEdGraphPin *Pin );
 }
