@@ -113,4 +113,4 @@ const FSlateBrush * UDataDefinitionExtension_AssetDefinition::GetIconBrush( cons
 	return GetThumbnailBrush( InAssetData, InClassName );
 }
 
-#undef LOCTEXT
+#undef LOCTEXT_NAMESPACE
