@@ -19,7 +19,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execSet_Get )
 
 	// Since Item isn't really an int, step the stack manually
 	const FProperty *ElementProp = SetProperty->ElementProp;
-	const int32 PropertySize = ElementProp->ElementSize * ElementProp->ArrayDim;
+	const int32 PropertySize = ElementProp->GetElementSize( ) * ElementProp->ArrayDim;
 	void *StorageSpace = FMemory_Alloca( PropertySize );
 	ElementProp->InitializeValue( StorageSpace );
 
@@ -31,7 +31,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execSet_Get )
 
 	// If the destination and the inner type are identical in size and their field classes derive from one another, then permit the writing out of the array element to the destination memory
 	void *ItemPtr = StorageSpace;
-	if (Stack.MostRecentPropertyAddress != nullptr && (PropertySize == Stack.MostRecentProperty->ElementSize * Stack.MostRecentProperty->ArrayDim) &&
+	if (Stack.MostRecentPropertyAddress != nullptr && (PropertySize == Stack.MostRecentProperty->GetElementSize( ) * Stack.MostRecentProperty->ArrayDim) &&
 		(MostRecentPropClass->IsChildOf(ElementPropClass) || ElementPropClass->IsChildOf(MostRecentPropClass)))
 	{
 		ItemPtr = Stack.MostRecentPropertyAddress;
@@ -119,7 +119,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execMap_Get )
 	
 	// Since Key isn't really an int, step the stack manually
 	const FProperty *CurrKeyProp = MapProperty->KeyProp;
-	const int32 KeyPropertySize = CurrKeyProp->ElementSize * CurrKeyProp->ArrayDim;
+	const int32 KeyPropertySize = CurrKeyProp->GetElementSize( ) * CurrKeyProp->ArrayDim;
 	void* KeyStorageSpace = FMemory_Alloca( KeyPropertySize );
 	CurrKeyProp->InitializeValue( KeyStorageSpace );
 
@@ -131,7 +131,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execMap_Get )
 
 	// If the destination and the inner type are identical in size and their field classes derive from one another, then permit the writing out of the array element to the destination memory
 	void *KeyPtr = KeyStorageSpace;
-	if (Stack.MostRecentPropertyAddress != nullptr && (KeyPropertySize == Stack.MostRecentProperty->ElementSize * Stack.MostRecentProperty->ArrayDim) &&
+	if (Stack.MostRecentPropertyAddress != nullptr && (KeyPropertySize == Stack.MostRecentProperty->GetElementSize( ) * Stack.MostRecentProperty->ArrayDim) &&
 		(MostRecentPropClass->IsChildOf( CurrKeyPropClass ) || CurrKeyPropClass->IsChildOf( MostRecentPropClass )))
 	{
 		KeyPtr = Stack.MostRecentPropertyAddress;
@@ -139,7 +139,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execMap_Get )
 
 	// Since the Value isn't really an int, step the stack manually
 	const FProperty *CurrValueProp = MapProperty->ValueProp;
-	const int32 ValuePropertySize = CurrValueProp->ElementSize * CurrValueProp->ArrayDim;
+	const int32 ValuePropertySize = CurrValueProp->GetElementSize( ) * CurrValueProp->ArrayDim;
 	void *ValueStorageSpace = FMemory_Alloca( ValuePropertySize );
 	CurrValueProp->InitializeValue( ValueStorageSpace );
 	
@@ -151,7 +151,7 @@ DEFINE_FUNCTION( UBlueprintContainerExtensions::execMap_Get )
 
 	// If the destination and the inner type are identical in size and their field classes derive from one another, then permit the writing out of the array element to the destination memory
 	void *ItemPtr = ValueStorageSpace;
-	if (Stack.MostRecentPropertyAddress != nullptr && (ValuePropertySize == Stack.MostRecentProperty->ElementSize * Stack.MostRecentProperty->ArrayDim) &&
+	if (Stack.MostRecentPropertyAddress != nullptr && (ValuePropertySize == Stack.MostRecentProperty->GetElementSize( ) * Stack.MostRecentProperty->ArrayDim) &&
 		(MostRecentPropClass->IsChildOf( CurrValuePropClass ) || CurrValuePropClass->IsChildOf( MostRecentPropClass )))
 	{
 		ItemPtr = Stack.MostRecentPropertyAddress;

@@ -6,7 +6,6 @@ public class StarfireAssetsEditor : ModuleRules
 	public StarfireAssetsEditor( ReadOnlyTargetRules Target ) : base( Target )
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		bTreatAsEngineModule = false;
 
 		PrivateIncludePaths.AddRange(
 			new string[ ] {

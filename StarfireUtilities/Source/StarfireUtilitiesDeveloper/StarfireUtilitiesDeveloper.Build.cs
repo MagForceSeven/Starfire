@@ -6,7 +6,6 @@ public class StarfireUtilitiesDeveloper : ModuleRules
 	public StarfireUtilitiesDeveloper( ReadOnlyTargetRules Target ) : base( Target )
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		bTreatAsEngineModule = false;
 
 		PrivateIncludePaths.AddRange(
 			new string[ ] {

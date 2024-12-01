@@ -6,7 +6,6 @@ public class StarfireSaveDataEditor : ModuleRules
 	public StarfireSaveDataEditor( ReadOnlyTargetRules Target ) : base( Target )
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-		bTreatAsEngineModule = false;
 
 		PrivateIncludePaths.AddRange(
 			new string[ ] {

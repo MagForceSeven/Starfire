@@ -109,7 +109,7 @@ UK2Node_CustomEvent* StarfireK2Utilities::CreateCustomEvent( FKismetCompilerCont
 	EventNode->CustomFunctionName = *FString::Printf( TEXT( "%s_%s" ), *SourcePin->PinName.ToString( ), *CompilerContext.GetGuid( Node ) );
 	EventNode->AllocateDefaultPins( );
 
-	const auto Event_DelegatePin = EventNode->FindPinChecked( UK2Node_CustomEvent::DelegateOutputName );
+	const auto Event_DelegatePin = EventNode->GetDelegatePin( );
 	SourcePin->MakeLinkTo( Event_DelegatePin );
 
 	const auto Event_ThenPin = EventNode->FindPinChecked( UEdGraphSchema_K2::PN_Then );
