@@ -32,7 +32,7 @@
 		},
 		{
 			"Name": "SaveDataExample",
-			"Type": "Runtime",
+			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
 	],
