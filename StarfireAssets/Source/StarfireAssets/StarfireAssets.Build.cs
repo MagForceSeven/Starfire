@@ -28,12 +28,9 @@ public class StarfireAssets : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[ ]
 			{
-				"BlueprintGraph",
 				"Core",
 				"CoreUObject",
-				"KismetCompiler",
 				"Projects",
-				"UnrealEd",
 				// ... add private dependencies that you statically link with here ...	
 			} );
 
@@ -42,5 +39,16 @@ public class StarfireAssets : ModuleRules
 			{
 				// ... add any modules that your module loads dynamically here ...
 			} );
+
+		if (Target.bBuildEditor)
+		{
+			PrivateDependencyModuleNames.AddRange(
+				new string[ ]
+				{
+					"BlueprintGraph",
+					"KismetCompiler",
+					"UnrealEd",
+				});
+		}
 	}
 }
