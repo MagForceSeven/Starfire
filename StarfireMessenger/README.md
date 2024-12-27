@@ -102,12 +102,18 @@ struct FTestStatefulContext_C : public FTestStatefulContext
 ```
 
 In Blueprint, you can create new structures through the Editor as normal.
+
 ![](./Resources/readme_BlueprintMessageTypes.png)
+
 Marking the properties as 'ExposeOnSpawn'.
+
 ![](./Resources/readme_MessageTypesProperties.png)
+
 And adding them to the Project Settings for *Starfire Messenger*.
 Here you can select which type (*Immediate* or *Stateful*) and the Context Type.
+
 ![](./Resources/readme_ProjectSettings.png)
+
 Abstract and derived message types are not supported for Blueprint messages.
 
 ### Messenger Subsystem
@@ -117,6 +123,7 @@ C++ provides a static function that takes a WorldContext object and returns the 
 `UStarfireMessenger* Messenger = UStarfireMessenger::GetSubsystem( WorldContext );`
 
 Blueprint uses the built-in subsystem accessor node:
+
 ![](./Resources/readme_Messenger.png)
 
 ### Broadcasting Messages
@@ -150,10 +157,15 @@ Messenger->Broadcast< FTestStatefulContext_C >( MessageContext, 1, 2.0f );
 ```
 
 Blueprint provides a single Broadcast node:
+
 ![](./Resources/readme_Broadcast.png)
+
 The message type can be selected through the Message Type pin (listing any native message type or blueprint type listed in the Project Settings):
+
 ![](./Resources/readme_BroadcastListing.png)
+
 Selecting a Message Type allows the ability to set all the members of the message (which should be marked as ExposeOnSpawn) as well as Context (if the message type requires it)
+
 ![](./Resources/readme_BroadcastBlueprint.png)
 
 ### Message Listening
@@ -198,15 +210,18 @@ In Blueprint, two different nodes are provided to respond to broadcast messages.
 
 "Register for Message" is a node that allows you to select another function or event to be called when the message occurs.
 Function signature rules are the same as in C++ where the first parameter is the message structure followed by the (optional) context and the (optional) statefulness enumeration.
+
 ![](./Resources/readme_MessageRegister.png)
 
 The drop down allows you to select from the class's functions/events that have a matching signature and will include both C++ & Blueprint functions of the class.
 The drop down also provides helpful options for creating new functions or events which will become the selected target to call when the message occurs.
+
 ![](./Resources/readme_RegisterList.png)
 
 An async node is also provided that allows responding to broadcasts directly inline without the need for a handler function.
 There are two varieties, one for Immediate mode messages and one for Stateful messages.
 In the case of Stateful messages, the statefulness enumeration is converted directly into separate execution pins.
+
 ![](./Resources/readme_MessageListen.png)
 
 In both cases, the nodes also support a Context Filter input pin which acts identically to the context filter in C++.
@@ -238,7 +253,9 @@ To get the best use from Instanced Structs, you should set the "BaseStruct" meta
 The good news is that if you use the 'Create matching hierarchical function/event' option of 'Register for Message' or use the 'Listen Hierarchically' checkbox of 'Listen for Message' this is all taken care for you!
 
 From there, you can use the provided 'Cast Message' node to convert the Instanced Struct parameter to the message type of your choice.
+
 ![](./Resources/readme_MessageCast.png)
+
 This node functions identically to the cast node used with objects, except for fact that the desired type is selected through a pin drop down instead of there being separate nodes for each type.
 
 The 'BaseStruct' meta is used to limit the cast node's drop down to the potentially relevant message types. If it's not set (because you created the function yourself) or you removed it, no worries. It will still work as expected, you'll just have a larger list of types to choose from. Some of which might never be able to succeed.
