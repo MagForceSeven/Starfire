@@ -48,8 +48,22 @@ Highlights:
 * Controls for versioning, compression, file corruption checks and Game Feature information
 * Reusable such that you could use it for multiple user-file save data reasons: campaign saves, meta-progression, character pools, etc
 
+### Starfire Messenger
+Provides a World Subsystem that acts as a message bus and provides highly decoupled method of broadcasting messages across a project.
+
+Highlight:
+* Messages are simple structures that don't require any additional allocation
+* The message structure is used as both the payload data and the type used by listeners to register for messages
+* A special type of message that is remembered and passed to listeners that register later
+* A significant suite of functions that provide lots of flexibility in how listeners register, all with overlords & concepts to minimize the API clients actually need to care about
+* Support for blueprint structures within the Project Settings
+* Blueprint support for all messaging operations including two options for how blueprint listens for messages
+* Support for hierarchical messages and message listening (listening for a type also recieves any messages of a child type) (only for native message types thoughs)
+
 ## Dependencies
 * Starfire Utilities is only dependent on modules available from the UE5 engine
 * Starfire Assets is dependent on Starfire Utilities and Epic's Game Features plugin
 * Starfire Save Data is dependent on both Starfire Utilities and Starfire Assets
-  * The Starfire Assets dependency is removable if desired. See the Starfire Assets ReadMe for more details  
+  * The Starfire Assets dependency is removable if desired. See the Starfire Assets ReadMe for more details
+* Starfire Messenger is dependent on Starfire Utilities
+  * The Starfire Utilities dependency is removable if desired. See the Starfire Assets ReadMe for more details
