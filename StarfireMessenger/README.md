@@ -30,7 +30,7 @@ I kept seeing variations of the Lyra version shared in places online and finally
 				- Since there is no way to provide a base type for blueprint messages, hierarchical listening with them is not supported nor is there a way to mark them abstract.
 				- Blueprint can still listen hierarchically to messages defined in C++.
 
-Future work for this plugin can be found [here](https://open.codecks.io/decks/43-starfire-messenger), but there is no timeline for when this work may be addressed.
+Future work for this plugin can be found [here](https://open.codecks.io/starfire/decks/43-starfire-messenger), but there is no timeline for when this work may be addressed.
 Pull requests and feature requests are happily accepted.
 
 ## Dependencies
