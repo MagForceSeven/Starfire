@@ -32,8 +32,8 @@
 		},
 		{
 			"Name": "SaveDataExample",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"Type": "Runtime",
+			"LoadingPhase": "None"
 		}
 	],
 	"Plugins": [
