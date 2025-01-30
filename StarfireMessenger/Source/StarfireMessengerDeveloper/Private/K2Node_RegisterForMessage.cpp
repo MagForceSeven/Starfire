@@ -375,21 +375,13 @@ bool UK2Node_RegisterForMessage::HandleAnyChangeWithoutNotifying( )
 			UBlueprint::GetGuidFromClassByFieldName< UFunction >( ParentClass, SelectedFunctionName, SelectedFunctionGuid );
 	}
 
-	if (!IsValid( ))
-	{
-		// do not clear the name, so we can keep it around as a hint/guide for 
-		// users (so they can better determine what went wrong)
-
-		SelectedFunctionGuid.Invalidate( );
-	}
-
 	return (OldSelectedFunctionName != GetDelegateFunctionName( ));
 }
 
 void UK2Node_RegisterForMessage::SetDelegateFunction( FName Name )
 {
 	SelectedFunctionName = Name;
-	SelectedFunctionGuid.Invalidate( );
+	UBlueprint::GetGuidFromClassByFieldName< UFunction >( GetScopeClass( ), SelectedFunctionName, SelectedFunctionGuid );
 }
 
 UFunction* UK2Node_RegisterForMessage::GetDelegateSignature( ) const
@@ -422,7 +414,7 @@ void UK2Node_RegisterForMessage::ClearCachedBlueprintData( UBlueprint *Blueprint
 {
 	Super::ClearCachedBlueprintData( Blueprint );
 
-	//ReconstructNode( );
+	SelectedFunctionName = FBlueprintEditorUtils::GetFunctionNameFromClassByGuid( Blueprint->SkeletonGeneratedClass, SelectedFunctionGuid );
 }
 
 UEdGraphPin* UK2Node_RegisterForMessage::GetHandlePin( ) const
