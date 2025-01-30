@@ -36,9 +36,4 @@ void UStarfireFeatureData::PostLoad( )
 
 	IVerifiableAsset::Verify( this, nullptr );
 	FMessageLog( "AssetCheck" ).Open( );
-
-	// The Asset Manager does these for the Asset Types in the Project Settings, but not for feature types for some reason (at least not before the content data is provided to any callback)
-	bool bIsValid, bClassWasLoaded; // Both values ignored
-	for (auto &ScanDir : PrimaryAssetTypesToScan)
-		ScanDir.FillRuntimeData( bIsValid, bClassWasLoaded );
 }

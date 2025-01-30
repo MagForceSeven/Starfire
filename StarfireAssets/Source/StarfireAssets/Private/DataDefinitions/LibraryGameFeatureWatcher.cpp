@@ -59,14 +59,20 @@ void UDefinitionLibrary_GameFeatureWatcher::UpdateFeatureCache( const UGameFeatu
 	TArray< FAssetData > AssetDataList;
 	for (const auto &ScanDir : GameFeatureData->GetPrimaryAssetTypesToScan( ) )
 	{
-		if (ScanDir.AssetBaseClassLoaded->IsChildOf< UDataDefinition >( ))
+		FPrimaryAssetTypeInfo RealTypeInfo;
+		const auto bAlreadyExisted = AssetManager.GetPrimaryAssetTypeInfo( FPrimaryAssetType( ScanDir.PrimaryAssetType ), /*out*/ RealTypeInfo );
+
+		if (!ensure(bAlreadyExisted))
+			continue; // Asset types should have all been added by UGameFeaturesSubsystem::AddGameFeatureToAssetManager
+
+		if (RealTypeInfo.AssetBaseClassLoaded->IsChildOf< UDataDefinition >( ))
 			SearchRules.AssetBaseClass = UDataDefinition::StaticClass( );
-		else if (ScanDir.AssetBaseClassLoaded->IsChildOf< UDataDefinitionExtension >( ))
+		else if (RealTypeInfo.AssetBaseClassLoaded->IsChildOf< UDataDefinitionExtension >( ))
 			SearchRules.AssetBaseClass = UDataDefinitionExtension::StaticClass( );
 		else
 			continue;
 		
-		SearchRules.bHasBlueprintClasses = ScanDir.bHasBlueprintClasses;
+		SearchRules.bHasBlueprintClasses = RealTypeInfo.bHasBlueprintClasses;
 
 		AssetManager.SearchAssetRegistryPaths( AssetDataList, SearchRules );
 	}
