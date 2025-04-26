@@ -16,7 +16,7 @@
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataUtilities)
 
 static const FString AutoSavePrefix = "AutoSave_";
-extern const FString DevSavePrefix = "Dev_"; // extern'd to GameSaveGameBlueprintUtilities
+extern const FString Ex_DevSavePrefix = "Dev_"; // extern'd to GameSaveGameBlueprintUtilities
 
 static TAutoConsoleVariable< bool > CVar_AllowDeveloperSaves( TEXT( "Game.SaveGames.AllowDeveloperSaves" ),
 	#if !UE_BUILD_SHIPPING && !UE_BUILD_TEST
@@ -29,8 +29,8 @@ static TAutoConsoleVariable< bool > CVar_AllowDeveloperSaves( TEXT( "Game.SaveGa
 static TAutoConsoleVariable< int > CVar_MaxAutoSaveSlots( TEXT( "Game.SaveGame.MaxAutoSaveSlots" ), 5, TEXT( "The maximum number of unique autosaves allowed at one time" ), ECVF_Cheat );
 static TAutoConsoleVariable< FString > CVar_QuickSaveSlotName( TEXT( "Game.SaveGames.QuickSaveSlotName" ), "QuickSave", TEXT( "The name of the slot to use for savegames" ), ECVF_Cheat );
 
-FString GetQuickSaveSlotName( void ) { return CVar_QuickSaveSlotName.GetValueOnAnyThread( ); }
-FString GetQuickSaveDisplayName( void ) { return NSLOCTEXT( "Game_SaveGames", "QuickSaveFriendlyName", "Quick Save" ).ToString( ); }
+FString Ex_GetQuickSaveSlotName( void ) { return CVar_QuickSaveSlotName.GetValueOnAnyThread( ); }
+FString Ex_GetQuickSaveDisplayName( void ) { return NSLOCTEXT( "Game_SaveGames", "QuickSaveFriendlyName", "Quick Save" ).ToString( ); }
 
 FEnumeratedSaveDataHeader::FEnumeratedSaveDataHeader( const USaveDataUtilities::FEnumeratedHeader_Core &Core ) :
 	SlotName( Core.SlotName ),
@@ -48,7 +48,7 @@ FString UGameSaveDataUtilities::GetUnusedSlotName( int32 UserIndex, ESaveDataTyp
 {
 	ensureAlways( SaveType != ESaveDataType::User ); // User saves should not have to find an unused slot name
 	
-	static const TArray< FString > Types = { FString( ), FString( ), AutoSavePrefix, DevSavePrefix };
+	static const TArray< FString > Types = { FString( ), FString( ), AutoSavePrefix, Ex_DevSavePrefix };
 
 	return Super::GetUnusedSlotName( UserIndex, Types[ (int)SaveType ] );
 }
@@ -102,7 +102,7 @@ bool UGameSaveDataUtilities::SaveToSlot( const UObject *WorldContext, FString Sl
 	{
 		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
 			break;
-		case ESaveDataType::Developer: SlotName = DevSavePrefix + SlotName;
+		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
 			break;
 
 		default: // other types don't modify the slot name
@@ -165,7 +165,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot( const UObject *WorldContext, 
 	{
 		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
 			break;
-		case ESaveDataType::Developer: SlotName = DevSavePrefix + SlotName;
+		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
 			break;
 
 		default: // other types don't modify the slot name
@@ -232,7 +232,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 	{
 		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
 			break;
-		case ESaveDataType::Developer: SlotName = DevSavePrefix + SlotName;
+		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
 			break;
 
 		default: // other types don't modify the slot name
@@ -840,12 +840,12 @@ bool UGameSaveDataUtilities::QuickSave( const UObject *WorldContext, int32 UserI
 	if (!IsManualSavingAllowed( WorldContext ))
 		return false;
 	
-	return SaveToSlot( WorldContext, GetQuickSaveSlotName( ), UserIndex, ESaveDataType::Quick, GetQuickSaveDisplayName( ) );
+	return SaveToSlot( WorldContext, Ex_GetQuickSaveSlotName( ), UserIndex, ESaveDataType::Quick, Ex_GetQuickSaveDisplayName( ) );
 }
 
 void UGameSaveDataUtilities::QuickSave_Async( const UObject *WorldContext, int32 UserIndex, const FSaveAsyncCallback &OnCompletion )
 {
-	const auto SlotName = GetQuickSaveSlotName( );
+	const auto SlotName = Ex_GetQuickSaveSlotName( );
 	
 	if (!IsManualSavingAllowed( WorldContext ))
 	{
@@ -853,7 +853,7 @@ void UGameSaveDataUtilities::QuickSave_Async( const UObject *WorldContext, int32
 		return;
 	}
 	
-	SaveToSlot_Async( WorldContext, SlotName, UserIndex, ESaveDataType::Quick, GetQuickSaveDisplayName( ), OnCompletion );
+	SaveToSlot_Async( WorldContext, SlotName, UserIndex, ESaveDataType::Quick, Ex_GetQuickSaveDisplayName( ), OnCompletion );
 }
 
 #if !UE_BUILD_SHIPPING && !UE_BUILD_TEST
@@ -865,7 +865,7 @@ bool UGameSaveDataUtilities::DeveloperSave( const UObject *WorldContext, const F
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 	
-	return SaveToSlot( WorldContext, DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride );
+	return SaveToSlot( WorldContext, Ex_DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride );
 }
 
 void UGameSaveDataUtilities::DeveloperSave_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, FString DisplayNameOverride, const FSaveAsyncCallback &OnCompletion )
@@ -879,6 +879,6 @@ void UGameSaveDataUtilities::DeveloperSave_Async( const UObject *WorldContext, c
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 
-	SaveToSlot_Async( WorldContext, DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride, OnCompletion );
+	SaveToSlot_Async( WorldContext, Ex_DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride, OnCompletion );
 }
 #endif

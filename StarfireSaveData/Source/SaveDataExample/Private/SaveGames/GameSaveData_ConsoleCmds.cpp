@@ -7,8 +7,8 @@
 // Engine
 #include "Engine/World.h"
 
-extern FString GetQuickSaveSlotName( void );
-extern FString GetQuickSaveDisplayName( void );
+extern FString Ex_GetQuickSaveSlotName( void );
+extern FString Ex_GetQuickSaveDisplayName( void );
 
 using namespace ExecSF_Params;
 struct FSaveDataExecs : public FExecSF
@@ -118,10 +118,10 @@ struct FSaveDataExecs : public FExecSF
 		const UGameSaveData *SaveData = nullptr;
 
 		if (Async)
-			UGameSaveDataUtilities::LoadSaveGameFromSlot_Async( World, GetQuickSaveSlotName( ), 0, { } );
+			UGameSaveDataUtilities::LoadSaveGameFromSlot_Async( World, Ex_GetQuickSaveSlotName( ), 0, { } );
 		else
 			// ReSharper disable once CppDeclaratorNeverUsed
-			const auto Result = UGameSaveDataUtilities::LoadSaveGameFromSlot( World, GetQuickSaveSlotName( ), 0, Header, SaveData );
+			const auto Result = UGameSaveDataUtilities::LoadSaveGameFromSlot( World, Ex_GetQuickSaveSlotName( ), 0, Header, SaveData );
 	}
 
 	static void ReloadSave( const UWorld *World, const TCHAR *Cmd, FOutputDevice &Ar )
@@ -164,4 +164,4 @@ struct FSaveDataExecs : public FExecSF
 			const auto Result = UGameSaveDataUtilities::LoadMostRecentSave( World, 0, SlotName, Header, SaveData );
 	}
 
-} GSaveDataExecs;
+} Ex_GSaveDataExecs;

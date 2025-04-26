@@ -5,7 +5,7 @@
 const FGuid Example_SaveGameVersion( 0xBAADF00D, 0xDEADBEEF, 0xD15EA5ED, 0x0B00B135 );
 static FDevVersionRegistration GRegisterSaveGameVersion( Example_SaveGameVersion, (int32)EGameSaveDataVersion::Build_Latest, TEXT("SaveGameExample") );
 
-EGameSaveDataVersion GetSaveGameVersion( const FArchive &Ar )
+EGameSaveDataVersion Ex_GetSaveGameVersion( const FArchive &Ar )
 {
 	const FCustomVersion *CustomVersion = Ar.GetCustomVersions( ).GetVersion( Example_SaveGameVersion );
 	if (CustomVersion == nullptr)

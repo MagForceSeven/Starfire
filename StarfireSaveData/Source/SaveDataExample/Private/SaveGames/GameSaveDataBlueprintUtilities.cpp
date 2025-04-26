@@ -100,20 +100,20 @@ USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveAutoSave( int UserInde
 	return SaveGameToSlot_Internal( FString( ), UserIndex, ESaveDataType::Auto, DisplayNameOverride, WorldContext );
 }
 
-extern FString GetQuickSaveSlotName( void );
-extern FString GetQuickSaveDisplayName( void );
+extern FString Ex_GetQuickSaveSlotName( void );
+extern FString Ex_GetQuickSaveDisplayName( void );
 USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveQuickSave( int UserIndex, UObject *WorldContext )
 {
-	return SaveGameToSlot_Internal( GetQuickSaveSlotName( ), UserIndex, ESaveDataType::Quick, GetQuickSaveDisplayName( ), WorldContext );
+	return SaveGameToSlot_Internal( Ex_GetQuickSaveSlotName( ), UserIndex, ESaveDataType::Quick, Ex_GetQuickSaveDisplayName( ), WorldContext );
 }
 
-extern const FString DevSavePrefix;
+extern const FString Ex_DevSavePrefix;
 USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveDeveloperSave( const FString &SlotName, int UserIndex, FString DisplayNameOverride, UObject *WorldContext )
 {
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 	
-	return SaveGameToSlot_Internal( DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride, WorldContext );
+	return SaveGameToSlot_Internal( Ex_DevSavePrefix + SlotName, UserIndex, ESaveDataType::Developer, DisplayNameOverride, WorldContext );
 }
 
 USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveCheckpointToSlot( const UGameSaveData *const& Checkpoint, const FString &SlotName, int UserIndex, ESaveDataType SaveType, FString DisplayNameOverride, UObject *WorldContext )
