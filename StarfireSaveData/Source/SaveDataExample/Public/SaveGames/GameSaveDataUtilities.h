@@ -45,7 +45,7 @@ public:
 
 	// The header information for this particular save
 	UPROPERTY( BlueprintReadOnly, Category = "Header" )
-	const UGameSaveHeader *Header = nullptr;
+	TObjectPtr< const UGameSaveHeader > Header = nullptr;
 };
 
 // Callback for the completion of an async save process

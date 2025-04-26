@@ -29,7 +29,7 @@ public:
 
 	// All the extensions that are currently affecting this definition
 	UPROPERTY( Transient, BlueprintReadOnly, Category = "Data Definition" )
-	TArray< const UDataDefinitionExtension* > ActiveExtensions;
+	TArray< TObjectPtr< const UDataDefinitionExtension > > ActiveExtensions;
 
 	// Find the first extension of a specific type affecting this asset
 	template< CExtensionType type_t >

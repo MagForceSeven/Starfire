@@ -84,9 +84,11 @@ template < CInterfaceType interface_t, CObjectType source_t >
 // Utilities for casting arrays of TObjectPtr
 
 template < CObjectType type_t >
+UE_DEPRECATED( 5.5, "Use MutableView (provided by the Engine) instead." )
 [[nodiscard]] TArray< type_t* >& ObjectPtrArrayCast( TArray< TObjectPtr< type_t > > &Source );
 
 template < CObjectType type_t >
+UE_DEPRECATED( 5.5, "Use ObjectPtrDecay (provided by the Engine) instead." )
 [[nodiscard]] const TArray< type_t* >& ObjectPtrArrayCast( const TArray< TObjectPtr< type_t > > &Source );
 
 #if CPP

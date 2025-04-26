@@ -106,6 +106,34 @@ const TArray< TSoftObjectPtr< type_t > >& ArrayUpCast( const TArray< TSoftObject
 }
 
 template < class type_t, class source_t >
+	requires SFstd::derived_from< source_t, type_t >
+TArray< TObjectPtr< type_t > >& ArrayUpCast( TArray< TObjectPtr< source_t > > &Source )
+{
+	return *reinterpret_cast< TArray< TObjectPtr< type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< source_t, type_t >
+const TArray< TObjectPtr< type_t > >& ArrayUpCast( const TArray< TObjectPtr< source_t > > &Source )
+{
+	return *reinterpret_cast< const TArray< TObjectPtr< type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< source_t, type_t >
+TArray< TObjectPtr< const type_t > >& ArrayUpCast( TArray< TObjectPtr< const source_t > > &Source )
+{
+	return *reinterpret_cast< TArray< TObjectPtr< const type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< source_t, type_t >
+const TArray< TObjectPtr< const type_t > >& ArrayUpCast( const TArray< TObjectPtr< const source_t > > &Source )
+{
+	return *reinterpret_cast< const TArray< TObjectPtr< const type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
 	requires SFstd::derived_from< type_t, source_t >
 TArray< type_t* >& ArrayDownCast( TArray< source_t* > &Source )
 {
@@ -147,14 +175,44 @@ const TArray< TSoftObjectPtr< type_t > >& ArrayDownCast( const TArray< TSoftObje
 	return *reinterpret_cast< const TArray< TSoftObjectPtr< type_t > >* >( &Source );
 }
 
+template < class type_t, class source_t >
+	requires SFstd::derived_from< type_t, source_t >
+TArray< TObjectPtr< type_t > >& ArrayDownCast( TArray< TObjectPtr< source_t > > &Source )
+{
+	return *reinterpret_cast< TArray< TObjectPtr< type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< type_t, source_t >
+const TArray< TObjectPtr< type_t > >& ArrayDownCast( const TArray< TObjectPtr< source_t > > &Source )
+{
+	return *reinterpret_cast< const TArray< TSoftObjectPtr< type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< type_t, source_t >
+TArray< TObjectPtr< const type_t > >& ArrayDownCast( TArray< TObjectPtr< const source_t > > &Source )
+{
+	return *reinterpret_cast< TArray< TSoftObjectPtr< const type_t > >* >( &Source );
+}
+
+template < class type_t, class source_t >
+	requires SFstd::derived_from< type_t, source_t >
+const TArray< TObjectPtr< const type_t > >& ArrayDownCast( const TArray< TObjectPtr< const source_t > > &Source )
+{
+	return *reinterpret_cast< const TArray< TObjectPtr< const type_t > >* >( &Source );
+}
+
 template < CObjectType type_t >
 TArray< type_t* >& ObjectPtrArrayCast( TArray< TObjectPtr< type_t > > &Source )
+
 {
-	return *reinterpret_cast< TArray< type_t* >* >( &Source );
+	return MutableView( Source );
 }
 
 template < CObjectType type_t >
 const TArray< type_t* >& ObjectPtrArrayCast( const TArray< TObjectPtr< type_t > > &Source )
+
 {
-	return *reinterpret_cast< const TArray< type_t* >* >( &Source );
+	return ObjectPtrDecay( Source );
 }

@@ -27,7 +27,7 @@ public:
 
 	// The header that was successfully loaded
 	UPROPERTY( VisibleInstanceOnly, Category = "Header" )
-	const USaveDataHeader *Header = nullptr;
+	TObjectPtr< const USaveDataHeader > Header = nullptr;
 
 	// The results that occurred when trying to load the header for this slot/index/type triplet
 	UPROPERTY( VisibleInstanceOnly, Category = "Header" )

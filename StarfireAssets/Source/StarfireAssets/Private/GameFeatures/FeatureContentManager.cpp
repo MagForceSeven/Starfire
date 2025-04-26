@@ -263,11 +263,11 @@ void UFeatureContentManager::DisableFeatures( const TSet< FString > &ToDisable )
 
 void UFeatureContentManager::SetEnabledFeatures( const TSet< const UStarfireFeatureData* > &NewFeatures, const TArray< FName > &Bundles )
 {
-	const auto Keep = EnabledFeatures.Intersect( NewFeatures );
-	const auto Enable = NewFeatures.Difference( Keep );
+	const auto Keep = EnabledFeatures.Intersect( ObjectPtrWrap( NewFeatures ) );
+	const auto Enable = NewFeatures.Difference( ObjectPtrDecay( Keep ) );
 	const auto Disable = EnabledFeatures.Difference( Keep );
 
-	DisableFeatures( Disable );
+	DisableFeatures( ObjectPtrDecay( Disable ) );
 	EnableFeatures( Enable, Bundles );
 }
 
@@ -279,12 +279,12 @@ void UFeatureContentManager::SetEnabledFeatures( const TSet< FString > &NewFeatu
 void UFeatureContentManager::DisableAllFeatures( void )
 {
 	// create a copy of EnabledEntitlements since Disable will iterate and modify that array
-	DisableFeatures( TSet( EnabledFeatures ) );
+	DisableFeatures( ObjectPtrDecay( TSet( EnabledFeatures ) ) );
 }
 
 void UFeatureContentManager::SetFeaturesAsOwned( const TSet< const UStarfireFeatureData* > &ToOwn )
 {
-	const auto NewlyOwned = ToOwn.Difference( OwnedFeatures );
+	const auto NewlyOwned = ToOwn.Difference( ObjectPtrDecay( OwnedFeatures ) );
 	
 	OwnedFeatures.Append( ToOwn );
 
@@ -308,14 +308,14 @@ TSet< const UStarfireFeatureData* > UFeatureContentManager::SetFeaturesAsUnowned
 		}
 	}
 
-	const auto NewlyUnowned = ToDisown.Intersect( OwnedFeatures );
+	const auto NewlyUnowned = ToDisown.Intersect( ObjectPtrDecay( OwnedFeatures ) );
 
-	OwnedFeatures = OwnedFeatures.Difference( ToDisown );
+	OwnedFeatures = OwnedFeatures.Difference( ObjectPtrWrap( ToDisown ) );
 
 	for (const auto F : NewlyUnowned)
 		OnFeatureDisowned.Broadcast( F );
 
-	return EnabledFeatures.Intersect( ToDisown );
+	return ObjectPtrDecay( EnabledFeatures ).Intersect( ToDisown );
 }
 
 TSet< const UStarfireFeatureData* > UFeatureContentManager::SetFeaturesAsUnowned( const TSet< FString > &ToDisown, bool bIgnoreBuiltIns )
@@ -325,12 +325,12 @@ TSet< const UStarfireFeatureData* > UFeatureContentManager::SetFeaturesAsUnowned
 
 TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( const TSet< const UStarfireFeatureData* > &ToOwn, bool bIgnoreBuiltIns )
 {
-	const auto Keep = OwnedFeatures.Intersect( ToOwn );
-	const auto NewOwn = ToOwn.Difference( Keep );
+	const auto Keep = OwnedFeatures.Intersect( ObjectPtrWrap( ToOwn ) );
+	const auto NewOwn = ToOwn.Difference( ObjectPtrDecay( Keep ) );
 	const auto ToDisown = OwnedFeatures.Difference( Keep );
 
 	SetFeaturesAsOwned( NewOwn );
-	return SetFeaturesAsUnowned( ToDisown );
+	return SetFeaturesAsUnowned( ObjectPtrDecay( ToDisown ) );
 }
 
 TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( const TSet< FString > &ToOwn, bool bIgnoreBuiltIns )
@@ -340,7 +340,7 @@ TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( co
 
 TSet< const UStarfireFeatureData* > UFeatureContentManager::DisownAllFeatures( bool bIgnoreBuiltIns )
 {
-	return SetFeaturesAsUnowned( OwnedFeatures, bIgnoreBuiltIns );
+	return SetFeaturesAsUnowned( ObjectPtrDecay( OwnedFeatures ), bIgnoreBuiltIns );
 }
 
 bool UFeatureContentManager::AreAllFeaturesActive( const TArray< const UStarfireFeatureData* > &Features ) const
@@ -516,7 +516,7 @@ void UFeatureContentManager::EnableDeveloperPIEFeatures( const UWorld *World, co
 		Content.Add( Feature );
 
 		const auto Plugin = IPluginManager::Get( ).FindPluginFromPath( World->GetPathName( ) );
-		const auto Dependencies = GetFeaturePluginDependencies( Plugin, DataMapping );
+		const auto Dependencies = GetFeaturePluginDependencies( Plugin, ObjectPtrDecay( DataMapping ) );
 
 		for (const auto &FeatureName : Dependencies)
 		{

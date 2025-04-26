@@ -97,6 +97,9 @@ private:
 	void AsyncLoadComplete( const FString &AsyncSlotName, int32 AsyncUserIndex, ESaveDataLoadResult Result, const UGameSaveHeader *Header, const UGameSaveData *SaveData );
 };
 
+enum class ESaveDataType : uint8;
+class UGameSaveData;
+
 // Blueprint utility for creating & writing a save game to disk
 UCLASS( )
 class SAVEDATAEXAMPLE_API USaveSaveData_AsyncAction : public UBlueprintAsyncAction_SF
@@ -155,7 +158,7 @@ private:
 
 	// Optional pre-existing save data that should be saved out instead of creating one based on the current state of the game
 	UPROPERTY( )
-	const UGameSaveData *Checkpoint = nullptr;
+	TObjectPtr< const UGameSaveData > Checkpoint = nullptr;
 
 	// Local callback for the async save operation
 	void AsyncSaveComplete( const FString &AsyncSlotName, int32 AsyncUserIndex, bool Success );

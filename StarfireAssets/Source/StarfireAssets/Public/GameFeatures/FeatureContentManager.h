@@ -132,27 +132,27 @@ public:
 private:
 	// The complete set of content packages that are possible to own or enable
 	UPROPERTY( )
-	TArray< const UStarfireFeatureData* > KnownFeatureData;
+	TArray< TObjectPtr< const UStarfireFeatureData > > KnownFeatureData;
 
 	// The content packages owned by the user (as defined by the platform or developer settings)
 	UPROPERTY( )
-	TSet< const UStarfireFeatureData* > OwnedFeatures;
+	TSet< TObjectPtr< const UStarfireFeatureData > > OwnedFeatures;
 
 	// The content packages that are enabled by the user to actually affect the game
 	UPROPERTY( )
-	TSet< const UStarfireFeatureData* > EnabledFeatures;
+	TSet< TObjectPtr< const UStarfireFeatureData > > EnabledFeatures;
 
 	// Direct mapping of the PluginName to the feature data
 	UPROPERTY( )
-	TMap< FString, const UStarfireFeatureData* > DataMapping;
+	TMap< FString, TObjectPtr< const UStarfireFeatureData > > DataMapping;
 
 	// Direct mapping of the feature data to the PluginName
 	UPROPERTY( )
-	TMap< const UStarfireFeatureData*, FString > NameMapping;
+	TMap< TObjectPtr< const UStarfireFeatureData >, FString > NameMapping;
 
 	// Direct mapping of the feature data to the PluginURL
 	UPROPERTY( )
-	TMap< const UStarfireFeatureData*, FString > URLMapping;
+	TMap< TObjectPtr< const UStarfireFeatureData >, FString > URLMapping;
 
 	DECLARE_FUNCTION( execGetOwnedFeatures );
 	DECLARE_FUNCTION( execGetEnabledFeatures );

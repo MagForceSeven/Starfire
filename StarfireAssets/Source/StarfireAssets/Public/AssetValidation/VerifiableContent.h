@@ -36,18 +36,26 @@ public:
 	// A utility for handling the verification of an asset and get around const-ness issues
 	template < VerifiableAsset type_t >
 	static void Verify( const type_t* Asset, const UObject *WorldContext );
+	template < VerifiableAsset type_t >
+	static void Verify( TObjectPtr< const type_t > Asset, const UObject *WorldContext );
 
 	// A helper utility for calling Verify on a collection of verifiable assets
 	template < VerifiableAsset type_t >
 	static void VerifyAll( const TArray< const type_t* > &Assets, const UObject *WorldContext );
+	template < VerifiableAsset type_t >
+	static void VerifyAll( const TArray< TObjectPtr< const type_t > > &Assets, const UObject *WorldContext );
 
 	// A helper utility for calling Verify on a collection of verifiable assets
 	template < VerifiableAsset type_t >
 	static void VerifyAll( const TArray< type_t* > &Assets, const UObject *WorldContext );
+	template < VerifiableAsset type_t >
+	static void VerifyAll( const TArray< TObjectPtr< type_t > > &Assets, const UObject *WorldContext );
 
 	// Determine if there are nullptrs in the array and remove them (when there's a valid world context)
 	template < class type_t >
-	[[nodiscard]] static bool SanitizeArray( TArray< type_t* > &Array, const UObject *WorldContext );
+	[[nodiscard]] static bool SanitizeArray( TArray< type_t*  > &Array, const UObject *WorldContext );
+	template < class type_t >
+	[[nodiscard]] static bool SanitizeArray( TArray< TObjectPtr< type_t >  > &Array, const UObject *WorldContext );
 };
 
 // Static class for instanced sub-objects which support verifying their data with Asset Check calls
@@ -70,12 +78,18 @@ public:
 	// A utility for handling the verification of a sub-object and get around const-ness issues
 	template < VerifiableStrategy type_t >
 	static bool Verify( const type_t *SubObject, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
+	template < VerifiableStrategy type_t >
+	static bool Verify( TObjectPtr< const type_t > SubObject, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
 
 	// A helper utility for calling Verify on a collection of verifiable sub-objects
 	template < VerifiableStrategy type_t >
 	static bool VerifyAll( const TArray< const type_t* > &SubObjects, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
 	template < VerifiableStrategy type_t >
+	static bool VerifyAll( const TArray< TObjectPtr< const type_t > > &SubObjects, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
+	template < VerifiableStrategy type_t >
 	static bool VerifyAll( const TArray< type_t* > &SubObjects, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
+	template < VerifiableStrategy type_t >
+	static bool VerifyAll( const TArray< TObjectPtr< type_t > > &SubObjects, const UObject *Asset, const UObject *WorldContext, FKismetCompilerContext *CompilerContext = nullptr );
 };
 
 // Remove nullptrs from the array (when the WorldContext is valid) and verify all the remaining elements of the array

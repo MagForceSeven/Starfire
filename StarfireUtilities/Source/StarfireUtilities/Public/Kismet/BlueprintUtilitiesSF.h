@@ -37,9 +37,19 @@ template < class type_t >
 [[nodiscard]] const TArray< type_t* >& BlueprintCompatibilityCast( const TArray< const type_t* > &NativeArray );
 
 template < class type_t >
+[[nodiscard]] TArray< type_t* >& BlueprintCompatibilityCast( TArray< TObjectPtr< const type_t > > &NativeArray );
+template < class type_t >
+[[nodiscard]] const TArray< type_t* >& BlueprintCompatibilityCast( const TArray< TObjectPtr< const type_t > > &NativeArray );
+
+template < class type_t >
 [[nodiscard]] TArray< const type_t* >& NativeCompatibilityCast( TArray< type_t* > &BlueprintArray );
 template < class type_t >
 [[nodiscard]] const TArray< const type_t* >& NativeCompatibilityCast( const TArray< type_t* > &BlueprintArray );
+
+template < class type_t >
+[[nodiscard]] TArray< const type_t* >& NativeCompatibilityCast( TArray< TObjectPtr< type_t > > &BlueprintArray );
+template < class type_t >
+[[nodiscard]] const TArray< const type_t* >& NativeCompatibilityCast( const TArray< TObjectPtr< type_t > > &BlueprintArray );
 
 #if CPP
 #define SF_BLUEPRINT_UTILITIES_HPP

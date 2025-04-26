@@ -686,8 +686,8 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::GameInstanceInit( const 
 		const auto &AllDefinitions = LibraryTypeMap.FindOrAdd( UDataDefinition::StaticClass( )->GetFName( ) );
 		const auto &AllExtensions = ActiveExtensions.Array( );
 
-		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllDefinitions ), Game );
-		IVerifiableAsset::VerifyAll( ObjectPtrArrayCast( AllExtensions ), Game );
+		IVerifiableAsset::VerifyAll( ObjectPtrDecay( AllDefinitions ), Game );
+		IVerifiableAsset::VerifyAll( ObjectPtrDecay( AllExtensions ), Game );
 		FMessageLog( "AssetCheck" ).Open( );
 	} );
 

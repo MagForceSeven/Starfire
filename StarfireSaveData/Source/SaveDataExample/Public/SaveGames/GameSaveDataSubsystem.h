@@ -19,7 +19,7 @@ public:
 
 	// The save data that should be used to populate game objects when the map is loaded
 	UPROPERTY( )
-	const UGameSaveData *SaveGame = nullptr;
+	TObjectPtr< const UGameSaveData > SaveGame = nullptr;
 
 	// The slot name of the last save that was loaded
 	FString LastSaveSlotName;
