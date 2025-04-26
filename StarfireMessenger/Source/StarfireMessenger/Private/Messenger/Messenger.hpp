@@ -7,14 +7,14 @@
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CImmediateNoContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( const type_t &Message )
 {
 	BroadcastImmediateInternal( FConstStructView::Make< type_t >( Message ), nullptr );
 }
 
 template < CImmediateWithContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( const type_t &Message, typename type_t::ContextType *Context )
 {
 	if (ensureAlways( Context != nullptr ))
@@ -25,14 +25,14 @@ void UStarfireMessenger::Broadcast( const type_t &Message, typename type_t::Cont
 }
 
 template < CStatefulNoContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( const type_t &Message )
 {
 	BroadcastStatefulInternal( FConstStructView::Make< type_t >( Message ), nullptr );
 }
 
 template < CStatefulWithContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( const type_t &Message, typename type_t::ContextType *Context )
 {
 	if (ensureAlways( Context != nullptr ))
@@ -44,7 +44,7 @@ void UStarfireMessenger::Broadcast( const type_t &Message, typename type_t::Cont
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CImmediateNoContextType type_t, class ... args_t >
-	requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+	requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( args_t && ... args )
 {
 	const type_t Message( std::forward< args_t >( args ) ... );
@@ -52,7 +52,7 @@ void UStarfireMessenger::Broadcast( args_t && ... args )
 }
 
 template < CImmediateWithContextType type_t, class ... args_t >
-	requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+	requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( typename type_t::ContextType *Context, args_t && ... args )
 {
 	if (ensureAlways( Context != nullptr ))
@@ -64,7 +64,7 @@ void UStarfireMessenger::Broadcast( typename type_t::ContextType *Context, args_
 }
 
 template < CStatefulNoContextType type_t, class ... args_t >
-	requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+	requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( args_t && ... args )
 {
 	const type_t Message( std::forward< args_t >( args ) ... );
@@ -72,7 +72,7 @@ void UStarfireMessenger::Broadcast( args_t && ... args )
 }
 
 template < CStatefulWithContextType type_t, class ... args_t >
-	requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+	requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( typename type_t::ContextType *Context, args_t && ... args )
 {
 	if (ensureAlways( Context != nullptr ))
@@ -363,7 +363,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -382,7 +382,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -405,7 +405,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -897,7 +897,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > &&  SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > &&  SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -916,7 +916,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -939,7 +939,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -1153,7 +1153,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CStatefulNoContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::ClearStatefulMessage( )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -1161,7 +1161,7 @@ void UStarfireMessenger::ClearStatefulMessage( )
 }
 
 template < CStatefulWithContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::ClearStatefulMessage( typename type_t::ContextType *Context )
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -1170,7 +1170,7 @@ void UStarfireMessenger::ClearStatefulMessage( typename type_t::ContextType *Con
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CStatefulNoContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 bool UStarfireMessenger::HasStatefulMessage() const
 {
 	const auto MessageType = type_t::StaticStruct( );
@@ -1178,7 +1178,7 @@ bool UStarfireMessenger::HasStatefulMessage() const
 }
 
 template < CStatefulWithContextType type_t >
-	requires !CAbstractMessageType< type_t >
+	requires (!CAbstractMessageType< type_t >)
 bool UStarfireMessenger::HasStatefulMessage( typename type_t::ContextType *Context ) const
 {
 	const auto MessageType = type_t::StaticStruct( );

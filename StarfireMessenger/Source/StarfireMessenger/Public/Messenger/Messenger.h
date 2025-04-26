@@ -120,58 +120,58 @@ public:
 
 	// Broadcast an immediate message out to the listeners that have registered for it
 	template < CImmediateNoContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void Broadcast( const type_t &Message );
 	template < CImmediateWithContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void Broadcast( const type_t &Message, typename type_t::ContextType *Context );
 	// Broadcast a stateful message out to the listeners that have registered for it
 	// And store message for later broadcast to new listeners
 	template < CStatefulNoContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void Broadcast( const type_t &Message );
 	template < CStatefulWithContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void Broadcast( const type_t &Message, typename type_t::ContextType *Context );
 
 	// Overloads that allow for in-place construction of the event data
 	
 	// Broadcast an immediate message out to the listeners that have registered for it
 	template < CImmediateNoContextType type_t, class ... args_t >
-		requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+		requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 	void Broadcast( args_t && ... args );
 	template < CImmediateWithContextType type_t, class ... args_t >
-		requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+		requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 	void Broadcast( typename type_t::ContextType *Context, args_t && ... args );
 	// Broadcast a stateful message out to the listeners that have registered for it
 	// And store message for later broadcast to new listeners
 	template < CStatefulNoContextType type_t, class ... args_t >
-		requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+		requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 	void Broadcast( args_t && ... args );
 	template < CStatefulWithContextType type_t, class ... args_t >
-		requires CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >
+		requires (CConstructorVarArgsMatch< type_t, args_t ... > && !CAbstractMessageType< type_t >)
 	void Broadcast( typename type_t::ContextType *Context, args_t && ... args );
 	
 	// Clear the stateful message for the specified message type
 	template < CStatefulNoContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void ClearStatefulMessage( );
 	// Clear any stateful message for the specified message type and context
 	// A nullptr context will clear stateful messages for all contexts
 	template < CStatefulWithContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	void ClearStatefulMessage( typename type_t::ContextType *Context );
 
 	// curious, for some reason the [[nodiscard]] attribute causes a compile error in MSVC, so we'll drop it for now in favor of the requires clause which is more important
 
 	// Check if a particular message type has an active stored message
 	template < CStatefulNoContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	/*[[nodiscard]]*/ bool HasStatefulMessage( ) const;
 	// Check if a particular message type has an active stored message for a potential context
 	// A nullptr context will check for stored messages for any context
 	template < CStatefulWithContextType type_t >
-		requires !CAbstractMessageType< type_t >
+		requires (!CAbstractMessageType< type_t >)
 	/*[[nodiscard]]*/ bool HasStatefulMessage( typename type_t::ContextType *Context ) const;
 
 	// Stop listening for the message
@@ -221,13 +221,13 @@ public:
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CImmediateWithContextType type_t >
@@ -301,13 +301,13 @@ public:
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires !SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CStatefulWithContextType type_t >

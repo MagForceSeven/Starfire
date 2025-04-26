@@ -185,7 +185,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForStatefulMessageInter
 			}
 			else
 			{
-				for (const auto Messages : StatefulData->ContextualMessages)
+				for (const auto& Messages : StatefulData->ContextualMessages)
 					Listener->StatefulCallback( Messages.Value, Messages.Key, EStatefulMessageEvent::ExistingMessage );
 			}
 		}

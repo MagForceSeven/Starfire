@@ -13,7 +13,13 @@
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"Installed": false,
+	"EnabledByDefault": false,
 	"EditorCustomVirtualPath": "Starfire",
+	"SupportedTargetPlatforms": [
+		"Win64",
+		"Linux",
+		"LinuxArm64"
+	],
 	"Modules": [
 		{
 			"Name": "StarfireAssets",

@@ -201,7 +201,7 @@ TArray< FString > UFeatureContentManager::GetEnabledFeatureNames( void ) const
 	TArray< FString > Results;
 	Results.Reserve( EnabledFeatures.Num( ) );
 
-	for (const auto E : EnabledFeatures)
+	for (const auto& E : EnabledFeatures)
 		Results.Push( NameMapping.FindRef( E ) );
 
 	return Results;

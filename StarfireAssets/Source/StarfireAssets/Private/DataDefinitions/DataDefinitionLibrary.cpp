@@ -186,7 +186,7 @@ void UDataDefinitionLibrary::GetAllDefinitionIDsForType( const UClass *ClassType
 
 	outArray.Reserve( TypeMap->Num() );
 
-	for (const auto Definition : *TypeMap)
+	for (const auto& Definition : *TypeMap)
 	{
 		outArray.Push( Definition->GetPrimaryAssetId( ) );
 	}
@@ -200,7 +200,7 @@ const UDataDefinition* UDataDefinitionLibrary::FindDefinition( const UClass *Cla
 	if (Set == nullptr)
 		return nullptr;
 
-	for (const auto Definition : *Set)
+	for (const auto& Definition : *Set)
 	{
 		if (Definition->GetPrimaryAssetId().PrimaryAssetName == AssetName)
 			return Definition;
@@ -235,7 +235,7 @@ void UDataDefinitionLibrary::GetPrimaryAssetDependencies( const FPrimaryAssetId 
 		const auto DataDefinition = GetDefinition< UDataDefinition >( AssetID );
 		if (ensureAlways( DataDefinition != nullptr ))
 		{
-			for (const auto Extension : DataDefinition->ActiveExtensions)
+			for (const auto& Extension : DataDefinition->ActiveExtensions)
 			{
 				const auto ExtensionID = Extension->GetPrimaryAssetId( );
 
