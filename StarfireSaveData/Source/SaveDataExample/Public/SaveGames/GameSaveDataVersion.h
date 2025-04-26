@@ -51,4 +51,4 @@ static_assert( GameSaveData_StripRTM(EGameSaveDataVersion::RTM_Minimum) >= EGame
 static_assert( EGameSaveDataVersion::Current_Plus_One < EGameSaveDataVersion::RTM, "SaveData Version value collision!" ); // just in case
 
 // Utility to get the build agnostic save game version that is associated with an Archive
-SAVEDATAEXAMPLE_API EGameSaveDataVersion GetSaveGameVersion( const FArchive &Ar );
+SAVEDATAEXAMPLE_API EGameSaveDataVersion Ex_GetSaveGameVersion( const FArchive &Ar );
