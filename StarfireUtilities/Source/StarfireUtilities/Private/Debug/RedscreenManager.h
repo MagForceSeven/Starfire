@@ -35,7 +35,7 @@ protected:
 
 	// A reference to an active screen that is displaying messages
 	UPROPERTY( )
-	URedscreenScreen *ScreenWidget = nullptr;
+	TObjectPtr<URedscreenScreen> ScreenWidget = nullptr;
 
 	// A hook to be notified when the screen widget is closed (removed from the view)
 	UFUNCTION( )
