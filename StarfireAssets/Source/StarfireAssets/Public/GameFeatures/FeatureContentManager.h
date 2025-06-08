@@ -44,7 +44,7 @@ public:
 	// Get the collection of entitlements that are currently owned
 	UFUNCTION( BlueprintCallable, CustomThunk, Category = "Feature Content" )
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetOwnedFeatures( ) const;
-	// Get the primary asset ids for all of the content entitlements that are currently owned
+	// Get the primary asset ids for all content entitlements that are currently owned
 	UFUNCTION( BlueprintCallable, Category = "Feature Content" )
 	[[nodiscard]] TArray< FPrimaryAssetId > GetOwnedFeatureIDs( ) const;
 
@@ -85,7 +85,7 @@ public:
 	// Determine if all the specified packages have made it to the active state
 	[[nodiscard]] bool AreAllFeaturesActive( const TArray< const UStarfireFeatureData* > &Features ) const;
 	[[nodiscard]] bool AreAllFeaturesActive( const TArray< FString > &PluginNames ) const;
-	// Determine if all the packages that have been been enabled have made it to the active state
+	// Determine if all the packages that have been enabled have made it to the active state
 	[[nodiscard]] bool AreEnabledFeaturesActive( void ) const;
 
 	// Check the status of a plugin package

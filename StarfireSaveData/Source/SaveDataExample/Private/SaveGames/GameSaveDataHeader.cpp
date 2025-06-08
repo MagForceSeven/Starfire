@@ -9,6 +9,7 @@
 
 int32 UGameSaveHeader::GetFileTypeTag( void ) const
 {
+	// ReSharper disable once CppMultiCharacterLiteral
 	return 'GAME';
 }
 

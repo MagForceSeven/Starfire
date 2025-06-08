@@ -1,4 +1,5 @@
 
+// ReSharper disable once CppMissingIncludeGuard
 #ifndef TYPE_UTILITIES_SF_HPP
 	#error You shouldn't be including this file directly
 #endif

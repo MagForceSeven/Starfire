@@ -25,7 +25,7 @@ enum class ESaveDataType : uint8
 	Developer,
 };
 
-// Condensed information for a a save that has been found on disk
+// Condensed information for a save that has been found on disk
 USTRUCT( BlueprintType )
 struct SAVEDATAEXAMPLE_API FEnumeratedSaveDataHeader
 {
@@ -77,7 +77,7 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "SaveType") )
 	[[nodiscard]] static FString GetUnusedSlotName( int32 UserIndex, ESaveDataType SaveType );
 
-	// Remove a save slot from from the disk
+	// Remove a save slot from the disk
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext") )
 	[[nodiscard]] static bool DeleteSaveGameInSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex );
 	

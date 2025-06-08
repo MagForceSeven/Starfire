@@ -3,32 +3,32 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(Messenger)
 
-//
+// Data for single listener-to-message binding
 struct FMessageListener
 {
-	//
+	// Handle that uniquely identifies this binding
 	FMessageListenerHandle Handle;
 
-	//
+	// The type of message that has been bound to
 	TObjectPtr< const UScriptStruct > MessageType;
 
-	//
+	// Callback that has been bound to the message (only one used per binding)
 	TFunction< void( FConstStructView, UObject* )> ImmediateCallback;
 	TFunction< void( FConstStructView, UObject*, EStatefulMessageEvent )> StatefulCallback;
 
-	//
+	// Client context filter for received messages (optional)
 	TObjectPtr< const UObject > ContextFilter;
-	//
+	// Listener interested in the message
 	TObjectPtr< const UObject > Owner;
 };
 
-//
+// State data for broadcast stateful messages
 struct FStatefulMessages
 {
-	//
+	// Message data for context-based message types
 	TMap< TObjectPtr< UObject >, FInstancedStruct > ContextualMessages;
 
-	//
+	// Message data for context-less message types
 	FInstancedStruct DefaultMessage;
 };
 

@@ -165,14 +165,14 @@ void UK2Node_RegisterForMessage::CreatePinsForType( UScriptStruct *InType, TArra
 	}
 }
 
-void UK2Node_RegisterForMessage::UpdateFunctionSignature( UScriptStruct *InType )
+void UK2Node_RegisterForMessage::UpdateFunctionSignature( const UScriptStruct *InType )
 {
 	SignatureFunction = DetermineSignatureFunction( InType );
 	
 	HandleAnyChange( true );
 }
 
-UFunction* UK2Node_RegisterForMessage::DetermineSignatureFunction( UScriptStruct *InType ) const
+UFunction* UK2Node_RegisterForMessage::DetermineSignatureFunction( const UScriptStruct *InType ) const
 {
 	const auto MessageType = (InType == nullptr) ? GetMessageType( ) : InType;
 	if (MessageType == nullptr)

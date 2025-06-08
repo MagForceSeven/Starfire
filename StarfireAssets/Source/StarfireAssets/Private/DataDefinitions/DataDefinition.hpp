@@ -1,4 +1,5 @@
 
+// ReSharper disable once CppMissingIncludeGuard
 #ifndef DATA_DEFINITION_HPP
 	#error You shouldn't be including this file directly
 #endif

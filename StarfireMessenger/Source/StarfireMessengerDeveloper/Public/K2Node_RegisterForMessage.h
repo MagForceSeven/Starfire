@@ -57,10 +57,10 @@ protected:
 	[[nodiscard]] bool IsValid( FString *OutMsg = nullptr, bool bDontUseSkeletalClassForSelf = false ) const;
 
 	// Determine what the current signature should be based on the node settings and inputs
-	void UpdateFunctionSignature( UScriptStruct *InType = nullptr );
+	void UpdateFunctionSignature( const UScriptStruct *InType = nullptr );
 	
 	// Based on pins and configuration options, determine which function should be used to format the delegate
-	[[nodiscard]] UFunction* DetermineSignatureFunction( UScriptStruct *InType = nullptr ) const;
+	[[nodiscard]] UFunction* DetermineSignatureFunction( const UScriptStruct *InType = nullptr ) const;
 
 	// Hold onto a reference to the function that defines the signature of the delegate
 	UPROPERTY( )

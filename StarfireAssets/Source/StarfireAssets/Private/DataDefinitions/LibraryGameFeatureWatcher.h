@@ -31,13 +31,17 @@ public:
 private:
 	// Game Feature Observer API
 	void OnGameFeatureRegistering( const UGameFeatureData *GameFeatureData, const FString &PluginName, const FString& PluginURL ) override;
+	void OnGameFeatureUnregistering(const UGameFeatureData *GameFeatureData, const FString &PluginName, const FString &PluginURL) override;
 	void OnGameFeatureActivating( const UGameFeatureData *GameFeatureData, const FString& PluginURL ) override;
 	void OnGameFeatureDeactivating( const UGameFeatureData *GameFeatureData, FGameFeatureDeactivatingContext &Context, const FString& PluginURL ) override;
 
 private:
 	// Mapping of the plugins to their name
+	// ReSharper disable once CppUE4ProbableMemoryIssuesWithUObjectsInContainer
 	TMap< const UGameFeatureData*, FString > PluginNames;
+
 	// The IDs for the data definitions that are part of each game feature
+	// ReSharper disable once CppUE4ProbableMemoryIssuesWithUObjectsInContainer
 	TMap< const UGameFeatureData*, TArray< FPrimaryAssetId > > FeatureAssets;
 };
 

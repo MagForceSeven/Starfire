@@ -34,14 +34,14 @@ public:
 
 protected:
 	// Called when a new struct was picked via the asset picker
-	void OnPickedNewStruct(const UScriptStruct* ChosenStruct);
+	void OnPickedNewStruct( const UScriptStruct* ChosenStruct ) const;
 
 	//~ Begin SGraphPinObject Interface
-	virtual FReply OnClickUse() override;
-	virtual bool AllowSelfPinWidget() const override { return false; }
-	virtual TSharedRef<SWidget> GenerateAssetPicker() override;
-	virtual FText GetDefaultComboText() const override;
-	virtual FOnClicked GetOnUseButtonDelegate() override;
+	FReply OnClickUse() override;
+	bool AllowSelfPinWidget() const override { return false; }
+	TSharedRef<SWidget> GenerateAssetPicker() override;
+	FText GetDefaultComboText() const override;
+	FOnClicked GetOnUseButtonDelegate() override;
 	//~ End SGraphPinObject Interface
 
 	bool bAllowImmediate = false;

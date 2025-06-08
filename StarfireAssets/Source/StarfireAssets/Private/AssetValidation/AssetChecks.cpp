@@ -37,7 +37,7 @@ AssetChecks::FScopedChecksChannel::~FScopedChecksChannel( )
 }
 
 #if WITH_EDITOR
-TSharedRef< FTokenizedMessage > MessageBase( const UObject *Asset, FKismetCompilerContext *CompilerContext )
+static TSharedRef< FTokenizedMessage > MessageBase( const UObject *Asset, const FKismetCompilerContext *CompilerContext )
 {
 	if (!Asset->IsA< UK2Node >( ))
 	{
@@ -58,7 +58,7 @@ TSharedRef< FTokenizedMessage > MessageBase( const UObject *Asset, FKismetCompil
 }
 #endif
 
-void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const UObject *WorldContext, FKismetCompilerContext *CompilerContext )
+void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const UObject *WorldContext, const FKismetCompilerContext *CompilerContext )
 {
 	check( Asset != nullptr );
 	check( !Message.IsEmpty( ) );
@@ -70,7 +70,7 @@ void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset,
 	RedscreenImpl( WorldContext, false, File, Line, TEXT( "%s: %s" ), *Asset->GetName( ), *Message );
 }
 
-void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const UObject *SecondaryReference, const UObject *WorldContext, FKismetCompilerContext *CompilerContext )
+void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const UObject *SecondaryReference, const UObject *WorldContext, const FKismetCompilerContext *CompilerContext )
 {
 	check( Asset != nullptr );
 	check( !Message.IsEmpty( ) );
@@ -84,7 +84,7 @@ void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset,
 	RedscreenImpl( WorldContext, false, File, Line, TEXT( "%s: %s - %s" ), *Asset->GetName( ), *Message, *SecondaryReference->GetName( ) );
 }
 
-void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const TArray< const UObject* > &SecondaryReferences, const UObject *WorldContext, FKismetCompilerContext *CompilerContext )
+void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset, const FString &Message, const TArray< const UObject* > &SecondaryReferences, const UObject *WorldContext, const FKismetCompilerContext *CompilerContext )
 {
 	check( Asset != nullptr );
 	check( !Message.IsEmpty( ) );

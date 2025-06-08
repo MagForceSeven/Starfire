@@ -29,6 +29,7 @@ void USaveDataHeader::FillCoreData( const USaveData *SaveData, const FString &In
 int32 USaveDataHeader::GetFileTypeTag( ) const
 {
 	unimplemented( );
+	// ReSharper disable once CppMultiCharacterLiteral
 	return 'UNKN';
 }
 

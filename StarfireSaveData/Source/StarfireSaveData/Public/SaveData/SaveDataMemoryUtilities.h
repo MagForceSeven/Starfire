@@ -10,6 +10,7 @@ enum class ESaveDataCompressionType : uint32;
 // Primary description of the save game file
 struct FSaveDataFileDescription
 {
+	// ReSharper disable once CppMultiCharacterLiteral
 	uint32 FileTypeTag = 'UNST';
 	uint32 HeaderSize = 0; // Size of entire header section which includes header and version info
 	uint32 HeaderHash = 0; // Hash of the header section

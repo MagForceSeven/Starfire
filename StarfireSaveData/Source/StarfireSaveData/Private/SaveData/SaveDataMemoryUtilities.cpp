@@ -65,7 +65,7 @@ ESaveDataLoadResult SaveDataMemoryUtilities::LoadHeaderFromArchive( FArchive &Ar
 	if (HeaderSize < sizeof( FSaveDataVersionData ))
 		return ESaveDataLoadResult::CorruptFile;
 
-	// Is the file large enough for the how big it needs to be to hold the header information
+	// Is the file large enough for how big it needs to be to hold the header information
 	if (FileSize < (HeaderStart + HeaderSize))
 		return ESaveDataLoadResult::CorruptFile;
 

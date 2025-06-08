@@ -1,4 +1,5 @@
 
+// ReSharper disable CppDeclaratorNeverUsed
 #include "Templates/ContainerRandUtilities.h"
 
 static void Test( )

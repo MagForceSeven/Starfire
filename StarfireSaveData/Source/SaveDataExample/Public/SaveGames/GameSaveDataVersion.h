@@ -1,6 +1,7 @@
 
 #pragma once
 
+// ReSharper disable once CppUnusedIncludeDirective
 #include "SaveData/SaveDataVersion.h"
 
 #if !defined SF_BUILD_RTM

@@ -4,7 +4,7 @@
 #include "Templates/Casts.h"
 
 // PS5 is known to be missing these concepts
-// if another platform is missing concepts from it's std implementation,
+// if another platform is missing concepts from its std implementation,
 // either add another platform case or add "STARFIRE_PLATFORM_MISSING_CONCEPTS=1" as a project definition in your Target.cs
 
 #if defined(PLATFORM_PS5) && PLATFORM_PS5

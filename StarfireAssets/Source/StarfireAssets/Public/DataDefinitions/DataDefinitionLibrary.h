@@ -39,7 +39,7 @@ public:
 	template < CDefinitionType type_t >
 	[[nodiscard]] const type_t* DEBUG_FindDefinition( const FName &AssetName );
 
-	// Do some custom game instance startup, such as loading non-feature and active feature definitions and toggling the pre-load bundles
+	// Do some custom game instance startup, such as loading non-feature and active feature definitions and toggling the preload bundles
 	TSharedPtr< FStreamableHandle > GameInstanceInit( const UGameInstance *Game );
 	// Do some custom game instance cleanup, such as unloading the definitions
 	void GameInstanceShutdown( const UGameInstance *Game );
@@ -154,7 +154,7 @@ public:
 	[[nodiscard]] const UDataDefinition* operator*( void ) const;
 	[[nodiscard]] const UDataDefinition* operator->( void ) const;
 
-	// Pre & Post Increment operators
+	// Pre- & Post-Increment operators
 	FDataDefinitionIterator& operator++( void );
 	FDataDefinitionIterator operator++( int );
 

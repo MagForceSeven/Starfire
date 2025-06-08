@@ -188,7 +188,7 @@ FOnClicked SGraphPinMessengerType::GetOnUseButtonDelegate()
 	return FOnClicked::CreateSP(this, &SGraphPinMessengerType::OnClickUse);
 }
 
-void SGraphPinMessengerType::OnPickedNewStruct(const UScriptStruct* ChosenStruct)
+void SGraphPinMessengerType::OnPickedNewStruct( const UScriptStruct* ChosenStruct ) const
 {
 	if(GraphPinObj->IsPendingKill())
 	{

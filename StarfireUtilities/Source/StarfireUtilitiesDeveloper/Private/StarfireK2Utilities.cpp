@@ -199,7 +199,7 @@ void StarfireK2Utilities::CreateEventDispatcherPins( const UClass *Class, UK2Nod
 		if (DispatcherProperty->SignatureFunction == nullptr)
 			continue;
 
-		const auto PinNameLambda = FGetPinName::CreateLambda( [ DispatcherProperty ]( FProperty *Param ) -> FName { return CreateDispatcherParamPinName( DispatcherProperty, Param ); } );
+		const auto PinNameLambda = FGetPinName::CreateLambda( [ DispatcherProperty ]( const FProperty *Param ) -> FName { return CreateDispatcherParamPinName( DispatcherProperty, Param ); } );
 		
 		const auto FunctionPins = CreateFunctionPins( Node, DispatcherProperty->SignatureFunction, EGPD_Output, bMakeAdvanced, PinNameLambda, TooltipLambda );
 		if (OutDispatcherPins != nullptr)
@@ -279,7 +279,7 @@ UEdGraphPin* StarfireK2Utilities::ExpandDispatcherPins( FKismetCompilerContext &
 		if (DispatcherProperty->SignatureFunction == nullptr)
 			continue;
 
-		const auto PinNameLambda = FGetPinName::CreateLambda( [ DispatcherProperty ]( FProperty *Param ) -> FName { return CreateDispatcherParamPinName( DispatcherProperty, Param ); } );
+		const auto PinNameLambda = FGetPinName::CreateLambda( [ DispatcherProperty ]( const FProperty *Param ) -> FName { return CreateDispatcherParamPinName( DispatcherProperty, Param ); } );
 		const auto PinExpansionLambda = FDoPinExpansion::CreateLambda( [ &CompilerContext, CustomEvent ]( const FProperty *Param, UEdGraphPin *NodePin )
 			{
 				const auto EventPin = CustomEvent->CreateUserDefinedPin( Param->GetFName( ), NodePin->PinType, EGPD_Output );

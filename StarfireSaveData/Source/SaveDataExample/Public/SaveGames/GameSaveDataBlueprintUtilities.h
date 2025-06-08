@@ -121,7 +121,7 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "DisplayNameOverride", WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
 	static USaveSaveData_AsyncAction* SaveGameToSlot( const FString &SlotName, int UserIndex, const FString &DisplayNameOverride, UObject *WorldContext );
 
-	// Create an automated save game that is written to the an available or old autosave slot
+	// Create an automated save game that is written to an available or old autosave slot
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "DisplayNameOverride", WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
 	static USaveSaveData_AsyncAction* SaveAutoSave( int UserIndex, const FString &DisplayNameOverride, UObject *WorldContext );
 

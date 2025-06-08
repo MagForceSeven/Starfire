@@ -62,7 +62,7 @@ const UDataDefinitionExtension* UDataDefinition::FindExtension_BP( TSubclassOf< 
 	
 	if (Type == nullptr)
 	{
-		Redscreen( WorldContext, TEXT( "DataDefinition::FindExtensionByClass called without specifying an Exention Type %s.%s" ), *WorldContext->GetName( ), *GetBlueprintCallerFunctionName( ) );
+		Redscreen( WorldContext, TEXT( "DataDefinition::FindExtensionByClass called without specifying an Extension Type %s.%s" ), *WorldContext->GetName( ), *GetBlueprintCallerFunctionName( ) );
 		
 		return nullptr;
 	}
@@ -79,7 +79,7 @@ void UDataDefinition::GetAllExtensions_BP( TSubclassOf< UDataDefinitionExtension
 {
 	if (Type == nullptr)
 	{
-		Redscreen( WorldContext, TEXT( "DataDefinition::GetAllExtensionsByClass called without specifying an Exention Type %s.%s" ), *WorldContext->GetName( ), *GetBlueprintCallerFunctionName( ) );
+		Redscreen( WorldContext, TEXT( "DataDefinition::GetAllExtensionsByClass called without specifying an Extension Type %s.%s" ), *WorldContext->GetName( ), *GetBlueprintCallerFunctionName( ) );
 		
 		return;
 	}

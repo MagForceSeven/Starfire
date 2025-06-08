@@ -29,7 +29,7 @@ enum class ESaveDataLoadResult : uint8
 	// File was unable to be opened
 	FailedToOpen,
 
-	// Something wrong with the file tag. May be an invalid or corrupt file
+	// Something wrong with the file tag. Maybe an invalid or corrupt file
 	InvalidFileTag,
 
 	// File hashes don't match, something is corrupt with the file

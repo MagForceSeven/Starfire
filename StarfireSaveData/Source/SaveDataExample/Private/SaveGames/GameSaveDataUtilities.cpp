@@ -26,7 +26,7 @@ static TAutoConsoleVariable< bool > CVar_AllowDeveloperSaves( TEXT( "Game.SaveGa
 	#endif
 	TEXT( "Whether or not developer save request should be honored" ), ECVF_Cheat );
 
-static TAutoConsoleVariable< int > CVar_MaxAutoSaveSlots( TEXT( "Game.SaveGame.MaxAutoSaveSlots" ), 5, TEXT( "The maximum number of unique autosaves allowed at one time" ), ECVF_Cheat );
+static TAutoConsoleVariable< int > CVar_MaxAutoSaveSlots( TEXT( "Game.SaveGame.MaxAutoSaveSlots" ), 5, TEXT( "The maximum number of unique auto-saves allowed at one time" ), ECVF_Cheat );
 static TAutoConsoleVariable< FString > CVar_QuickSaveSlotName( TEXT( "Game.SaveGames.QuickSaveSlotName" ), "QuickSave", TEXT( "The name of the slot to use for savegames" ), ECVF_Cheat );
 
 FString Ex_GetQuickSaveSlotName( void ) { return CVar_QuickSaveSlotName.GetValueOnAnyThread( ); }
@@ -804,7 +804,7 @@ void UGameSaveDataUtilities::AutoSave_Async( const UObject *WorldContext, int32 
 		// The save game data to be saved into the auto save slot
 		const UGameSaveData *SaveData = nullptr;
 
-		// The header meta data about the save
+		// The header metadata about the save
 		UGameSaveHeader *Header = nullptr;
 		
 		// The user facing name that should be used for this save

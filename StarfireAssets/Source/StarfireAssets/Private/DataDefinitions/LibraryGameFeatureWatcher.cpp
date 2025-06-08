@@ -88,6 +88,12 @@ void UDefinitionLibrary_GameFeatureWatcher::OnGameFeatureRegistering( const UGam
 	UpdateFeatureCache( GameFeatureData );
 }
 
+void UDefinitionLibrary_GameFeatureWatcher::OnGameFeatureUnregistering( const UGameFeatureData *GameFeatureData, const FString &PluginName, const FString &PluginURL )
+{
+	PluginNames.Remove( GameFeatureData );
+	FeatureAssets.Remove( GameFeatureData );
+}
+
 void UDefinitionLibrary_GameFeatureWatcher::OnGameFeatureActivating( const UGameFeatureData *GameFeatureData, const FString& PluginURL )
 {
 	const auto AssetIDs = FeatureAssets.Find( GameFeatureData );

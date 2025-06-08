@@ -162,7 +162,7 @@ public:
 		requires (!CAbstractMessageType< type_t >)
 	void ClearStatefulMessage( typename type_t::ContextType *Context );
 
-	// curious, for some reason the [[nodiscard]] attribute causes a compile error in MSVC, so we'll drop it for now in favor of the requires clause which is more important
+	// curious, for some reason the [[nodiscard]] attribute causes a compile error in MSVC, so we'll drop it for now in favor of the "requires" clause which is more important
 
 	// Check if a particular message type has an active stored message
 	template < CStatefulNoContextType type_t >
