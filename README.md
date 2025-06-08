@@ -2,6 +2,7 @@
 A collection of UE5 plugins that I've developed over the course of my hobby development. Some of which has also been used professionally in some version.
 
 Current Engine version supported: 5.6.0
+
 Platform Support: Windows, Linux. (May work on other platforms, but untested)
 
 There are branches for version of the plugins compatible with earlier versions. However they are archives and not updated with any of the improvements that can be found in 'main'.
