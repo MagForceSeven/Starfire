@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "5.4.1",
+	"VersionName": "5.6.0",
 	"FriendlyName": "Starfire Save Data",
 	"Description": "Library for Save data and file management",
 	"Category": "Other",

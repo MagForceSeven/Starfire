@@ -13,7 +13,7 @@ void FMDMetaDataEditorStructChangeHandler::PreChange(const UUserDefinedStruct* S
 		FMDMetaDataEditorCachedStructMetadata& Cache = CachedStructMetadata.FindOrAdd(Struct);
 		if (Cache.Count++ == 0)
 		{
-			if (TMap<FName, FString>* MetaDataMap = UMetaData::GetMapForObject(Struct))
+			if (TMap<FName, FString>* MetaDataMap = FMetaData::GetMapForObject(Struct))
 			{
 				Cache.StructMetadata = *MetaDataMap;
 			}
@@ -37,7 +37,7 @@ void FMDMetaDataEditorStructChangeHandler::PostChange(const UUserDefinedStruct* 
 		{
 			if (--Cache->Count == 0)
 			{
-				TMap<FName, FString>& MetaDataMap = Struct->GetOutermost()->GetMetaData()->ObjectMetaDataMap.FindOrAdd(Struct);
+				TMap<FName, FString>& MetaDataMap = Struct->GetOutermost()->GetMetaData().ObjectMetaDataMap.FindOrAdd(Struct);
 				MetaDataMap.Append(MoveTemp(Cache->StructMetadata));
 
 				for (TFieldIterator<FProperty> PropertyIter(Struct); PropertyIter; ++PropertyIter)

@@ -1,7 +1,8 @@
 # Starfire
 A collection of UE5 plugins that I've developed over the course of my hobby development. Some of which has also been used professionally in some version.
 
-Current Engine version supported: 5.5.0
+Current Engine version supported: 5.6.0
+Platform Support: Windows, Linux. (May work on other platforms, but untested)
 
 There are branches for version of the plugins compatible with earlier versions. However they are archives and not updated with any of the improvements that can be found in 'main'.
 
@@ -20,10 +21,8 @@ Some identified work can be found [here](https://open.codecks.io/starfire). Ther
 
 Highlights:
 * Typesafe array pointer and soft pointer casting utilities (I think everyone's got a version of this somewhere)
-* A ForEach Blueprint node for TMaps
 * An Editor Subsystem that can fixup Default Events when new defaults are added after child blueprints have already been made
 * An interface that can be used for dealing with soft references held by Developer Settings
-* Typesafe casting of structures (native only, somewhat less useful with Instanced Structs but somewhat more convienent than those)
 * A subsystem that can manage "splatting" tasks across multiple frames with various perf controls
 * A system of "redscreens" as an additional error reporting mechanism that promote the visibility of specific failures to something in-game instead of information that must be dug out of a log
 

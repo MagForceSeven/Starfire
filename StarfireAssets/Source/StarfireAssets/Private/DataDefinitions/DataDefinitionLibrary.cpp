@@ -245,11 +245,11 @@ void UDataDefinitionLibrary::GetPrimaryAssetDependencies( const FPrimaryAssetId 
 	}
 }
 
-TSharedPtr<FStreamableHandle> UDataDefinitionLibrary::LoadPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToLoad, const TArray<FName>& LoadBundles, FStreamableDelegate DelegateToCall, TAsyncLoadPriority Priority)
+TSharedPtr<FStreamableHandle> UDataDefinitionLibrary::LoadPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToLoad, const TArray<FName>& LoadBundles, FAssetManagerLoadParams&& LoadParams, UE::FSourceLocation Location)
 {
 	// Overridden to change the bRemoveAllBundles param from true to false. Unloading bundles not in the LoadBundles when doing LoadPrimaryAssets seems bonkers
 	// what if someone already loaded the asset with some bundles? you're going to unload *their* bundles??
-	return ChangeBundleStateForPrimaryAssets(AssetsToLoad, LoadBundles, TArray<FName>(), false, MoveTemp(DelegateToCall), Priority);
+	return ChangeBundleStateForPrimaryAssets(AssetsToLoad, LoadBundles, TArray<FName>(), false, MoveTemp(LoadParams), MoveTemp(Location));
 }
 
 void UDataDefinitionLibrary::IncrementRefCounts( const TSet< FPrimaryAssetId > &Assets, const TArray< FName > &BundleNames, const FPrimaryAssetId &SourceID )
@@ -359,7 +359,13 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::DecrementRefCountsAndUnl
 	return { };
 }
 
-TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::ChangeBundleStateForPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToChange, const TArray<FName>& AddBundles, const TArray<FName>& RemoveBundles, bool bRemoveAllBundles, FStreamableDelegate DelegateToCall, TAsyncLoadPriority Priority)
+TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::ChangeBundleStateForPrimaryAssets(
+	const TArray<FPrimaryAssetId>& AssetsToChange,
+	const TArray<FName>& AddBundles,
+	const TArray<FName>& RemoveBundles,
+	bool bRemoveAllBundles,
+	FAssetManagerLoadParams&& LoadParams,
+	UE::FSourceLocation Location)
 {
 	if (bRemoveAllBundles)
 	{
@@ -372,13 +378,13 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::ChangeBundleStateForPrim
 		for (const FPrimaryAssetId &ID : AssetsToChange)
 			PrimaryAssetBundleCounts.Remove( ID );
 		
-		return Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, { }, { }, true, DelegateToCall, Priority );
+		return Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, { }, { }, true, MoveTemp(LoadParams), Location );
 	}
 
 	TArray< TSharedPtr< FStreamableHandle > > AllHandles;
 
 	// We don't really care about the ref counts to actually make the load request since they're not ref-counted anyway at the engine level. Already loaded things aren't loaded again already
-	TSharedPtr< FStreamableHandle > LoadHandle = Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, AddBundles, { }, false, { }, Priority );
+	TSharedPtr< FStreamableHandle > LoadHandle = Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, AddBundles, { }, false, { }, LoadParams.Priority );
 	if (LoadHandle.IsValid( ) && LoadHandle->IsActive( ))
 		AllHandles.Push( LoadHandle );
 
@@ -396,13 +402,13 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::ChangeBundleStateForPrim
 	{
 		TSharedPtr< FStreamableHandle > ReturnHandle = StreamableManager.CreateCombinedHandle( AllHandles, FString::Printf( TEXT( "%s Fxs ChangeBundleStateForPrimaryAssets" ), *GetName( ) ) );
 		if (!ReturnHandle.IsValid( ) || ReturnHandle->HasLoadCompleted( ))
-			FStreamableHandle::ExecuteDelegate( DelegateToCall );
+			FStreamableHandle::ExecuteDelegate( LoadParams.OnComplete );
 		else
-			ReturnHandle->BindCompleteDelegate( DelegateToCall );
+			ReturnHandle->BindCompleteDelegate( LoadParams.OnComplete );
 		return ReturnHandle;
 	}
 	
-	FStreamableHandle::ExecuteDelegate( DelegateToCall );
+	FStreamableHandle::ExecuteDelegate( LoadParams.OnComplete );
 	return {};
 }
 

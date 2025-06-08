@@ -212,7 +212,7 @@ const TMap<FName, FString>* FMDMetaDataEditorFieldView::GetMetadataMap() const
 	}
 	else if (UUserDefinedStruct* Struct = MetadataStruct.Get())
 	{
-		return UMetaData::GetMapForObject(Struct);
+		return FMetaData::GetMapForObject(Struct);
 	}
 
 	return nullptr;

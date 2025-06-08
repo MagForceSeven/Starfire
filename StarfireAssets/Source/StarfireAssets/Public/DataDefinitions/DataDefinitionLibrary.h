@@ -52,8 +52,21 @@ public:
 	// Asset Manager API
 	[[nodiscard]] UObject* GetPrimaryAssetObject( const FPrimaryAssetId &AssetID ) const override;
 	[[nodiscard]] bool GetPrimaryAssetObjectList( FPrimaryAssetType PrimaryAssetType, TArray< UObject* > &ObjectList ) const override;
-	TSharedPtr<FStreamableHandle> LoadPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToLoad, const TArray<FName>& LoadBundles= TArray<FName>(), FStreamableDelegate DelegateToCall = FStreamableDelegate(), TAsyncLoadPriority Priority = FStreamableManager::DefaultAsyncLoadPriority) override;
-	TSharedPtr<FStreamableHandle> ChangeBundleStateForPrimaryAssets(const TArray<FPrimaryAssetId>& AssetsToChange, const TArray<FName>& AddBundles, const TArray<FName>& RemoveBundles, bool bRemoveAllBundles = false, FStreamableDelegate DelegateToCall = FStreamableDelegate(), TAsyncLoadPriority Priority = FStreamableManager::DefaultAsyncLoadPriority) override;
+
+	using UAssetManager::LoadPrimaryAssets;
+	TSharedPtr<FStreamableHandle> LoadPrimaryAssets(
+		const TArray<FPrimaryAssetId>& AssetsToLoad,
+		const TArray<FName>& LoadBundles, FAssetManagerLoadParams&& LoadParams,
+		UE::FSourceLocation Location = UE::FSourceLocation::Current()) override;
+
+	using UAssetManager::ChangeBundleStateForPrimaryAssets;
+	TSharedPtr<FStreamableHandle> ChangeBundleStateForPrimaryAssets(
+		const TArray<FPrimaryAssetId>& AssetsToChange,
+		const TArray<FName>& AddBundles,
+		const TArray<FName>& RemoveBundles,
+		bool bRemoveAllBundles,
+		FAssetManagerLoadParams&& LoadParams,
+		UE::FSourceLocation Location = UE::FSourceLocation::Current()) override;
 
 	// UObject API
 	static void AddReferencedObjects( UObject *InThis, FReferenceCollector &Collector );
