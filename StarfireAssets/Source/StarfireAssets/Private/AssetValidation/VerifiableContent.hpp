@@ -13,7 +13,7 @@ void IVerifiableAsset::Verify( const type_t* Asset, const UObject *WorldContext 
 template < VerifiableAsset type_t >
 void IVerifiableAsset::Verify( TObjectPtr< const type_t > Asset, const UObject *WorldContext )
 {
-	const_cast< type_t* >( Asset )->Verify( WorldContext );
+	const_cast< type_t* >( Asset.Get( ) )->Verify( WorldContext );
 }
 
 template < VerifiableAsset type_t >
