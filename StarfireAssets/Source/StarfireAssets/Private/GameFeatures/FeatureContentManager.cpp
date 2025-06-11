@@ -233,6 +233,11 @@ void UFeatureContentManager::EnableFeatures( const TSet< const UStarfireFeatureD
 	}
 }
 
+void UFeatureContentManager::EnableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToEnable, const TArray< FName > &Bundles )
+{
+	EnableFeatures( ObjectPtrDecay( ToEnable ), Bundles );
+}
+
 void UFeatureContentManager::EnableFeatures( const TSet< FString > &ToEnable, const TArray< FName > &Bundles )
 {
 	EnableFeatures( FindAllFeatures( ToEnable ), Bundles );
@@ -256,6 +261,12 @@ void UFeatureContentManager::DisableFeatures( const TSet< const UStarfireFeature
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeStatic
+void UFeatureContentManager::DisableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToDisable )
+{
+	DisableFeatures( ObjectPtrDecay( ToDisable ) );
+}
+
 void UFeatureContentManager::DisableFeatures( const TSet< FString > &ToDisable )
 {
 	DisableFeatures( FindAllFeatures( ToDisable ) );
@@ -269,6 +280,11 @@ void UFeatureContentManager::SetEnabledFeatures( const TSet< const UStarfireFeat
 
 	DisableFeatures( ObjectPtrDecay( Disable ) );
 	EnableFeatures( Enable, Bundles );
+}
+
+void UFeatureContentManager::SetEnabledFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &NewFeatures, const TArray< FName > &Bundles )
+{
+	SetEnabledFeatures( ObjectPtrDecay( NewFeatures ), Bundles );
 }
 
 void UFeatureContentManager::SetEnabledFeatures( const TSet< FString > &NewFeatures, const TArray< FName > &Bundles )
@@ -290,6 +306,11 @@ void UFeatureContentManager::SetFeaturesAsOwned( const TSet< const UStarfireFeat
 
 	for (const auto F : NewlyOwned)
 		OnFeatureOwned.Broadcast( F );
+}
+
+void UFeatureContentManager::SetFeaturesAsOwned( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToOwn )
+{
+	SetFeaturesAsOwned( ObjectPtrDecay( ToOwn ) );
 }
 
 void UFeatureContentManager::SetFeaturesAsOwned( const TSet< FString > &ToOwn )
@@ -318,6 +339,11 @@ TSet< const UStarfireFeatureData* > UFeatureContentManager::SetFeaturesAsUnowned
 	return ObjectPtrDecay( EnabledFeatures ).Intersect( ToDisown );
 }
 
+TSet<const UStarfireFeatureData *> UFeatureContentManager::SetFeaturesAsUnowned( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToDisown, bool bIgnoreBuiltIns )
+{
+	return SetFeaturesAsUnowned( ObjectPtrDecay( ToDisown ), bIgnoreBuiltIns );
+}
+
 TSet< const UStarfireFeatureData* > UFeatureContentManager::SetFeaturesAsUnowned( const TSet< FString > &ToDisown, bool bIgnoreBuiltIns )
 {
 	return SetFeaturesAsUnowned( FindAllFeatures( ToDisown ), bIgnoreBuiltIns );
@@ -331,6 +357,11 @@ TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( co
 
 	SetFeaturesAsOwned( NewOwn );
 	return SetFeaturesAsUnowned( ObjectPtrDecay( ToDisown ) );
+}
+
+TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToOwn, bool bIgnoreBuiltIns )
+{
+	return SetOwnedFeatures( ObjectPtrDecay( ToOwn ), bIgnoreBuiltIns );
 }
 
 TSet< const UStarfireFeatureData* > UFeatureContentManager::SetOwnedFeatures( const TSet< FString > &ToOwn, bool bIgnoreBuiltIns )
@@ -359,6 +390,12 @@ bool UFeatureContentManager::AreAllFeaturesActive( const TArray< const UStarfire
 
 	return true;
 }
+
+bool UFeatureContentManager::AreAllFeaturesActive( const TArray< TObjectPtr< const UStarfireFeatureData > > &Features ) const
+{
+	return AreAllFeaturesActive( ObjectPtrDecay( Features ) );
+}
+
 bool UFeatureContentManager::AreAllFeaturesActive( const TArray< FString > &PluginNames ) const
 {
 	const auto &FeaturesSubsystem = UGameFeaturesSubsystem::Get( );

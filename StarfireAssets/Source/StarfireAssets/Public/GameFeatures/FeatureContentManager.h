@@ -59,12 +59,15 @@ public:
 
 	// Turn on an entitlement so that it can affect gameplay
 	void EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles );
+	void EnableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToEnable, const TArray< FName > &Bundles );
 	void EnableFeatures( const TSet< FString > &ToEnable, const TArray< FName > &Bundles );
 	// Turn off an entitlement so that it will not affect gameplay
 	void DisableFeatures( const TSet< const UStarfireFeatureData* > &ToDisable );
+	void DisableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToDisable );
 	void DisableFeatures( const TSet< FString > &ToDisable );
 	// Set the state of the entitlements to a specific collection of entitlements
 	void SetEnabledFeatures( const TSet< const UStarfireFeatureData* > &NewFeatures, const TArray< FName > &Bundles );
+	void SetEnabledFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &NewFeatures, const TArray< FName > &Bundles );
 	void SetEnabledFeatures( const TSet< FString > &NewFeatures, const TArray< FName > &Bundles );
 
 	// Force all the entitlements into the disabled state
@@ -72,18 +75,22 @@ public:
 
 	// Specify a collection of features that should be treated as owned by the player
 	void SetFeaturesAsOwned( const TSet< const UStarfireFeatureData* > &ToOwn );
+	void SetFeaturesAsOwned( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToOwn );
 	void SetFeaturesAsOwned( const TSet< FString > &ToOwn );
 	// Specify a collection of features that should be treated as unowned by the player
 	TSet< const UStarfireFeatureData* > SetFeaturesAsUnowned( TSet< const UStarfireFeatureData* > ToDisown, bool bIgnoreBuiltIns = true );
+	TSet< const UStarfireFeatureData* > SetFeaturesAsUnowned( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToDisown, bool bIgnoreBuiltIns = true );
 	TSet< const UStarfireFeatureData* > SetFeaturesAsUnowned( const TSet< FString > &ToDisown, bool bIgnoreBuiltIns = true );
 	// Force the state of owned features to be a specific collection (returning the collection of currently enabled features that have become unowned)
 	TSet< const UStarfireFeatureData* > SetOwnedFeatures( const TSet< const UStarfireFeatureData* > &ToOwn, bool bIgnoreBuiltIns = true );
+	TSet< const UStarfireFeatureData* > SetOwnedFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToOwn, bool bIgnoreBuiltIns = true );
 	TSet< const UStarfireFeatureData* > SetOwnedFeatures( const TSet< FString > &ToOwn, bool bIgnoreBuiltIns = true );
 	// Force the state of all features to be unowned (returning the collection of currently enabled features that have become unowned)
 	TSet< const UStarfireFeatureData* > DisownAllFeatures( bool bIgnoreBuiltIns = false );
 
 	// Determine if all the specified packages have made it to the active state
 	[[nodiscard]] bool AreAllFeaturesActive( const TArray< const UStarfireFeatureData* > &Features ) const;
+	[[nodiscard]] bool AreAllFeaturesActive( const TArray< TObjectPtr< const UStarfireFeatureData > > &Features ) const;
 	[[nodiscard]] bool AreAllFeaturesActive( const TArray< FString > &PluginNames ) const;
 	// Determine if all the packages that have been enabled have made it to the active state
 	[[nodiscard]] bool AreEnabledFeaturesActive( void ) const;
