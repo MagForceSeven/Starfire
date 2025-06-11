@@ -105,11 +105,29 @@ IVerifiableStrategy::VerifyAll( Array, Asset, WorldContext );
 	bool Verified = true;																											\
 	if (IVerifiableAsset::SanitizeArray( A, WorldContext ))																			\
 	{																																\
-		AssetChecks::AC_Message( Asset, TEXT( #Array " configured with one or more nullptr instances." ), this, WorldContext );	\
+		AssetChecks::AC_Message( Asset, TEXT( #Array " configured with one or more nullptr instances." ), this, WorldContext );		\
 		Verified = false;																											\
 	}																																\
 																																	\
 	return IVerifiableStrategy::VerifyAll( A, Asset, WorldContext, Context ) && Verified;											\
+}( Array );
+
+// Remove nullptrs from the array (when the WorldContext is valid)
+#define SANITIZE_ARRAY( Array, Asset, WorldContext ) \
+if (IVerifiableAsset::SanitizeArray( Array, WorldContext )) \
+	AssetChecks::AC_Message( Asset, TEXT( #Array " configured with one or more nullptr instances." ), WorldContext );
+
+// Remove nullptrs from the array (when the WorldContext is valid)
+#define SANITIZE_ARRAY_EX( Array, Asset, WorldContext, Context )																	\
+[ this, Asset, WorldContext, Context ]( auto &A ) -> bool																			\
+{																																	\
+	if (IVerifiableAsset::SanitizeArray( A, WorldContext ))																			\
+	{																																\
+		AssetChecks::AC_Message( Asset, TEXT( #Array " configured with one or more nullptr instances." ), this, WorldContext );		\
+		return false;																												\
+	}																																\
+																																	\
+	return true;																													\
 }( Array );
 
 #if CPP
