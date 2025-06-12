@@ -384,7 +384,7 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::ChangeBundleStateForPrim
 	TArray< TSharedPtr< FStreamableHandle > > AllHandles;
 
 	// We don't really care about the ref counts to actually make the load request since they're not ref-counted anyway at the engine level. Already loaded things aren't loaded again already
-	TSharedPtr< FStreamableHandle > LoadHandle = Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, AddBundles, { }, false, { }, LoadParams.Priority );
+	TSharedPtr< FStreamableHandle > LoadHandle = Super::ChangeBundleStateForPrimaryAssets( AssetsToChange, AddBundles, TArray<FName>( ), false, MoveTemp(LoadParams), Location );
 	if (LoadHandle.IsValid( ) && LoadHandle->IsActive( ))
 		AllHandles.Push( LoadHandle );
 
