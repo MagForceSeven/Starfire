@@ -99,9 +99,9 @@ public:
 				return false;
 			
 			if (MetaStruct->IsChildOf(FSf_Message_Stateful::StaticStruct( )))
-				return (Found->Type == EMessageType::Immediate);
-			if (MetaStruct->IsChildOf( FSf_Message_Immediate::StaticStruct( ) ))
 				return (Found->Type == EMessageType::Stateful);
+			if (MetaStruct->IsChildOf( FSf_Message_Immediate::StaticStruct( ) ))
+				return (Found->Type == EMessageType::Immediate);
 
 			// Must be a case where we allow anything
 			return true;
@@ -129,9 +129,9 @@ public:
 			return false;
 			
 		if (MetaStruct->IsChildOf(FSf_Message_Stateful::StaticStruct( )))
-			return (Found->Type == EMessageType::Immediate);
-		if (MetaStruct->IsChildOf( FSf_Message_Immediate::StaticStruct( ) ))
 			return (Found->Type == EMessageType::Stateful);
+		if (MetaStruct->IsChildOf( FSf_Message_Immediate::StaticStruct( ) ))
+			return (Found->Type == EMessageType::Immediate);
 
 		// Must be a case where we allow anything
 		return true;
