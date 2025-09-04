@@ -44,7 +44,7 @@ protected:
 	static const FName ListenerHandlePinName;
 
 	// Whether an instanced struct should be output instead of the desired message type
-	UPROPERTY( EditDefaultsOnly )
+	UPROPERTY( EditDefaultsOnly, Category="Starfire Messenger" )
 	bool bListenHierarchically = false;
 	
 	// copied from Epic's ConstructObjectFromClass node

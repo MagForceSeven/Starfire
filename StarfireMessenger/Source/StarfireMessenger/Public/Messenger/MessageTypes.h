@@ -72,12 +72,12 @@ public:
 	[[nodiscard]] virtual UClass* GetContextType( ) const { return nullptr; }
 
 	// Utility for finding a message types context type at runtime
-	STARFIREMESSENGER_API [[nodiscard]] static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
+	[[nodiscard]] STARFIREMESSENGER_API  static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
 	// Utility for checking if a message type is stateful at runtime
-	STARFIREMESSENGER_API [[nodiscard]] static bool IsMessageTypeStateful( const UScriptStruct *MessageType );
+	[[nodiscard]] STARFIREMESSENGER_API  static bool IsMessageTypeStateful( const UScriptStruct *MessageType );
 #if WITH_EDITORONLY_DATA
 	// Utility for runtime checking if a type is abstract
-	STARFIREMESSENGER_API [[nodiscard]] static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
+	[[nodiscard]] STARFIREMESSENGER_API  static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
 #endif
 };
 SET_MESSAGE_TYPE_AS_ABSTRACT( FSf_MessageBase )
