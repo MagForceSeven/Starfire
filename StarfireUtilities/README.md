@@ -152,7 +152,7 @@ My [pull request](https://github.com/EpicGames/UnrealEngine/pull/10355) was merg
 The [pull request](https://github.com/EpicGames/UnrealEngine/pull/10355) was merged and included in the 5.6 release of the Engine. The custom node for this has been removed from this plugin and redirectors included that should make updates seamless. Any existing For Each (Map) nodes should use the Engine version on load or compile.
 
 ### Delegate Param Function
-![image](https://github.com/MagForceSeven/Starfire/assets/30977279/ed8e1255-0db9-4dd0-99d9-c1ab458f9652)
+![image](https://github.com/MagForceSeven/Starfire/StarfireUtilities/Resources/delegate_param.png)
 
 _K2Node_DelegateParamFunction.h/cpp_, _K2Interface_SelectDelegate.h_, _SGraphNode_K2SelectDelegate.h/cpp_, Starfire K2 Utilities
 
@@ -165,7 +165,7 @@ _K2Node_DependentOutputTypeNode_, Starfire K2 Utilities
 An abstract base class K2 node to aid in creating nodes that have an output pin whose type is compile-time deterministic based on the input pin type.
 
 ### Bind Delegate
-![image](https://github.com/MagForceSeven/Starfire/assets/30977279/3455c0a1-ed6a-4c0b-ba9c-da5a7120f649)
+![image](https://github.com/MagForceSeven/Starfire/StarfireUtilities/Resources/bind_delegate.png)
 
 _K2Node_BindDelegate.h/cpp_, _K2Interface_SelectDelegate.h_, _SGraphNode_K2SelectDelegate.h/cpp_, Starfire K2 Utilities
 
@@ -176,7 +176,7 @@ The second dropdown is similar to the Create Event node and allows selecting the
 Double clicking on the node will jump the view to the function that will be called when the delegate is executed or broadcast.
 
 ### Is Valid Object
-![image](https://github.com/MagForceSeven/Starfire/assets/30977279/22eac25d-9c01-4132-b360-425e6ad663c5)
+![image](https://github.com/MagForceSeven/Starfire/StarfireUtilities/Resources/is_valid.png)
 
 _K2Node_IsValidObject.h/cpp_, Starfire K2 Utilities
 
@@ -185,7 +185,7 @@ A reimplementation of the Is Valid Object macro for branching execution based on
 One major difference (and the reason it is available to the user) is the pass through pin. The input pin is connected to the output pin to aid in making overlaps and bathtubs (reroute lines below the Is Valid node check) less prevelent. It should also be able to help with validating results from pure functions that are meant to be attached to multiple input pins as they could be attached to the output of this Is Valid node instead of attaching the output of the pure node to multiple input pins (a potential blueprint hazard).
 
 ### Switch on Gameplay Tag (Hierarchical)
-<img width="305" height="303" alt="image" src="https://github.com/user-attachments/assets/7879caa7-5d8d-42d7-878f-e2ed7e3556e3" />
+![image](https://github.com/MagForceSeven/Starfire/StarfireUtilities/Resources/tag_switch.png)
 
 _K2Node_HierarchicalGameplayTagSwitch.h/cpp_, _SGraphNode_K2HierarchicalGameplayTagSwitch.h/cpp_
 
