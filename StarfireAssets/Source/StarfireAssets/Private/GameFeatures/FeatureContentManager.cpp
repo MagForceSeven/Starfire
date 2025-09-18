@@ -83,7 +83,8 @@ void UFeatureContentManager::OnGameFeatureRegistering( const UGameFeatureData *G
 	}
 
 	IVerifiableAsset::Verify( FeatureContent, this );
-	FMessageLog( "AssetCheck" ).Open( );
+	if (FMessageLog( "AssetCheck" ).NumMessages( EMessageSeverity::Warning ) > 0)
+		FMessageLog( "AssetCheck" ).Open( );
 
 	const auto &FeaturesSubsystem = UGameFeaturesSubsystem::Get( );
 	const auto &FeaturePolicies = FeaturesSubsystem.GetPolicy< UGameFeaturesProjectPolicies >( );

@@ -35,5 +35,7 @@ void UStarfireFeatureData::PostLoad( )
 	Super::PostLoad( );
 
 	IVerifiableAsset::Verify( this, nullptr );
-	FMessageLog( "AssetCheck" ).Open( );
+
+	if (FMessageLog( "AssetCheck" ).NumMessages( EMessageSeverity::Warning ) > 0)
+		FMessageLog( "AssetCheck" ).Open( );
 }

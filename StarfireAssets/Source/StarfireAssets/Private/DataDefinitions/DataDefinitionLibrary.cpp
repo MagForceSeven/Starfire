@@ -694,7 +694,9 @@ TSharedPtr< FStreamableHandle > UDataDefinitionLibrary::GameInstanceInit( const 
 
 		IVerifiableAsset::VerifyAll( ObjectPtrDecay( AllDefinitions ), Game );
 		IVerifiableAsset::VerifyAll( ObjectPtrDecay( AllExtensions ), Game );
-		FMessageLog( "AssetCheck" ).Open( );
+
+		if (FMessageLog( "AssetCheck" ).NumMessages( EMessageSeverity::Warning ) > 0)
+			FMessageLog( "AssetCheck" ).Open( );
 	} );
 
 	const auto &FeatureSubsystem = UGameFeaturesSubsystem::Get( );

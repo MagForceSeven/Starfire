@@ -185,7 +185,9 @@ void UDefinitionLibrary_FeatureAssetRuntimeValidator::OnGameFeatureLoading( cons
 	
 	IVerifiableAsset::VerifyAll( Definitions, this );
 	IVerifiableAsset::VerifyAll( Extensions, this );
-	FMessageLog( "AssetCheck" ).Open( );
+
+	if (FMessageLog( "AssetCheck" ).NumMessages( EMessageSeverity::Warning ) > 0)
+		FMessageLog( "AssetCheck" ).Open( );
 }
 
 void UDefinitionLibrary_FeatureAssetRuntimeValidator::Initialize( FSubsystemCollectionBase &Collection )
@@ -199,7 +201,9 @@ void UDefinitionLibrary_FeatureAssetRuntimeValidator::Initialize( FSubsystemColl
 	const auto Definitions = Library->GetAllDefinitions< UDataDefinition >( );
 
 	IVerifiableAsset::VerifyAll( Definitions, this );
-	FMessageLog( "AssetCheck" ).Open( );
+
+	if (FMessageLog( "AssetCheck" ).NumMessages( EMessageSeverity::Warning ) > 0)
+		FMessageLog( "AssetCheck" ).Open( );
 }
 
 void UDefinitionLibrary_FeatureAssetRuntimeValidator::Deinitialize( )
