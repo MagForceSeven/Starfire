@@ -185,6 +185,8 @@ A reimplementation of the Is Valid Object macro for branching execution based on
 One major difference (and the reason it is available to the user) is the pass through pin. The input pin is connected to the output pin to aid in making overlaps and bathtubs (reroute lines below the Is Valid node check) less prevelent. It should also be able to help with validating results from pure functions that are meant to be attached to multiple input pins as they could be attached to the output of this Is Valid node instead of attaching the output of the pure node to multiple input pins (a potential blueprint hazard).
 
 ### Switch on Gameplay Tag (Hierarchical)
+<img width="305" height="303" alt="image" src="https://github.com/user-attachments/assets/7879caa7-5d8d-42d7-878f-e2ed7e3556e3" />
+
 _K2Node_HierarchicalGameplayTagSwitch.h/cpp_, _SGraphNode_K2HierarchicalGameplayTagSwitch.h/cpp_
 
 A custom node (and slate view) that provides an alternative solution to the 'Switch on Gameplay Tag' blueprint node provided by the Epic.
