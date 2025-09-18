@@ -16,7 +16,8 @@ public class StarfireUtilities : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[ ]
 			{
-				"Engine"
+				"Engine",
+				"GameplayTags",
 				// ... add other public dependencies that you statically link with here ...
 			} );
 

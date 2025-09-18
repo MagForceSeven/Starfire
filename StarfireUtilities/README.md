@@ -130,6 +130,11 @@ A duplicate of the `TArrayCaster` from Epic's _GeneratedCodeHelpers.h_ because t
 
 The ArrayTypeUtilities function used to be written using the ArrayCaster instead of direct reinterpret casts, but I still have other code that isn't an up/down/interface cast and I find using this to be slightly better syntax than the reinterpret cast for general code.
 
+### Gameplay Tag K2 Statics
+_GameplayTagK2Statics.h/cpp_
+
+A private function library with utility functions to power custom blueprint nodes from the Developer module.
+
 ## Developer
 
 ### Starfire K2 Utilities
@@ -178,6 +183,15 @@ _K2Node_IsValidObject.h/cpp_, Starfire K2 Utilities
 A reimplementation of the Is Valid Object macro for branching execution based on an object instance. Since Epic implemented this as a macro, it's unavailable for use by custom K2 nodes which is unfortunate.
 
 One major difference (and the reason it is available to the user) is the pass through pin. The input pin is connected to the output pin to aid in making overlaps and bathtubs (reroute lines below the Is Valid node check) less prevelent. It should also be able to help with validating results from pure functions that are meant to be attached to multiple input pins as they could be attached to the output of this Is Valid node instead of attaching the output of the pure node to multiple input pins (a potential blueprint hazard).
+
+### Switch on Gameplay Tag (Hierarchical)
+_K2Node_HierarchicalGameplayTagSwitch.h/cpp_, _SGraphNode_K2HierarchicalGameplayTagSwitch.h/cpp_
+
+A custom node (and slate view) that provides an alternative solution to the 'Switch on Gameplay Tag' blueprint node provided by the Epic.
+
+The issue with the Engine node is that it only does exact matches between the input tag and the available output pins. But Gameplay Tags are designed to be treated hierarchically in many or most cases. This makes the Engine node of limited use unless you can specify every tag result instead of what you can do with other checks to do work if any child tag is present. So in this node, "UI.Layer.Game" would match a "UI.Layer" case, unless there's also a "UI.Layer.Game" case specified.
+
+This node should work almost identically to the Engine's non-hierarchical switch node. The first deviation from Epic is in error handling. Epic's version will happily compile when there are no cases specified, invalid tags in the PinTags list or if there is no valid input (hard coded or a pin connection). I've decided to produce compile errors in each of those cases. The other difference is that while a case has an invalid tag, connections with that case node are prevented. This is due to a poor UX that occurs as the name of the case pins change causing the execution pin links to break when changing the tag for a given case.
 
 ## Editor
 

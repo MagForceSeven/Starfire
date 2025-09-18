@@ -35,6 +35,7 @@ public class StarfireUtilitiesDeveloper : ModuleRules
 				"Slate",
 				"ToolMenus",
 				"ToolWidgets",
+				"GameplayTags",
 				
 				"StarfireUtilities",
 				// ... add private dependencies that you statically link with here ...	
