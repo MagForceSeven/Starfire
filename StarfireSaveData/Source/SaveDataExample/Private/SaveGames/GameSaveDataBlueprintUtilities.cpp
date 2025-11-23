@@ -20,9 +20,9 @@ void UEnumerateSaveDataHeaders_AsyncAction::Activate( void )
 	FSaveFilter SaveFilter;
 	if (Filter.IsBound( ))
 	{
-		SaveFilter = FSaveFilter::CreateLambda([ this ]( const FString &SlotName, int32 UserIndex, const UGameSaveHeader *Header, ESaveDataLoadResult LoadingResult ) -> bool
+		SaveFilter = FSaveFilter::CreateLambda([ this ]( const FString &SlotName, int32 ParamUserIndex, const UGameSaveHeader *Header, ESaveDataLoadResult LoadingResult ) -> bool
 		{
-			return Filter.Execute( SlotName, UserIndex, Header, LoadingResult );
+			return Filter.Execute( SlotName, ParamUserIndex, Header, LoadingResult );
 		});
 	}
 
@@ -49,7 +49,7 @@ UForEachSaveDataHeaders_AsyncAction* UForEachSaveDataHeaders_AsyncAction::ForEac
 
 void UForEachSaveDataHeaders_AsyncAction::Activate( void )
 {
-	const auto OnSingleHeader = FLoadHeaderAsyncCallback::CreateLambda( [ this ]( const FString &SlotName, int32 UserIndex, ESaveDataLoadResult LoadingResult, const UGameSaveHeader *Header )
+	const auto OnSingleHeader = FLoadHeaderAsyncCallback::CreateLambda( [ this ]( const FString &SlotName, int32 ParamUserIndex, ESaveDataLoadResult LoadingResult, const UGameSaveHeader *Header )
 	{
 		Loop.Broadcast( SlotName, Header, LoadingResult );
 	} );

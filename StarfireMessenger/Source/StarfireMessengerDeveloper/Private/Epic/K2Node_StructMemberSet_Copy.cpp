@@ -15,6 +15,8 @@
 #include "UObject/UnrealType.h"
 #include "PropertyCustomizationHelpers.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_StructMemberSet_Copy)
+
 class FKismetCompilerContext;
 class UEdGraphPin;
 

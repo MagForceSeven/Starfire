@@ -75,6 +75,11 @@ void FKCHandler_MakeStruct::RegisterNets(FKismetFunctionContext& Context, UEdGra
 		return;
 	}
 
+	return RegisterNetsImpl(Context, Node);
+}
+
+void FKCHandler_MakeStruct::RegisterNetsImpl(FKismetFunctionContext& Context, UK2Node_MakeStruct_COPY* Node)
+{
 	FNodeHandlingFunctor::RegisterNets(Context, Node);
 
 	UEdGraphPin* OutputPin = FindStructPinChecked(Node);

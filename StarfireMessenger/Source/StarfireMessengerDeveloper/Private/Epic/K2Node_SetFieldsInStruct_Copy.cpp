@@ -35,6 +35,8 @@
 #include "UObject/StructOnScope.h"
 #include "UObject/UnrealType.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_SetFieldsInStruct_Copy)
+
 class FBlueprintActionDatabaseRegistrar;
 struct FLinearColor;
 
@@ -77,7 +79,7 @@ public:
 
 	virtual UEdGraphPin* FindStructPinChecked(UEdGraphNode* InNode) const override
 	{
-		check(CastChecked<UK2Node_SetFieldsInStruct_COPY>(InNode));
+		check(InNode != nullptr && InNode->IsA<UK2Node_SetFieldsInStruct_COPY>());
 		UEdGraphPin* FoundPin = InNode->FindPinChecked(SetFieldsInStructHelper::StructRefPinName());
 		check(EGPD_Input == FoundPin->Direction);
 		return FoundPin;
@@ -102,9 +104,22 @@ public:
 		}
 	}
 
-	virtual void RegisterNets(FKismetFunctionContext& Context, UEdGraphNode* Node) override
+	virtual void RegisterNets(FKismetFunctionContext& Context, UEdGraphNode* InNode) override
 	{
-		FKCHandler_MakeStruct::RegisterNets(Context, Node);
+		UK2Node_SetFieldsInStruct_COPY* Node = CastChecked<UK2Node_SetFieldsInStruct_COPY>(InNode);
+		if (nullptr == Node->StructType)
+		{
+			CompilerContext.MessageLog.Error(*LOCTEXT("MakeStruct_UnknownStructure_Error", "Unknown structure to break for @@").ToString(), Node);
+			return;
+		}
+	
+		if (!UEdGraphSchema_K2::IsAllowableBlueprintVariableType(Node->StructType, Node->IsIntermediateNode()))
+		{
+			CompilerContext.MessageLog.Error(*LOCTEXT("MakeStruct_Error", "The structure @@ is not declared as BlueprintType - consider USTRUCT(BlueprintType) in C++ or resaving the asset").ToString(), Node);
+			return;
+		}
+
+		FKCHandler_MakeStruct::RegisterNetsImpl(Context, Node);
 
 		if (UEdGraphPin* ReturnPin = Node->FindPin(SetFieldsInStructHelper::StructOutPinName()))
 		{
@@ -208,7 +223,7 @@ FText UK2Node_SetFieldsInStruct_COPY::GetNodeTitle(ENodeTitleType::Type TitleTyp
 	else if (CachedNodeTitle.IsOutOfDate(this))
 	{
 		FFormatNamedArguments Args;
-		Args.Add(TEXT("StructName"), FText::FromName(StructType->GetFName()));
+		Args.Add(TEXT("StructName"), StructType->GetDisplayNameText());
 		// FText::Format() is slow, so we cache this to save on performance
 		CachedNodeTitle.SetCachedText(FText::Format(LOCTEXT("SetFieldsInStructNodeTitle", "Set members in {StructName}"), Args), this);
 	}
@@ -226,7 +241,7 @@ FText UK2Node_SetFieldsInStruct_COPY::GetTooltipText() const
 		// FText::Format() is slow, so we cache this to save on performance
 		CachedTooltip.SetCachedText(FText::Format(
 			LOCTEXT("SetFieldsInStruct_Tooltip", "Adds a node that modifies a '{0}'"),
-			FText::FromName(StructType->GetFName())
+			StructType->GetDisplayNameText()
 		), this);
 	}
 	return CachedTooltip;
@@ -258,7 +273,18 @@ void UK2Node_SetFieldsInStruct_COPY::ValidateNodeDuringCompilation(FCompilerResu
 			{
 				if (FProperty* BoundProperty = GetterNode->GetPropertyForVariable())
 				{
-					if (BoundProperty->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
+					const bool bIsFunctionInput =
+						!BoundProperty->HasAnyPropertyFlags(CPF_ReturnParm) &&
+						(!BoundProperty->HasAnyPropertyFlags(CPF_OutParm) || BoundProperty->HasAnyPropertyFlags(CPF_ReferenceParm))
+					;
+
+					const bool bIsReadOnly =
+						BoundProperty->HasAnyPropertyFlags(CPF_BlueprintReadOnly)
+					;
+
+					// Function input parameters generally get tagged as readonly by the compiler.
+					// If they're actually input/ouput reference parameters, then we can make an exception here.
+					if (bIsReadOnly && !bIsFunctionInput)
 					{
 						// TODO, This should REALLY be an error, but too much code may have been written not following this standard.
 						FText ErrorMessage = LOCTEXT("SetStructFields_StructIsConst", "The @@ is a Read Only property and can not be modified directly.");

@@ -36,7 +36,7 @@ void UFeatureContentManager::Initialize( FSubsystemCollectionBase &Collection )
 #endif
 
 	auto &Subsystem = UGameFeaturesSubsystem::Get( );
-	Subsystem.AddObserver( this );
+	Subsystem.AddObserver( this, UGameFeaturesSubsystem::EObserverPluginStateUpdateMode::CurrentAndFuture );
 }
 
 void UFeatureContentManager::Deinitialize( void )
@@ -229,7 +229,7 @@ void UFeatureContentManager::EnableFeatures( const TSet< const UStarfireFeatureD
 			OnFeatureEnabling.Broadcast( E );
 
 			const auto &URL = URLMapping.FindRef( E );
-			FeaturesSubsystem.LoadAndActivateGameFeaturePlugin( URL, { } /*, Bundles*/ );
+			FeaturesSubsystem.LoadAndActivateGameFeaturePlugin( URL, { }, Bundles );
 		}
 	}
 }

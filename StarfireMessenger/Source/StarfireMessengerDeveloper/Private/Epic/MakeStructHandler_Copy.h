@@ -6,6 +6,7 @@
 
 class FKismetCompilerContext;
 class UEdGraphNode;
+class UK2Node_MakeStruct_COPY;
 class UEdGraphPin;
 struct FBPTerminal;
 struct FKismetFunctionContext;
@@ -21,8 +22,9 @@ public:
 	virtual UEdGraphPin* FindStructPinChecked(UEdGraphNode* Node) const;
 
 	virtual void RegisterNets(FKismetFunctionContext& Context, UEdGraphNode* InNode) override;
-
 	virtual void RegisterNet(FKismetFunctionContext& Context, UEdGraphPin* Net) override;
+	void RegisterNetsImpl(FKismetFunctionContext& Context, UK2Node_MakeStruct_COPY* Node);
+
 	virtual FBPTerminal* RegisterLiteral(FKismetFunctionContext& Context, UEdGraphPin* Net) override;
 
 	virtual void Compile(FKismetFunctionContext& Context, UEdGraphNode* InNode) override;

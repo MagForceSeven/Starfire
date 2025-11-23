@@ -10,7 +10,7 @@
 #include "Containers/EnumAsByte.h"
 #include "EdGraph/EdGraphPin.h"
 #include "EdGraphSchema_K2.h"
-#include "Engine/UserDefinedStruct.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "HAL/PlatformCrt.h"
 #include "Internationalization/Internationalization.h"
 #include "Internationalization/Text.h"
@@ -26,6 +26,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 // UK2Node_StructOperation_COPY
+
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_StructOperation_Copy)
 
 UK2Node_StructOperation_COPY::UK2Node_StructOperation_COPY(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

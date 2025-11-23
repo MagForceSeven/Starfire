@@ -148,7 +148,7 @@ void UDefinitionLibrary_GameFeatureWatcher::Initialize( FSubsystemCollectionBase
 	Super::Initialize( Collection );
 	
 	const auto Subsystem = Collection.InitializeDependency< UGameFeaturesSubsystem >( );
-	Subsystem->AddObserver( this );
+	Subsystem->AddObserver( this, UGameFeaturesSubsystem::EObserverPluginStateUpdateMode::CurrentAndFuture );
 }
 
 bool UDefinitionLibrary_FeatureAssetRuntimeValidator::ShouldCreateSubsystem( UObject *Outer ) const
@@ -195,7 +195,7 @@ void UDefinitionLibrary_FeatureAssetRuntimeValidator::Initialize( FSubsystemColl
 	Super::Initialize( Collection );
 	
 	auto &Subsystem = UGameFeaturesSubsystem::Get( );
-	Subsystem.AddObserver( this );
+	Subsystem.AddObserver( this, UGameFeaturesSubsystem::EObserverPluginStateUpdateMode::CurrentAndFuture );
 
 	const auto Library = UDataDefinitionLibrary::GetInstance( );
 	const auto Definitions = Library->GetAllDefinitions< UDataDefinition >( );

@@ -32,6 +32,8 @@
 #include "UObject/UnrealType.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_MakeStruct_Copy)
+
 class FKismetCompilerContext;
 
 #define LOCTEXT_NAMESPACE "K2Node_MakeStruct"
@@ -242,7 +244,7 @@ FText UK2Node_MakeStruct_COPY::GetNodeTitle(ENodeTitleType::Type TitleType) cons
 	else if (CachedNodeTitle.IsOutOfDate(this))
 	{
 		FFormatNamedArguments Args;
-		Args.Add(TEXT("StructName"), FText::FromName(StructType->GetFName()));
+		Args.Add(TEXT("StructName"), StructType->GetDisplayNameText());
 		// FText::Format() is slow, so we cache this to save on performance
 		CachedNodeTitle.SetCachedText(FText::Format(LOCTEXT("MakeNodeTitle", "Make {StructName}"), Args), this);
 	}
@@ -260,7 +262,7 @@ FText UK2Node_MakeStruct_COPY::GetTooltipText() const
 		// FText::Format() is slow, so we cache this to save on performance
 		CachedTooltip.SetCachedText(FText::Format(
 			LOCTEXT("MakeStruct_Tooltip", "Adds a node that create a '{0}' from its members"),
-			FText::FromName(StructType->GetFName())
+			StructType->GetDisplayNameText()
 		), this);
 	}
 	return CachedTooltip;
@@ -459,7 +461,7 @@ void UK2Node_MakeStruct_COPY::ConvertDeprecatedNode(UEdGraph* Graph, bool bOnlyS
 		else
 		{
 			const FString& MetaData = StructType->GetMetaData(FBlueprintMetadata::MD_NativeMakeFunction);
-			MakeNodeFunction = FindObject<UFunction>(nullptr, *MetaData, true);
+			MakeNodeFunction = FindObject<UFunction>(nullptr, *MetaData, EFindObjectFlags::ExactClass);
 
 			if (MakeNodeFunction)
 			{

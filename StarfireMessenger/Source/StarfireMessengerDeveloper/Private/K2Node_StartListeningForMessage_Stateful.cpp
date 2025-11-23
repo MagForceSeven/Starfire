@@ -5,11 +5,10 @@
 
 #include "StarfireK2Utilities.h"
 
-#include "Epic/K2Node_SwitchEnum_Copy.h"
-
 // Blueprint Graph
 #include "K2Node_CallFunction.h"
 #include "K2Node_CustomEvent.h"
+#include "K2Node_SwitchEnum.h"
 
 // KismetCompiler
 #include "KismetCompiler.h"
@@ -120,7 +119,7 @@ void UK2Node_StartListeningForMessage_Stateful::ExpandNode( FKismetCompilerConte
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Create a switch node to convert from the enum parameter into multiple execution lines
-	const auto SwitchNode = CompilerContext.SpawnIntermediateNode< UK2Node_SwitchEnum_COPY >( this, SourceGraph );
+	const auto SwitchNode = CompilerContext.SpawnIntermediateNode< UK2Node_SwitchEnum >( this, SourceGraph );
 	SwitchNode->SetEnum( Enum );
 	SwitchNode->AllocateDefaultPins(  );
 

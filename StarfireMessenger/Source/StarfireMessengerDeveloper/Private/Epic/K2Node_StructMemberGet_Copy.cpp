@@ -13,6 +13,8 @@
 #include "UObject/UnrealNames.h"
 #include "UObject/UnrealType.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_StructMemberGet_Copy)
+
 class FKismetCompilerContext;
 
 //////////////////////////////////////////////////////////////////////////

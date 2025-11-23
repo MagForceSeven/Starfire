@@ -44,6 +44,7 @@ class UK2Node_SetFieldsInStruct_COPY : public UK2Node_MakeStruct_COPY
 	//~ Begin K2Node Interface
 	virtual bool IsNodePure() const override { return false; }
 	virtual class FNodeHandlingFunctor* CreateNodeHandler(class FKismetCompilerContext& CompilerContext) const override;
+	virtual void ConvertDeprecatedNode(UEdGraph* Graph, bool bOnlySafeChanges) override {};
 	//~ End K2Node Interface
 
 	STARFIREMESSENGERDEVELOPER_API static bool ShowCustomPinActions(const UEdGraphPin* InGraphPin, bool bIgnorePinsNum);
