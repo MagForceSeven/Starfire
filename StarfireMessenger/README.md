@@ -47,7 +47,7 @@ To provide a reasonable amount of type safety in blueprint for hierarchical mess
 
 ### Epic
 
-To make the custom nodes work as required, [two](https://github.com/EpicGames/UnrealEngine/pull/12431) [modifications](https://github.com/EpicGames/UnrealEngine/pull/11771) are required to an Engine node. To prevent users from having to also modify their engine, some nodes have been duplicated and renamed in order to support the plugin nodes. They've been modified so that they shouldn't interfere with normal use of blueprints, even though there are technically two of the same kind of node type present. These duplicates will be removed if/when the associated pull requests are merged into the Engine.
+To make the custom nodes work as required, [a modification](https://github.com/EpicGames/UnrealEngine/pull/11771) is required to an Engine node. To prevent users from having to also modify their engine, some nodes have been duplicated and renamed in order to support the plugin nodes. They've been modified so that they shouldn't interfere with normal use of blueprints, even though there are technically two of the same kind of node type present. These duplicates will be removed if/when the associated pull requests are merged into the Engine.
 
 ## Detailed Usage
 
@@ -292,4 +292,4 @@ This module also has all the duplicated Epic blueprint nodes to handle the custo
 
 ### Editor
 
-There is currently nothing in this module, it is a placeholder for future features. This is a placeholder for future features that need this module type.
+There is currently nothing in this module, it is a placeholder for future features that need this module type.
