@@ -1,0 +1,51 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.6.0",
+	"FriendlyName": "Starfire Persistence",
+	"Description": "Tools for persisting actor data across levels or sessions",
+	"Category": "Other",
+	"CreatedBy": "Russell Aasland",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EnabledByDefault": false,
+	"EditorCustomVirtualPath": "Starfire",
+	"SupportedTargetPlatforms": [
+		"Win64",
+		"Linux",
+		"LinuxArm64"
+	],
+	"Modules": [
+		{
+			"Name": "StarfirePersistence",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireDataActors",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfirePersistenceDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfirePersistenceEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "StarfireUtilities",
+			"Enabled": true
+		}
+	]
+}
