@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "5.6.0",
+	"VersionName": "5.7.0",
 	"FriendlyName": "Starfire Messenger",
 	"Description": "A generalized message bus for intersystem communication.",
 	"Category": "Other",
