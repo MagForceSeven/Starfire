@@ -204,9 +204,11 @@ FMessageListener* UStarfireMessenger::CreateListener( const UScriptStruct *Messa
 {
 	static const TArray InvalidTypes = { FSf_MessageBase::StaticStruct( ), FSf_Message_Immediate::StaticStruct( ), FSf_Message_Stateful::StaticStruct( ) };
 	static const auto Settings = GetDefault< UMessengerProjectSettings >( );
-	
+
+#if WITH_EDITOR
 	ensureAlwaysMsgf( !InvalidTypes.Contains( MessageType ), TEXT( "Listening for Messenger Type '%s' directly is not recommended. Listen for a more specific type instead." ), *MessageType->GetDisplayNameText( ).ToString( ) );
 	ensureAlwaysMsgf( !Settings->AdditionalListenExclusionTypes.Contains( MessageType ), TEXT( "Listening for Project Message Type '%s' directly is not recommended. Listen for a more specific type instead." ), *MessageType->GetDisplayNameText( ).ToString( ) );
+#endif
 
 	const auto Listener = new FMessageListener( );
 
