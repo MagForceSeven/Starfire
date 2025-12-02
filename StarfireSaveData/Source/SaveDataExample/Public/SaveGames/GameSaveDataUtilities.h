@@ -96,7 +96,7 @@ public:
 	// Save the current state of the game to a file
 	[[nodiscard]] static bool SaveToSlot( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { } );
 	// Save the current state of the game to a file asynchronously
-	static void SaveToSlot_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
+	static void SaveToSlot_Async( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
 
 	// Save a pre-existing checkpoint to a file
 	static void SaveCheckpointToSlot( const UObject *WorldContext,const UGameSaveData *CheckpointData, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { } );

@@ -116,7 +116,7 @@ bool UGameSaveDataUtilities::SaveToSlot( const UObject *WorldContext, FString Sl
 	return Super::SaveDataToSlot( WorldContext, Header, SaveData, SlotName, UserIndex );
 }
 
-void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride, const FSaveAsyncCallback &OnCompletion )
+void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride, const FSaveAsyncCallback &OnCompletion )
 {
 	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
 	{
@@ -131,6 +131,21 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, cons
 		return;
 	}
 
+	if (DisplayNameOverride.IsEmpty( ))
+		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
+
+	ensureAlways( SaveType != ESaveDataType::Quick ); // this is probably an error as saving a checkpoint is automated, but quick should always be user triggered
+	switch (SaveType)
+	{
+		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
+			break;
+		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
+			break;
+
+		default: // other types don't modify the slot name
+			break;
+	}
+
 	const auto AsyncFillComplete = FCreateCheckpointComplete::CreateLambda( [ SlotName, UserIndex, SaveType, DisplayNameOverride, OnCompletion ]( const UObject *WorldContext, const UGameSaveData* CheckpointData, bool Success )
 	{
 		if (!Success)
@@ -138,8 +153,15 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, cons
 			OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
 			return;
 		}
+		
+		const UGameSaveHeader* Header = CreateSaveGameHeader( CheckpointData, SaveType, DisplayNameOverride );
+		if (!ensureAlways( Header != nullptr ))
+		{
+			OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
+			return;
+		}
 
-		SaveCheckpointToSlot_Async( WorldContext, CheckpointData, SlotName, UserIndex, SaveType, DisplayNameOverride, OnCompletion );
+		SaveDataToSlot_Async( WorldContext, Header, CheckpointData, SlotName, UserIndex, OnCompletion );
 	});
 
 	FillAsyncSaveGameData_Async( WorldContext, SaveData, true, AsyncFillComplete );
