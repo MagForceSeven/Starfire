@@ -342,6 +342,7 @@ public:
 
 	// Subsystem API
 	void Deinitialize( ) override;
+	bool ShouldCreateSubsystem( UObject *Outer ) const override;
 
 	// GC hooks to prevent message data from being lost
 	static void AddReferencedObjects( UObject *InThis, FReferenceCollector &Collector );

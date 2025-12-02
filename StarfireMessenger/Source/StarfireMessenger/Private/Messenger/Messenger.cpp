@@ -1,6 +1,8 @@
 
 #include "Messenger/Messenger.h"
 
+#include "MessengerProjectSettings.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(Messenger)
 
 // Data for single listener-to-message binding
@@ -200,6 +202,12 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForStatefulMessageInter
 
 FMessageListener* UStarfireMessenger::CreateListener( const UScriptStruct *MessageType, const UObject *OwningObject, const UObject* ContextFilter )
 {
+	static const TArray InvalidTypes = { FSf_MessageBase::StaticStruct( ), FSf_Message_Immediate::StaticStruct( ), FSf_Message_Stateful::StaticStruct( ) };
+	static const auto Settings = GetDefault< UMessengerProjectSettings >( );
+	
+	ensureAlwaysMsgf( !InvalidTypes.Contains( MessageType ), TEXT( "Listening for Messenger Type '%s' directly is not recommended. Listen for a more specific type instead." ), *MessageType->GetDisplayNameText( ).ToString( ) );
+	ensureAlwaysMsgf( !Settings->AdditionalListenExclusionTypes.Contains( MessageType ), TEXT( "Listening for Project Message Type '%s' directly is not recommended. Listen for a more specific type instead." ), *MessageType->GetDisplayNameText( ).ToString( ) );
+
 	const auto Listener = new FMessageListener( );
 
 	Listener->Handle.Handle = HandleCounter++;
@@ -274,6 +282,20 @@ void UStarfireMessenger::Deinitialize( )
 	StatefulMessages.Empty( );
 
 	Super::Deinitialize( );
+}
+
+bool UStarfireMessenger::ShouldCreateSubsystem( UObject *Outer ) const
+{
+	TArray< UClass* > ChildClasses;
+	GetDerivedClasses( GetClass( ), ChildClasses, false );
+
+	// Only create an instance if there is no override implementation defined elsewhere
+	if (!ChildClasses.IsEmpty( ))
+	{
+		return false;
+	}
+
+	return Super::ShouldCreateSubsystem( Outer );
 }
 
 void UStarfireMessenger::ClearStatefulMessage( bool bExpectingContext, const UScriptStruct *Type, const UObject *Context )

@@ -41,6 +41,19 @@ public:
 	UPROPERTY( EditDefaultsOnly, Config, Category = "Messenger Project Settings", meta = (DisplayThumbnail = false))
 	TMap< TSoftObjectPtr< UScriptStruct >, FBlueprintMessageConfig > BlueprintMessageTypes;
 
+	// A collection of message types that should be prevented from being listened for.
+	// Similar to how listening for the lowest level message types from this plugin are filtered because it would be unhelpful to get every message ever.
+	UPROPERTY( EditDefaultsOnly, Config, Category = "Messenger Project Settings", meta = (DisplayThumbnail = false))
+	TArray< TSoftObjectPtr< UScriptStruct > > AdditionalListenExclusionTypes;
+
+	// Customization for the Messenger Pin of custom nodes (if the project wants to use different terminology)
+	UPROPERTY( EditDefaultsOnly, Config, Category = "Blueprint" )
+	FText MessengerPinNameOverride;
+
+	// Customization of the Blueprint node category where custom node are listed
+	UPROPERTY( EditDefaultsOnly, Config, Category = "Blueprint" )
+	FText MessengerNodesCategoryOverride;
+
 	// Developer Settings API
 	FName GetContainerName( ) const override;
 	FName GetCategoryName( ) const override;

@@ -154,6 +154,9 @@ TSharedRef<SWidget> SGraphPinMessengerType::GenerateAssetPicker()
 	StructFilter->bAllowAbstract = bAllowAbstract;
 	StructFilter->bAllowBlueprint = (BaseAllowedType == nullptr);
 
+	for (const auto& Type : StructFilter->Settings->AdditionalListenExclusionTypes)
+		StructFilter->Ignore.Push( Type.Get( ) );
+	
 	if (BaseAllowedType != nullptr)
 		StructFilter->MetaStruct = BaseAllowedType;
 	else if (bAllowImmediate && bAllowStateful)

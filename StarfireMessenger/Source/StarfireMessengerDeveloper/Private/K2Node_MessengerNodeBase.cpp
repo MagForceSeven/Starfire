@@ -2,6 +2,7 @@
 #include "K2Node_MessengerNodeBase.h"
 
 #include "Messenger/Messenger.h"
+#include "Messenger/MessengerProjectSettings.h"
 
 #include "StarfireK2Utilities.h"
 
@@ -21,6 +22,8 @@ const FName UK2Node_MessengerNodeBase::ContextPinName( TEXT( "ContextPin" ) );
 
 void UK2Node_MessengerNodeBase::AllocateDefaultPins( )
 {
+	static const auto Settings = GetDefault< UMessengerProjectSettings >( );
+
 	Super::AllocateDefaultPins( );
 
 	const auto ExecPin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_Execute );
@@ -30,6 +33,9 @@ void UK2Node_MessengerNodeBase::AllocateDefaultPins( )
 	MessengerPin->PinFriendlyName = LOCTEXT( "MessengerPin_FriendlyName", "Messenger" );
 	MessengerPin->PinType.bIsConst = true;
 	MessengerPin->PinType.bIsReference = true;
+
+	if (!Settings->MessengerPinNameOverride.IsEmpty( ))
+		MessengerPin->PinFriendlyName = Settings->MessengerPinNameOverride;
 
 	const auto MessageTypePin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Object, UScriptStruct::StaticClass( ), TypePinName );
 	MessageTypePin->PinFriendlyName = LOCTEXT( "TypePin_FriendlyName", "Message Type" );
@@ -266,6 +272,10 @@ UScriptStruct* UK2Node_MessengerNodeBase::GetMessageType( const TArray< UEdGraph
 
 FText UK2Node_MessengerNodeBase::GetMenuCategory( ) const
 {
+	static const auto Settings = GetDefault< UMessengerProjectSettings >( );
+	if (!Settings->MessengerNodesCategoryOverride.IsEmpty( ))
+		return Settings->MessengerNodesCategoryOverride;
+
 	return LOCTEXT( "StarfireMenuCategory", "Starfire Messenger" );
 }
 
