@@ -150,10 +150,36 @@ protected:
 	// Get the slot/header for the least recent save (that meets on optional filter requirement), calling the callback when process asynchronously completes
 	static void FindLeastRecentSave_Async( const UObject *WorldContext, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion, const FSaveFilter_Core &Filter = FSaveFilter_Core( ) );
 
+	// Saves the specified data to a file
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static bool SaveDataToPath( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName );
+	// Saves the specified data to a file, performing the write to disk in an asynchronous fashion
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void SaveDataToPath_Async( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName, const FSaveAsyncCallback_Core &OnCompletion = FSaveAsyncCallback_Core( ) );
+
+	// Load data from a file into pre-allocated header and save data objects
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static ESaveDataLoadResult LoadDataFromPath( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData );
+	// Load data from a file into pre-allocated header and save data objects, calling the callback when process asynchronously completes
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void LoadDataFromPath_Async( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData, const FLoadAsyncCallback_Core &OnCompletion );
+
+	// Load just the header information from a file
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static const USaveDataHeader* LoadPathHeaderOnly( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
+	// Load just the header information from a file, calling the callback when process asynchronously completes
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void LoadPathHeaderOnly_Async( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion );
+	
 	// Implementation functions for the process that is safe to call from anywhere, once some outer API has validated and controlled the execution
 	[[nodiscard]] static bool SaveDataToSlot_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &SlotName, int32 UserIndex );
 	[[nodiscard]] static ESaveDataLoadResult LoadDataFromSlot_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
 	[[nodiscard]] static const USaveDataHeader* LoadSlotHeaderOnly_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
+
+	//
+	[[nodiscard]] static bool SaveDataToPath_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName );
+	[[nodiscard]] static ESaveDataLoadResult LoadDataFromPath_Internal( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData );
+	[[nodiscard]] static const USaveDataHeader* LoadPathHeaderOnly_Internal( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
 	
 private:
 	// Internal base type for async tasks managed by the Async Manager World Subsystem
