@@ -83,6 +83,11 @@ public:
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
 	static ULoadSaveData_AsyncAction* LoadSaveGame( const FString &SlotName, int UserIndex, UObject *WorldContext );
 
+	// Load a specific save game and transition to the map associated with it
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
+	static ULoadSaveData_AsyncAction* LoadSaveGameFromFile( const FString &PathName, UObject *WorldContext );
+
 	// Core Blueprint Async Action API
 	void Activate( void ) override;
 
@@ -136,6 +141,11 @@ public:
 	// Write a save where the save data is already available
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "DisplayNameOverride, SaveType", WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
 	static USaveSaveData_AsyncAction* SaveCheckpointToSlot( const UGameSaveData *const& Checkpoint, const FString &SlotName, int UserIndex, ESaveDataType SaveType, FString DisplayNameOverride, UObject *WorldContext );
+
+	// Save a game to a specific file, overwriting whatever may already be there
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (AdvancedDisplay = "DisplayNameOverride", WorldContext = "WorldContext", BlueprintInternalUseOnly = true) )
+	static USaveSaveData_AsyncAction* SaveGameToFile( const FString &PathName, const FString &DisplayNameOverride, UObject *WorldContext );
 	
 	// Core Blueprint Async Action API
 	void Activate( void ) override;

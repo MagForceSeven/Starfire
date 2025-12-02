@@ -315,12 +315,48 @@ bool SaveDataMemoryUtilities::SaveFileDataToSlot( const FString &SlotName, const
 	return false;
 }
 
+bool SaveDataMemoryUtilities::SaveFileDataToPath( FString PathName, const TArray< uint8 > &FileData, const FString &SaveExt )
+{
+	check( !PathName.IsEmpty( ) );
+	check( !FileData.IsEmpty( ) );
+	
+	if (PathName[ 0 ] == '/') // maybe convert from project directory to a fully qualified one
+	{
+		PathName.RemoveAt( 0, 1 );
+		PathName = FPaths::ProjectContentDir( ) + PathName;
+	}
+	
+	PathName.Append( SaveExt );
+	
+	return FFileHelper::SaveArrayToFile( FileData, *PathName );
+}
+
 bool SaveDataMemoryUtilities::LoadFileDataFromSlot( const FString &SlotName, int32 UserIndex, TArray< uint8 > &outFileData )
 {
+	check( !SlotName.IsEmpty( ) );
+	check( UserIndex >= 0 );	
+	
 	outFileData.Reset( );
 
 	if (const auto SaveSystem = IPlatformFeaturesModule::Get( ).GetSaveGameSystem( ))
 		return SaveSystem->LoadGame( false, *SlotName, UserIndex, outFileData );
 
 	return false;
+}
+
+bool SaveDataMemoryUtilities::LoadFileDataFromPath( FString PathName, TArray< uint8 > &outFileData, const FString &SaveExt )
+{
+	check( !PathName.IsEmpty( ) );
+	
+	outFileData.Reset( );
+	
+	if (PathName[ 0 ] == '/') // maybe convert from project directory to a fully qualified one
+	{
+		PathName.RemoveAt( 0, 1 );
+		PathName = FPaths::ProjectContentDir( ) + PathName;
+	}
+	
+	PathName.Append( SaveExt );
+
+	return FFileHelper::LoadFileToArray( outFileData, *PathName );
 }

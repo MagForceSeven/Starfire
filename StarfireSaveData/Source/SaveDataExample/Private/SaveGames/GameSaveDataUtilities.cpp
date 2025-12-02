@@ -873,6 +873,304 @@ void UGameSaveDataUtilities::QuickSave_Async( const UObject *WorldContext, int32
 	SaveToSlot_Async( WorldContext, SlotName, UserIndex, ESaveDataType::Quick, Ex_GetQuickSaveDisplayName( ), OnCompletion );
 }
 
+bool UGameSaveDataUtilities::SaveToPath( const UObject *WorldContext, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride )
+{
+	check( IsInGameThread( ) );
+
+	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
+		return false; // Ignore saving a developer save
+
+	const auto SaveData = CreateAndFillSaveData( WorldContext, true );
+	if (!ensureAlways( SaveData != nullptr ))
+		return false;
+
+	if (DisplayNameOverride.IsEmpty( ))
+	{
+		int Index = INDEX_NONE;
+		PathName.FindLastChar( '/', Index );
+
+		DisplayNameOverride = PathName.Right( PathName.Len( ) - Index - 1 );
+
+		DisplayNameOverride = DisplayNameOverride.Replace( TEXT( "_" ), TEXT( " " ) );
+	}
+
+	const auto Header = CreateSaveGameHeader( SaveData, SaveType, DisplayNameOverride );
+	if (!ensureAlways( Header != nullptr ))
+		return false;
+
+	return Super::SaveDataToPath( WorldContext, Header, SaveData, PathName );
+}
+
+void UGameSaveDataUtilities::SaveToPath_Async( const UObject *WorldContext, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride, const FSaveAsyncCallback &OnCompletion )
+{
+	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return; // Ignore saving a developer save
+	}
+
+	const auto SaveData = CreateSaveData( WorldContext );
+	if (!ensureAlways( SaveData != nullptr ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	if (DisplayNameOverride.IsEmpty( ))
+	{
+		int Index = INDEX_NONE;
+		PathName.FindLastChar( '/', Index );
+
+		DisplayNameOverride = PathName.Right( PathName.Len( ) - Index - 1 );
+
+		DisplayNameOverride = DisplayNameOverride.Replace( TEXT( "_" ), TEXT( " " ) );
+	}
+
+	const auto AsyncFillComplete = FCreateCheckpointComplete::CreateLambda( [ PathName, SaveType, DisplayNameOverride, OnCompletion ]( const UObject *WorldContext, const UGameSaveData* CheckpointData, bool Success )
+	{
+		if (!Success)
+		{
+			OnCompletion.ExecuteIfBound( PathName, -1, false );
+			return;
+		}
+
+		const UGameSaveHeader* Header = CreateSaveGameHeader( CheckpointData, SaveType, DisplayNameOverride );
+		if (!ensureAlways( Header != nullptr ))
+		{
+			OnCompletion.ExecuteIfBound( PathName, -1, false );
+			return;
+		}
+
+		SaveDataToPath_Async( WorldContext, Header, CheckpointData, PathName, OnCompletion );
+	});
+
+	FillAsyncSaveGameData_Async( WorldContext, SaveData, true, AsyncFillComplete );
+}
+
+void UGameSaveDataUtilities::SaveCheckpointToPath( const UObject *WorldContext, const UGameSaveData *CheckpointData, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride )
+{
+	check( IsInGameThread( ) );
+
+	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
+		return; // Ignore saving a developer save
+	
+	if (!ensureAlways( CheckpointData != nullptr ))
+		return;
+	if (!ensureAlways( CheckpointData->bCreationComplete == true ))
+		return;
+
+	if (DisplayNameOverride.IsEmpty( ))
+	{
+		int Index = INDEX_NONE;
+		PathName.FindLastChar( '/', Index );
+
+		DisplayNameOverride = PathName.Right( PathName.Len( ) - Index - 1 );
+
+		DisplayNameOverride = DisplayNameOverride.Replace( TEXT( "_" ), TEXT( " " ) );
+	}
+
+	const auto SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData, GetTransientPackage( ) ) );
+
+	if (!ensureAlways( FillCheckpointData( WorldContext, SaveGameData ) ))
+		return;
+	SaveGameData->bCreationComplete = true;
+
+	const auto Header = CreateSaveGameHeader( SaveGameData, SaveType, DisplayNameOverride );
+	if (!ensureAlways( Header != nullptr ))
+		return;
+
+	const auto SaveDataResult = Super::SaveDataToPath( WorldContext, Header, SaveGameData, PathName );
+	ensureAlways( SaveDataResult );
+}
+
+void UGameSaveDataUtilities::SaveCheckpointToPath_Async( const UObject *WorldContext, const UGameSaveData *CheckpointData, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride, const FSaveAsyncCallback &OnCompletion )
+{
+	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return; // Ignore saving a developer save
+	}
+	
+	if (!ensureAlways( Super::SaveOperationsAreAllowed( ) ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	if (!ensureAlways( CheckpointData != nullptr ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	if (!ensureAlways( CheckpointData->bCreationComplete ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	if (DisplayNameOverride.IsEmpty( ))
+	{
+		int Index = INDEX_NONE;
+		PathName.FindLastChar( '/', Index );
+
+		DisplayNameOverride = PathName.Right( PathName.Len( ) - Index - 1 );
+
+		DisplayNameOverride = DisplayNameOverride.Replace( TEXT( "_" ), TEXT( " " ) );
+	}
+
+	struct FSaveCheckpointTask : public FSaveDataTask
+	{
+		FSaveCheckpointTask( const FString &PN, ESaveDataType ST, const FString &DN, const UGameSaveData *CP ) : FSaveDataTask( -1 ), PathName( PN ), DisplayName( DN ), SaveType( ST ), CheckpointData( CP ) { }
+
+		void Branch(const UObject *WorldContext) override
+		{
+			Context = WorldContext;
+		}
+
+		void DoWork( )
+		{
+			SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData.Get( ), GetTransientPackage( ) ) );
+			if (SaveGameData == nullptr)
+				return;
+
+			if (!FillCheckpointData( Context, SaveGameData ))
+				return;
+			SaveGameData->bCreationComplete = true;
+
+			Header = CreateSaveGameHeader( SaveGameData, SaveType, DisplayName );
+			if (Header == nullptr)
+				return;
+
+			bResult = Super::SaveDataToPath_Internal( Context, Header, SaveGameData, PathName );
+		}
+
+		void Join(const UObject *WorldContext) override
+		{
+			if (SaveGameData != nullptr)
+				SaveGameData->ClearInternalFlags( EInternalObjectFlags::Async );
+			if (Header != nullptr)
+				Header->ClearInternalFlags( EInternalObjectFlags::Async );
+		}
+
+		// The name of the slot to save to
+		FString PathName;
+
+		// The display name to assign to the save header
+		FString DisplayName;
+
+		// The type of save to write
+		ESaveDataType SaveType;
+
+		// The checkpoint to use as the source data for the save
+		TStrongObjectPtr< const UGameSaveData > CheckpointData;
+
+		// The actual save data to write to the disk
+		UGameSaveData *SaveGameData = nullptr;
+
+		// The associated header to write to the disk
+		UGameSaveHeader *Header = nullptr;
+
+		// The world context for filling the checkpoint data
+		const UObject *Context = nullptr;
+
+		// The overall result of the write operation
+		bool bResult = false;
+
+	} NewTask( PathName, SaveType, DisplayNameOverride, CheckpointData );
+
+	const auto AsyncTaskComplete = FAsyncTaskComplete< FSaveCheckpointTask >::CreateLambda( [ OnCompletion ]( const UObject *WorldContext, const FSaveCheckpointTask &Task )
+	{
+		OnCompletion.ExecuteIfBound( Task.PathName, Task.UserIndex, Task.bResult );
+	});
+
+	if (!Super::StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Save Checkpoint to Path", AsyncTaskComplete ))
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+}
+
+ESaveDataLoadResult UGameSaveDataUtilities::LoadSaveGameFromPath( const UObject *WorldContext, const FString &PathName, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData )
+{
+	check( IsInGameThread( ) );
+
+	const auto Header = NewObject< UGameSaveHeader >( GetTransientPackage( ) );
+	const auto SaveData = NewObject< UGameSaveData >( GetTransientPackage( ) );
+
+	outHeader = Header;
+	outSaveData = SaveData;
+
+	const auto Result = Super::LoadDataFromPath( WorldContext, PathName, Header, SaveData );
+	if (Result != ESaveDataLoadResult::Success)
+		return Result;
+
+	SaveData->bCreationComplete = true;
+
+	PostSaveGameLoad( WorldContext, Header, SaveData, PathName );
+
+	return ESaveDataLoadResult::Success;
+}
+
+void UGameSaveDataUtilities::LoadSaveGameFromPath_Async( const UObject *WorldContext, const FString &PathName, const FLoadAsyncCallback &OnCompletion )
+{
+	check( OnCompletion.IsBound( ) );
+
+	const TWeakObjectPtr< const UObject > WeakWorldContext( WorldContext );
+	auto CompletionLambda = [ WeakWorldContext, OnCompletion ]( const FString &SlotName, int32 UserIndex, ESaveDataLoadResult Result, const USaveDataHeader *Header, const USaveData *SaveData ) -> void
+	{
+		const auto GameHeader = CastChecked< UGameSaveHeader >( Header, ECastCheckedType::NullAllowed );
+		const auto GameSaveData = CastChecked< UGameSaveData >( SaveData, ECastCheckedType::NullAllowed );
+
+		if (GameSaveData != nullptr)
+			const_cast< UGameSaveData* >( GameSaveData )->bCreationComplete = true;
+
+		if (const auto WorldContext = WeakWorldContext.Get( ))
+		{
+			OnCompletion.Execute( SlotName, UserIndex, Result, GameHeader, GameSaveData );
+
+			if (Result == ESaveDataLoadResult::Success)
+				PostSaveGameLoad( WorldContext, GameHeader, GameSaveData, SlotName );
+		}
+		else
+		{
+			ensureAlwaysMsgf( false, TEXT( "World Context for load save became invalid during async operation!" ) );
+			OnCompletion.Execute( SlotName, UserIndex, ESaveDataLoadResult::SerializationFailed, nullptr, nullptr );
+		}
+	};
+
+	const auto Header = NewObject< UGameSaveHeader >( GetTransientPackage( ) );
+	const auto SaveData = NewObject< UGameSaveData >( GetTransientPackage( ) );
+
+	Super::LoadDataFromPath_Async( WorldContext, PathName, Header, SaveData, FLoadAsyncCallback_Core::CreateLambda( CompletionLambda ) );
+}
+
+ESaveDataLoadResult UGameSaveDataUtilities::LoadPathHeaderOnly( const UObject *WorldContext, const FString &PathName, const UGameSaveHeader *& outHeader )
+{
+	check( IsInGameThread( ) );
+
+	ESaveDataLoadResult Result = ESaveDataLoadResult::FailedToOpen;
+
+	outHeader = Cast< UGameSaveHeader >( Super::LoadPathHeaderOnly( WorldContext, PathName, UGameSaveHeader::StaticClass( ), Result ) );
+
+	return Result;
+}
+
+void UGameSaveDataUtilities::LoadPathHeaderOnly_Async( const UObject *WorldContext, const FString &PathName, const FLoadHeaderAsyncCallback &OnCompletion )
+{
+	check( OnCompletion.IsBound( ) );
+
+	auto CompletionLambda = [ OnCompletion ]( const FString &SlotName, int32 UserIndex, ESaveDataLoadResult Result, const USaveDataHeader *Header ) -> void
+	{
+		OnCompletion.Execute( SlotName, UserIndex, Result, Cast< UGameSaveHeader >( Header ) );
+	};
+
+	Super::LoadPathHeaderOnly_Async( WorldContext, PathName, UGameSaveHeader::StaticClass( ), FLoadHeaderAsyncCallback_Core::CreateLambda( CompletionLambda ) );
+}
+
 #if !UE_BUILD_SHIPPING && !UE_BUILD_TEST
 bool UGameSaveDataUtilities::DeveloperSave( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, FString DisplayNameOverride )
 {

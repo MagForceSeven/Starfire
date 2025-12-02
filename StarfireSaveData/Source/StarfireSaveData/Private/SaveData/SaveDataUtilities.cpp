@@ -20,12 +20,32 @@ const FString USaveDataUtilities::SaveExtension( ".sav" );
 static TUniquePtr< FArchive > CreateFileReaderForSlot( const FString& SlotName, int32 UserIndex, const FString &SlotExt )
 {
 	check( !SlotName.IsEmpty( ) );
+	check( !SlotExt.IsEmpty( ) );
 
 	const auto FilePath = FString::Printf( TEXT( "%sSaveGames/%s%s" ), *FPaths::ProjectSavedDir( ), *SlotName, *SlotExt );
 	constexpr uint32 ReadFlags = 0;
 
 	// CreateFileReader does an allocation with 'new' so we wrap it in a UniquePtr so that it will get deleted properly by the calling code
 	return TUniquePtr< FArchive >( IFileManager::Get( ).CreateFileReader( *FilePath, ReadFlags ) );
+}
+
+static TUniquePtr< FArchive > CreateFileReaderForPath( FString PathName, const FString &SaveExt )
+{
+	check( !PathName.IsEmpty( ) );
+	check( !SaveExt.IsEmpty( ) );
+	
+	if (PathName[ 0 ] == '/') // maybe convert from project directory to a fully qualified one
+	{
+		PathName.RemoveAt( 0, 1 );
+		PathName = FPaths::ProjectContentDir( ) + PathName;
+	}
+	
+	PathName.Append( SaveExt );
+
+	constexpr uint32 ReadFlags = 0;
+
+	// CreateFileReader does an allocation with 'new' so we wrap it in a UniquePtr so that it will get deleted properly by the calling code
+	return TUniquePtr< FArchive >( IFileManager::Get( ).CreateFileReader( *PathName, ReadFlags ) );
 }
 
 bool USaveDataUtilities::SaveOperationsAreAllowed( void )
@@ -911,6 +931,307 @@ void USaveDataUtilities::FindLeastRecentSave_Async( const UObject *WorldContext,
 	});
 
 	EnumerateSaveHeaders_Async( WorldContext, UserIndex, HeaderType, OnTaskComplete, Filter );
+}
+
+bool USaveDataUtilities::SaveDataToPath_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName )
+{
+	check( Header != nullptr );
+	check( SaveData != nullptr );
+	check( !PathName.IsEmpty( ) );
+
+	TArray< uint8 > FileData;
+	if (SaveDataMemoryUtilities::SaveGameDataToMemory( Header, SaveData, FileData ))
+	{
+		if (SaveDataMemoryUtilities::SaveFileDataToPath( PathName, FileData, SaveExtension ))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool USaveDataUtilities::SaveDataToPath( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName )
+{
+	check( Header != nullptr );
+	check( SaveData != nullptr );
+
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+		return false;
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+		return false;
+
+	return SaveDataToPath_Internal( WorldContext, Header, SaveData, PathName );
+}
+
+void USaveDataUtilities::SaveDataToPath_Async( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName, const FSaveAsyncCallback_Core &OnCompletion )
+{
+	check( Header != nullptr );
+	check( SaveData != nullptr );
+
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+	
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+	{
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
+	}
+
+	struct FSaveToSlotTask : public FSaveDataTask
+	{
+		FSaveToSlotTask( const FString &PN, const USaveDataHeader *H, const USaveData *SD ) : FSaveDataTask( -1 ), PathName( PN ), Header( H ), SaveData( SD ) { }
+
+		void Branch(const UObject *WorldContext) override
+		{
+			Context = WorldContext;
+		}
+
+		void DoWork( )
+		{
+			bSaveResult = SaveDataToPath_Internal( Context, Header.Get( ), SaveData.Get( ), PathName );
+		}
+		
+		// The slot name to be written or loaded
+		FString PathName;
+
+		// The header that needs to be written asynchronously
+		TStrongObjectPtr< const USaveDataHeader > Header;
+
+		// The save game data that needs to be written asynchronously
+		TStrongObjectPtr< const USaveData > SaveData;
+
+		// The results of any request to save
+		bool bSaveResult = false;
+
+		// The context in which the operation is running
+		const UObject *Context = nullptr;
+		
+	} NewTask( PathName, Header, SaveData );
+
+	const auto OnTaskComplete = FAsyncTaskComplete< FSaveToSlotTask >::CreateLambda( [ OnCompletion ]( const UObject *World, const FSaveToSlotTask &Task )
+	{
+		OnCompletion.ExecuteIfBound( Task.PathName, Task.UserIndex, Task.bSaveResult );
+	});
+
+	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Save to Path", OnTaskComplete ))
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+}
+
+
+ESaveDataLoadResult USaveDataUtilities::LoadDataFromPath_Internal( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData )
+{
+	check( !PathName.IsEmpty( ) );
+	check( outHeader != nullptr );
+	check( outSaveData != nullptr );
+
+	TArray< uint8 > FileData;
+	if (SaveDataMemoryUtilities::LoadFileDataFromPath( PathName, FileData, SaveExtension ))
+	{
+		TArray< uint8 > SaveDataBytes;
+
+		const auto Result = SaveDataMemoryUtilities::LoadDataFromMemory( FileData, outHeader, SaveDataBytes, outSaveData->GetClass( ), WorldContext );
+
+		if (Result != ESaveDataLoadResult::Success)
+			return Result;
+
+		if (SaveDataMemoryUtilities::SerializeSaveGameData( SaveDataBytes, outSaveData ))
+			return ESaveDataLoadResult::Success;
+	}
+
+	return ESaveDataLoadResult::FailedToOpen;
+}
+
+ESaveDataLoadResult USaveDataUtilities::LoadDataFromPath( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData )
+{
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+		return ESaveDataLoadResult::RequestFailure;
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+		return ESaveDataLoadResult::RequestFailure;
+	if (!ensureAlways( outHeader != nullptr ))
+		return ESaveDataLoadResult::RequestFailure;
+	if (!ensureAlways( outSaveData != nullptr ))
+		return ESaveDataLoadResult::RequestFailure;
+	
+	return LoadDataFromPath_Internal( WorldContext, PathName, outHeader, outSaveData );
+}
+
+void USaveDataUtilities::LoadDataFromPath_Async( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData, const FLoadAsyncCallback_Core &OnCompletion )
+{
+	check( OnCompletion.IsBound( ) );
+
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr, nullptr );
+		return;
+	}
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr, nullptr );
+		return;
+	}
+
+	if (!ensureAlways( outHeader != nullptr ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr, nullptr );
+		return;
+	}
+
+	if (!ensureAlways( outSaveData != nullptr ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr, nullptr );
+		return;
+	}
+	
+	struct FLoadSlotTask : public FSaveDataTask
+	{
+		FLoadSlotTask( const FString &PN, USaveDataHeader *H, USaveData *SD ) : FSaveDataTask( -1 ), PathName( PN ), Header( H ), SaveData( SD ) { }
+
+		void Branch(const UObject *WorldContext) override
+		{
+			Context = WorldContext;
+		}
+		
+		void DoWork( )
+		{
+			LoadResult = LoadDataFromPath_Internal( Context, PathName, Header.Get( ), SaveData.Get( ) );
+		}
+
+		// The slot name to be written or loaded
+		FString PathName;
+
+		// The header that needs to be loaded asynchronously
+		TStrongObjectPtr< USaveDataHeader > Header;
+
+		// The save game data that needs to be loaded asynchronously
+		TStrongObjectPtr< USaveData > SaveData;
+
+		// The world context this task is running within
+		const UObject *Context = nullptr;
+
+		// The results of any request to load
+		ESaveDataLoadResult LoadResult = ESaveDataLoadResult::RequestFailure;
+
+	} NewTask( PathName, outHeader, outSaveData );
+	
+	const auto OnTaskComplete = FAsyncTaskComplete< FLoadSlotTask >::CreateLambda( [ OnCompletion ]( const UObject *World, const FLoadSlotTask &Task )
+	{
+		OnCompletion.Execute( Task.PathName, Task.UserIndex, Task.LoadResult, Task.Header.Get( ), Task.SaveData.Get( ) );
+	});
+
+	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Load From Path", OnTaskComplete ))
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr, nullptr );
+}
+
+const USaveDataHeader* USaveDataUtilities::LoadPathHeaderOnly_Internal( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult )
+{
+	check( !PathName.IsEmpty( ) );
+	check( HeaderType != nullptr );
+
+	if (const auto Archive = CreateFileReaderForPath( PathName, SaveExtension ))
+	{
+		FSaveDataFileDescription SaveFileDescription;
+		FSaveDataVersionData VersionData;
+
+		USaveDataHeader *Header = NewObject< USaveDataHeader >( GetTransientPackage( ), HeaderType );
+
+		outResult = SaveDataMemoryUtilities::LoadHeaderFromArchive( *Archive, SaveFileDescription, VersionData, Header, WorldContext );
+		Archive->Close( );
+
+		return Header;
+	}
+
+	outResult = ESaveDataLoadResult::FailedToOpen;
+	return nullptr;
+}
+
+const USaveDataHeader* USaveDataUtilities::LoadPathHeaderOnly( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult )
+{
+	outResult = ESaveDataLoadResult::RequestFailure;
+	
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+		return nullptr;
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+		return nullptr;
+	if (!ensureAlways( HeaderType != nullptr ))
+		return nullptr;
+	
+	return LoadPathHeaderOnly_Internal( WorldContext, PathName, HeaderType, outResult );
+}
+
+void USaveDataUtilities::LoadPathHeaderOnly_Async( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, const FLoadHeaderAsyncCallback_Core &OnCompletion )
+{
+	check( OnCompletion.IsBound( ) );
+
+	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr );
+		return;
+	}
+
+	if (!ensureAlways( !PathName.IsEmpty( ) ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr );
+		return;
+	}
+
+	if (!ensureAlways( HeaderType != nullptr ))
+	{
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr );
+		return;
+	}
+	
+	struct FLoadHeaderTask : public FSaveDataTask
+	{
+		FLoadHeaderTask( const FString &PN, const TSubclassOf< USaveDataHeader > &HT ) : FSaveDataTask( -1 ), PathName( PN ), HeaderType( HT ) { }
+
+		void Branch(const UObject *WorldContext) override
+		{
+			Context = WorldContext;
+		}
+		
+		void DoWork( )
+		{
+			Header = LoadSlotHeaderOnly_Internal( Context, PathName, UserIndex, HeaderType, LoadResult );
+		}
+
+		void Join(const UObject *WorldContext) override
+		{
+			if (Header != nullptr)
+				const_cast< USaveDataHeader* >( Header )->ClearInternalFlags( EInternalObjectFlags::Async );
+		}
+		
+		// The slot name to be written or loaded
+		FString PathName;
+		
+		// The type of header that needs to be loaded or written asynchronously
+		const TSubclassOf< USaveDataHeader > &HeaderType;
+
+		// The World Context this task is running in
+		const UObject *Context = nullptr;
+
+		// The header that was loaded (if successful)
+		const USaveDataHeader *Header = nullptr;
+
+		// The results of any request to load
+		ESaveDataLoadResult LoadResult = ESaveDataLoadResult::RequestFailure;
+
+	} NewTask( PathName, HeaderType );
+
+	const auto OnTaskComplete = FAsyncTaskComplete< FLoadHeaderTask >::CreateLambda( [ OnCompletion ]( const UObject *World, const FLoadHeaderTask &Task )
+	{
+		OnCompletion.Execute( Task.PathName, Task.UserIndex, Task.LoadResult, Task.Header );
+	});
+
+	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Load Header from Path", OnTaskComplete ))
+		OnCompletion.Execute( PathName, -1, ESaveDataLoadResult::RequestFailure, nullptr );
 }
 
 #undef LOCTEXT_NAMESPACE

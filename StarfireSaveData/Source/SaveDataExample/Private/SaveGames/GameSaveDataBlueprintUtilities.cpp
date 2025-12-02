@@ -69,6 +69,7 @@ void UForEachSaveDataHeaders_AsyncAction::Activate( void )
 ULoadSaveData_AsyncAction* ULoadSaveData_AsyncAction::LoadSaveGame( const FString &SlotName, int UserIndex, UObject *WorldContext )
 {
 	const auto Action = NewObject< ULoadSaveData_AsyncAction >( WorldContext );
+	ensureAlways( UserIndex >= 0 );
 
 	Action->SlotName = SlotName;
 	Action->UserIndex = UserIndex;
@@ -76,9 +77,22 @@ ULoadSaveData_AsyncAction* ULoadSaveData_AsyncAction::LoadSaveGame( const FStrin
 	return Action;
 }
 
+ULoadSaveData_AsyncAction* ULoadSaveData_AsyncAction::LoadSaveGameFromFile( const FString &PathName, UObject *WorldContext )
+{
+	const auto Action = NewObject< ULoadSaveData_AsyncAction >( WorldContext );
+
+	Action->SlotName = PathName;
+	Action->UserIndex = -1;
+
+	return Action;
+}
+
 void ULoadSaveData_AsyncAction::Activate( void )
 {
-	UGameSaveDataUtilities::LoadSaveGameFromSlot_Async( this, SlotName, UserIndex, FLoadAsyncCallback::CreateUObject( this, &ULoadSaveData_AsyncAction::AsyncLoadComplete ) );
+	if (UserIndex >= 0)
+		UGameSaveDataUtilities::LoadSaveGameFromSlot_Async( this, SlotName, UserIndex, FLoadAsyncCallback::CreateUObject( this, &ULoadSaveData_AsyncAction::AsyncLoadComplete ) );
+	else
+		UGameSaveDataUtilities::LoadSaveGameFromPath_Async( this, SlotName, FLoadAsyncCallback::CreateUObject( this, &ULoadSaveData_AsyncAction::AsyncLoadComplete ) );
 
 	StartAction( this, false );
 }
@@ -124,9 +138,22 @@ USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveCheckpointToSlot( cons
 	return Action;
 }
 
+USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveGameToFile( const FString &PathName, const FString &DisplayNameOverride, UObject *WorldContext )
+{
+	const auto Action = NewObject< USaveSaveData_AsyncAction >( WorldContext );
+
+	Action->SlotName = PathName;
+	Action->UserIndex = -1;
+	Action->SaveType = ESaveDataType::Developer;
+	Action->DisplayNameOverride = DisplayNameOverride;
+
+	return Action;
+}
+
 USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveGameToSlot_Internal( const FString &SlotName, int UserIndex, ESaveDataType SaveType, const FString &DisplayNameOverride, UObject *WorldContext )
 {
 	const auto Action = NewObject< USaveSaveData_AsyncAction >( WorldContext );
+	ensureAlways( UserIndex >= 0 );
 
 	Action->SlotName = SlotName;
 	Action->UserIndex = UserIndex;
@@ -140,7 +167,9 @@ void USaveSaveData_AsyncAction::Activate( void )
 {
 	const auto CompletionDelegate = FSaveAsyncCallback::CreateUObject( this, &USaveSaveData_AsyncAction::AsyncSaveComplete );
 	
-	if (SaveType == ESaveDataType::Auto) // specialized call for the auto-save slot to include finding slot name asynchronously
+	if (UserIndex < 0)
+		UGameSaveDataUtilities::SaveToPath_Async( this, SlotName, SaveType, DisplayNameOverride, CompletionDelegate );
+	else if (SaveType == ESaveDataType::Auto) // specialized call for the auto-save slot to include finding slot name asynchronously
 		UGameSaveDataUtilities::AutoSave_Async( this, UserIndex, DisplayNameOverride, CompletionDelegate );
 	else if (Checkpoint != nullptr) // specialized call for the save with an existing save data
 		UGameSaveDataUtilities::SaveCheckpointToSlot_Async( this, Checkpoint, SlotName, UserIndex, SaveType, DisplayNameOverride, CompletionDelegate );

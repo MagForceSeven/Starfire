@@ -152,6 +152,34 @@ public:
 	static bool QuickSave( const UObject *WorldContext, int32 UserIndex );
 	// Create and write a save to a file asynchronously - always to slot 'QuickSave' - always user triggered
 	static void QuickSave_Async( const UObject *WorldContext, int32 UserIndex, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
+	
+	// Save the current state of the game to a file
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static bool SaveToPath( const UObject *WorldContext, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride = { } );
+	// Save the current state of the game to a file asynchronously
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void SaveToPath_Async( const UObject *WorldContext, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
+
+	// Save a pre-existing checkpoint to a file
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void SaveCheckpointToPath( const UObject *WorldContext, const UGameSaveData *CheckpointData, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride = { } );
+	// save a pre-existing checkpoint to a file asynchronously
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void SaveCheckpointToPath_Async( const UObject *WorldContext, const UGameSaveData *CheckpointData, const FString &PathName, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
+
+	// Try to load the data from a slot into the save game data structure
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static ESaveDataLoadResult LoadSaveGameFromPath( const UObject *WorldContext, const FString &PathName, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData );
+	// Try to load the data from a slot asynchronously and report back when complete with the save data
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void LoadSaveGameFromPath_Async( const UObject *WorldContext, const FString &PathName, const FLoadAsyncCallback &OnCompletion );
+
+	// Load just the header information for a slot
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	[[nodiscard]] static ESaveDataLoadResult LoadPathHeaderOnly( const UObject *WorldContext, const FString &PathName, const UGameSaveHeader *& outHeader );
+	// Load just the header information for a slot, calling the callback when process asynchronously completes
+	// Files starting with "/" will be assumed to be coming from ProjectContent, otherwise specify a fully qualified path
+	static void LoadPathHeaderOnly_Async( const UObject *WorldContext, const FString &PathName, const FLoadHeaderAsyncCallback &OnCompletion );
 
 #if !UE_BUILD_SHIPPING && !UE_BUILD_TEST
 	// A development only automatic save created with the current state of the game and written to disk

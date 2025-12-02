@@ -5,7 +5,7 @@
 #include "SaveGames/GameSaveDataSubsystem.h"
 
 // Engine
-#include "Engine/World.h"
+#include "EngineUtils.h"
 
 extern FString Ex_GetQuickSaveSlotName( void );
 extern FString Ex_GetQuickSaveDisplayName( void );
@@ -29,6 +29,9 @@ struct FSaveDataExecs : public FExecSF
 
 		AddExec( TEXT( "Game.SaveData.ReloadSave"), TEXT( "Load the save that was most recently loaded" ), FExecDelegate::CreateStatic( &FSaveDataExecs::ReloadSave ) );
 		AddExec( TEXT( "Game.SaveData.LoadMostRecent"), TEXT( "Load the save that was most recently loaded" ), FExecDelegate::CreateStatic( &FSaveDataExecs::LoadRecent ) );
+
+		AddExec( TEXT( "Game.SaveData.SaveToFile" ), TEXT( "Save the current state of the game to an arbitrary file location" ), FExecDelegate::CreateStatic( &FSaveDataExecs::SaveToFile ) );
+		AddExec( TEXT( "Game.SaveData.LoadFile" ), TEXT( "Load a game from an arbitrary file location" ), FExecDelegate::CreateStatic( &FSaveDataExecs::LoadFile ) );
 	}
 
 	static void SaveToSlot( const UWorld *World, const TCHAR *Cmd, FOutputDevice &Ar )
@@ -162,6 +165,71 @@ struct FSaveDataExecs : public FExecSF
 		else
 			// ReSharper disable once CppDeclaratorNeverUsed
 			const auto Result = UGameSaveDataUtilities::LoadMostRecentSave( World, 0, SlotName, Header, SaveData );
+	}
+
+	static void OnFinishSave(const FString &PathName, int32 /*UserIndex*/, bool Success )
+	{
+		if (!Success && (GEngine->GameViewport != nullptr))
+		{
+			FConsoleOutputDevice StrOut(GEngine->GameViewport->ViewportConsole);
+			StrOut.Logf( TEXT("Failed to write save file: '%s'"), *PathName );
+		}
+	}
+
+	static void SaveToFile( const UWorld *World, const TCHAR *Cmd, FOutputDevice &Ar )
+	{
+		FString PathName;
+		bool Async = false;
+		if (GetParams( Cmd, PathName, Async ) < 1)
+		{
+			Ar.Log( FString::Printf( TEXT( "Game.SaveData.SaveToFile - file name required." ) ) );
+			return;
+		}
+
+		if (Async)
+		{
+			UGameSaveDataUtilities::SaveToPath_Async( World, PathName, ESaveDataType::User, { }, FSaveAsyncCallback::CreateStatic( &OnFinishSave ) );
+		}
+		else
+		{
+			const auto Result = UGameSaveDataUtilities::SaveToPath( World, PathName, ESaveDataType::User );
+			if (!Result)
+				Ar.Logf( TEXT("Failed to write save file: '%s'"), *PathName );
+		}
+	}
+
+	static void OnFinishLoad(const FString &PathName, int32 /*UserIndex*/, ESaveDataLoadResult Result, const UGameSaveHeader* /*Header*/, const UGameSaveData* /*SaveData*/ )
+	{
+		if ((Result != ESaveDataLoadResult::Success) && (GEngine->GameViewport != nullptr))
+		{
+			FConsoleOutputDevice StrOut(GEngine->GameViewport->ViewportConsole);
+			StrOut.Logf( TEXT("Failed to load save file: '%s'"), *PathName );
+		}
+	}
+
+	static void LoadFile( const UWorld *World, const TCHAR *Cmd, FOutputDevice &Ar )
+	{
+		FString PathName;
+		bool Async = false;
+		if (GetParams( Cmd, PathName, Async ) < 1)
+		{
+			Ar.Log( FString::Printf( TEXT( "Game.SaveData.LoadFile - file name required." ) ) );
+			return;
+		}
+
+		const UGameSaveHeader *Header = nullptr;
+		const UGameSaveData *SaveData = nullptr;
+		
+		if (Async)
+		{
+			UGameSaveDataUtilities::LoadSaveGameFromPath_Async( World, PathName, FLoadAsyncCallback::CreateStatic( &OnFinishLoad ) );
+		}
+		else
+		{
+			const auto Result = UGameSaveDataUtilities::LoadSaveGameFromPath( World, PathName, Header, SaveData );
+			if (Result != ESaveDataLoadResult::Success)
+				Ar.Logf( TEXT("Failed to load save file: '%s'"), *PathName );
+		}
 	}
 
 } Ex_GSaveDataExecs;
