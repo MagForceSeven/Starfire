@@ -260,34 +260,26 @@ void USaveDataUtilities::SaveDataToSlot_Async( const UObject *WorldContext, cons
 
 	struct FSaveToSlotTask : public FSaveDataTask
 	{
-		FSaveToSlotTask( int32 UI, const FString &SN, USaveDataHeader *H, USaveData *SD ) : FSaveDataTask( UI ), SlotName( SN ), Header( H ), SaveData( SD ) { }
+		FSaveToSlotTask( int32 UI, const FString &SN, const USaveDataHeader *H, const USaveData *SD ) : FSaveDataTask( UI ), SlotName( SN ), Header( H ), SaveData( SD ) { }
 
 		void Branch(const UObject *WorldContext) override
 		{
-			Header->AddToRoot( );
-			SaveData->AddToRoot( );
 			Context = WorldContext;
 		}
 
 		void DoWork( )
 		{
-			bSaveResult = SaveDataToSlot_Internal( Context, Header, SaveData, SlotName, UserIndex );
-		}
-
-		void Join(const UObject *WorldContext) override
-		{
-			Header->RemoveFromRoot( );
-			SaveData->RemoveFromRoot( );
+			bSaveResult = SaveDataToSlot_Internal( Context, Header.Get( ), SaveData.Get( ), SlotName, UserIndex );
 		}
 		
 		// The slot name to be written or loaded
 		FString SlotName;
 
 		// The header that needs to be written asynchronously
-		USaveDataHeader *Header = nullptr;
+		TStrongObjectPtr< const USaveDataHeader > Header;
 
 		// The save game data that needs to be written asynchronously
-		USaveData *SaveData = nullptr;
+		TStrongObjectPtr< const USaveData > SaveData;
 
 		// The results of any request to save
 		bool bSaveResult = false;
@@ -295,7 +287,7 @@ void USaveDataUtilities::SaveDataToSlot_Async( const UObject *WorldContext, cons
 		// The context in which the operation is running
 		const UObject *Context = nullptr;
 		
-	} NewTask( UserIndex, SlotName, const_cast< USaveDataHeader* >( Header ), const_cast< USaveData* >( SaveData ) );
+	} NewTask( UserIndex, SlotName, Header, SaveData );
 
 	const auto OnTaskComplete = FAsyncTaskComplete< FSaveToSlotTask >::CreateLambda( [ OnCompletion ]( const UObject *World, const FSaveToSlotTask &Task )
 	{
@@ -389,30 +381,22 @@ void USaveDataUtilities::LoadDataFromSlot_Async( const UObject *WorldContext, co
 
 		void Branch(const UObject *WorldContext) override
 		{
-			Header->AddToRoot( );
-			SaveData->AddToRoot( );
 			Context = WorldContext;
 		}
 		
 		void DoWork( )
 		{
-			LoadResult = LoadDataFromSlot_Internal( Context, SlotName, UserIndex, Header, SaveData );
-		}
-
-		void Join(const UObject *WorldContext) override
-		{
-			Header->RemoveFromRoot( );
-			SaveData->RemoveFromRoot( );
+			LoadResult = LoadDataFromSlot_Internal( Context, SlotName, UserIndex, Header.Get( ), SaveData.Get( ) );
 		}
 
 		// The slot name to be written or loaded
 		FString SlotName;
 
 		// The header that needs to be loaded asynchronously
-		USaveDataHeader *Header = nullptr;
+		TStrongObjectPtr< USaveDataHeader > Header;
 
 		// The save game data that needs to be loaded asynchronously
-		USaveData *SaveData = nullptr;
+		TStrongObjectPtr< USaveData > SaveData;
 
 		// The world context this task is running within
 		const UObject *Context = nullptr;
@@ -424,7 +408,7 @@ void USaveDataUtilities::LoadDataFromSlot_Async( const UObject *WorldContext, co
 	
 	const auto OnTaskComplete = FAsyncTaskComplete< FLoadSlotTask >::CreateLambda( [ OnCompletion ]( const UObject *World, const FLoadSlotTask &Task )
 	{
-		OnCompletion.Execute( Task.SlotName, Task.UserIndex, Task.LoadResult, Task.Header, Task.SaveData );
+		OnCompletion.Execute( Task.SlotName, Task.UserIndex, Task.LoadResult, Task.Header.Get( ), Task.SaveData.Get( ) );
 	});
 
 	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Load From Slot", OnTaskComplete ))
