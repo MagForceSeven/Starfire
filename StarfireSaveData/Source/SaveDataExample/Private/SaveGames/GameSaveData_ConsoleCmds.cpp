@@ -16,7 +16,7 @@ struct FSaveDataExecs : public FExecSF
 	FSaveDataExecs( )
 	{
 		AddExec( TEXT( "Game.SaveData.SaveToSlot" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FSaveDataExecs::SaveToSlot ) );
-		AddExec( TEXT( "Game.SaveData.LoadSlot" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FSaveDataExecs::LoadSlot ) );
+		AddExec( TEXT( "Game.SaveData.LoadSlot" ), TEXT( "Load a game from a specified slot" ), FExecDelegate::CreateStatic( &FSaveDataExecs::LoadSlot ) );
 
 		AddExec( TEXT( "Game.SaveData.AutoSave" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FSaveDataExecs::AutoSave ) );
 
