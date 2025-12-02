@@ -53,7 +53,6 @@ void UGameSaveDataUtilities::FillAsyncSaveGameData_Async( const UObject *WorldCo
 	{
 		FFillSaveData( UGameSaveData *S, bool CP ) : SaveGameData( S )
 		{
-			SaveGameData->AddToRoot( );
 		}
 
 		void Branch(const UObject *WorldContext) override
@@ -63,28 +62,23 @@ void UGameSaveDataUtilities::FillAsyncSaveGameData_Async( const UObject *WorldCo
 
 		void DoWork( )
 		{
-			Result = FillAsyncSaveGameData( SaveGameData );
+			Result = FillAsyncSaveGameData( SaveGameData.Get( ) );
 		}
 
-		void Join(const UObject *WorldContext) override
-		{
-			SaveGameData->RemoveFromRoot( );
-		}
-		
 		// The save game data that should be filled in
-		UGameSaveData *SaveGameData = nullptr;
+		TStrongObjectPtr< UGameSaveData > SaveGameData;
 
 		// The world that we're creating the save data from
 		const UObject *Context = nullptr;
 
-		// Whether or not the fill was completed successfully
+		// Was the fill was completed successfully?
 		bool Result = false;
 
 	} NewTask( SaveGameData, bIncludeCheckpoints );
 
 	const auto OnFillComplete = FAsyncTaskComplete< FFillSaveData >::CreateLambda( [ OnCompletion ]( const UObject *WorldContext, const FFillSaveData &Task )
 	{
-		OnCompletion.Execute( WorldContext, Task.SaveGameData, Task.Result );
+		OnCompletion.Execute( WorldContext, Task.SaveGameData.Get( ), Task.Result );
 	});
 
 	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Fill Async Save Data", OnFillComplete ))
@@ -111,7 +105,6 @@ void UGameSaveDataUtilities::FillCheckpointData_Async( const UObject *WorldConte
 	{
 		FFillCheckpointData( UGameSaveData *S ) : SaveGameData( S )
 		{
-			SaveGameData->AddToRoot( );
 		}
 
 		void Branch(const UObject *WorldContext) override
@@ -121,28 +114,23 @@ void UGameSaveDataUtilities::FillCheckpointData_Async( const UObject *WorldConte
 
 		void DoWork( )
 		{
-			Result = FillCheckpointData( Context, SaveGameData );
+			Result = FillCheckpointData( Context, SaveGameData.Get( ) );
 		}
 
-		void Join(const UObject *WorldContext) override
-		{
-			SaveGameData->RemoveFromRoot( );
-		}
-		
 		// The save game data that should be filled in
-		UGameSaveData *SaveGameData = nullptr;
+		TStrongObjectPtr< UGameSaveData > SaveGameData;
 
 		// The world that we're creating the save data from
 		const UObject *Context = nullptr;
 
-		// Whether or not the fill was completed successfully
+		// Was the fill was completed successfully?
 		bool Result = false;
 
 	} NewTask( SaveGameData );
 
 	const auto OnFillComplete = FAsyncTaskComplete< FFillCheckpointData >::CreateLambda( [ OnCompletion ]( const UObject *InWorldContext, const FFillCheckpointData &Task )
 	{
-		OnCompletion.Execute( InWorldContext, Task.SaveGameData, Task.Result );
+		OnCompletion.Execute( InWorldContext, Task.SaveGameData.Get( ), Task.Result );
 	});
 
 	if (!StartAsyncSaveTask( WorldContext, MoveTemp( NewTask ), "Fill Async Checkpoint Data", OnFillComplete ))

@@ -250,9 +250,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 
 		void DoWork( )
 		{
-			FGCScopeGuard GCGuard;
-
-			SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData, GetTransientPackage( ) ) );
+			SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData.Get( ), GetTransientPackage( ) ) );
 			if (SaveGameData == nullptr)
 				return;
 
@@ -285,7 +283,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 		ESaveDataType SaveType;
 
 		// The checkpoint to use as the source data for the save
-		const UGameSaveData *CheckpointData = nullptr;
+		TStrongObjectPtr< const UGameSaveData > CheckpointData;
 
 		// The actual save data to write to the disk
 		UGameSaveData *SaveGameData = nullptr;
@@ -744,8 +742,7 @@ void UGameSaveDataUtilities::AutoSave_Async( const UObject *WorldContext, int32 
 			{
 				if (Success)
 				{
-					SaveData = CheckpointData;
-					const_cast< UGameSaveData* >( SaveData )->AddToRoot( );
+					SaveData = TStrongObjectPtr( CheckpointData );
 				}
 				else
 				{
@@ -783,26 +780,24 @@ void UGameSaveDataUtilities::AutoSave_Async( const UObject *WorldContext, int32 
 
 			FGCScopeGuard GCGuard;
 
-			Header = CreateSaveGameHeader( SaveData, ESaveDataType::Auto, DisplayName );
+			Header = CreateSaveGameHeader( SaveData.Get( ), ESaveDataType::Auto, DisplayName );
 			if (Header == nullptr)
 			{
 				bResult = false;
 				return;
 			}
 
-			bResult = SaveDataToSlot_Internal( Context, Header, SaveData, SlotName, UserIndex );
+			bResult = SaveDataToSlot_Internal( Context, Header, SaveData.Get( ), SlotName, UserIndex );
 		}
 
 		void Join(const UObject *WorldContext) override
 		{
-			const_cast< UGameSaveData* >( SaveData )->RemoveFromRoot( );
-
 			if (Header != nullptr) // we allocated the header during the async process, so clear this flag to allow it to be GC'd
 				Header->ClearInternalFlags( EInternalObjectFlags::Async );
 		}
 
 		// The save game data to be saved into the auto save slot
-		const UGameSaveData *SaveData = nullptr;
+		TStrongObjectPtr< const UGameSaveData > SaveData;
 
 		// The header metadata about the save
 		UGameSaveHeader *Header = nullptr;
