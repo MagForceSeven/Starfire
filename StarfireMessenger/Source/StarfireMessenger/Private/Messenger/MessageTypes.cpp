@@ -47,6 +47,36 @@ TSoftClassPtr< UObject > FSf_MessageBase::GetContextType( const UScriptStruct *M
 	return nullptr;
 }
 
+#if WITH_EDITOR
+FText FSf_MessageBase::GetContextPinName( const UScriptStruct *MessageType )
+{
+	if (MessageType->IsNative( ))
+	{
+		if (ensureAlways(MessageType->IsChildOf( FSf_MessageBase::StaticStruct( ) )))
+		{
+			const FInstancedStruct StructCDO( MessageType );
+			const FSf_MessageBase *BasePtr = StructCDO.GetPtr< FSf_MessageBase >( );
+			check( BasePtr != nullptr );
+
+			const auto PinName = BasePtr->GetContextPinName( );
+			if (!PinName.IsEmpty( ))
+				return PinName;
+		}
+	}
+	else
+	{
+		const auto Settings = GetDefault< UMessengerProjectSettings >( );
+		if (const auto MessageConfig = Settings->BlueprintMessageTypes.Find( MessageType ))
+		{
+			if (!MessageConfig->ContextPinName.IsEmpty( ))
+				return MessageConfig->ContextPinName;
+		}
+	}
+
+	return NSLOCTEXT( "StarfireMessenger_Editor", "ContextPin_Default", "Context" );
+}
+#endif
+
 bool FSf_MessageBase::IsMessageTypeStateful( const UScriptStruct *MessageType )
 {
 	if (MessageType->IsNative( ))

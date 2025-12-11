@@ -56,8 +56,10 @@ In C++ you can create new message types by deriving from `FSf_Message_Immediate`
 The `SET_MESSAGE_TYPE_AS_ABSTRACT` macro can be used with either type to mark message types that shouldn't be broadcast directly.
 The `SET_CONTEXT_TYPE` macro can also be used by either type to indicate a specific type of object that will be related to the broadcast.
 	- Derived types can redeclare context types, but should only become _more_ specific. `FTestStatefulContext_C` in the following example could choose a type derived from `APawn` but should not choose a type like `AActor`.
+The `SET_CONTEXT_NAME` macro can be used to customize the blueprint name of context pins.
 Properties can optionally be declared as BlueprintReadOnly if they are going to read in blueprint.
 Properties can optionally be declared as ExposeOnSpawn if they are going to be broadcast from blueprint.
+
 ```
 USTRUCT( )
 struct FTestImmediateNoContext : public FSf_Message_Immediate
@@ -83,7 +85,8 @@ struct FTestStatefulContext : public FSf_Message_Stateful
 {
 	GENERATED_BODY( )
 
-	SET_CONTEXT_TYPE( APawn );
+	SET_CONTEXT_TYPE( APawn )
+	SET_CONTEXT_NAME( "Pawn" )
 	
 	UPROPERTY( BlueprintReadOnly, meta=(ExposeOnSpawn))
 	int Test1;
@@ -98,7 +101,6 @@ struct FTestStatefulContext_C : public FTestStatefulContext
 	UPROPERTY( BlueprintReadOnly, meta=(ExposeOnSpawn))
 	int Test2;
 };
-
 ```
 
 In Blueprint, you can create new structures through the Editor as normal.

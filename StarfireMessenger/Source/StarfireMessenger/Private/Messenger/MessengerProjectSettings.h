@@ -29,6 +29,10 @@ public:
 	// The type of context object that should be expected (can be none)
 	UPROPERTY( EditDefaultsOnly, Category = "Blueprint Message Config", meta = (DisplayThumbnail = false) )
 	TSoftClassPtr< UObject > ContextType;
+	
+	// A custom name to give to context pins for this type of message
+	UPROPERTY( EditDefaultsOnly, Category = "Blueprint Message Config" )
+	FText ContextPinName;
 };
 
 // Project configuration settings for the Starfire Messenger plugin

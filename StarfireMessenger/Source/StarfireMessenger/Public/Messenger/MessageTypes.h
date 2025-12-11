@@ -34,6 +34,11 @@
  *				- The type being specified as the "ContextType" does need a full definition available, only having access to a forward declaration isn't sufficient
  *					- This shouldn't really be a huge issue since context related events are probably declared with the context or with other events that share a context type
  *						and where the listener for that message likely would have to/want to include that header anyway
+ *						
+ *			- the SET_CONTEXT_NAME macro can be used to set the name the context pin is given in blueprints
+ *				- SET_CONTEXT_NAME( "PinName" )
+ *				- if unset, will default to "Context"
+ *				- Will also be used to set the name of the context pin when creating matching functions or custom events
  */
 
 // Template that can be specialized to identify message types
@@ -78,6 +83,10 @@ public:
 #if WITH_EDITORONLY_DATA
 	// Utility for runtime checking if a type is abstract
 	[[nodiscard]] STARFIREMESSENGER_API  static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
+	// An override name to give to context pins for messages of this type
+	[[nodiscard]] STARFIREMESSENGER_API virtual FText GetContextPinName( ) const { return { }; }
+	// Utility for getting the override name to give context pins of the specified type
+	[[nodiscard]] STARFIREMESSENGER_API static FText GetContextPinName( const UScriptStruct *MessageType );
 #endif
 };
 SET_MESSAGE_TYPE_AS_ABSTRACT( FSf_MessageBase )
@@ -86,6 +95,15 @@ SET_MESSAGE_TYPE_AS_ABSTRACT( FSf_MessageBase )
 #define SET_CONTEXT_TYPE( Type ) \
 	using ContextType = Type; \
 	UClass* GetContextType( ) const override { return std::remove_cv_t< Type >::StaticClass( ); }
+
+// Macro to update the context type for derived types
+#if WITH_EDITOR
+#define SET_CONTEXT_NAME( ContextPinName )	\
+	FText GetContextPinName( ) const { return NSLOCTEXT( "StarfireMessenger", ContextPinName, ContextPinName ); }
+#else
+	#define SET_CONTEXT_NAME( ... )
+#endif
+
 
 // Base for standard fire-and-forget messages
 USTRUCT( BlueprintType )

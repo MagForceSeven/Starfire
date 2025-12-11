@@ -71,6 +71,8 @@ void SGraphNode_K2RegisterMessage::ConfigureContextPin( const TSharedPtr< FUserP
 
 	if (ContextType != nullptr)
 		PinInfo->PinType.PinSubCategoryObject = ContextType.Get( );
+	
+	PinInfo->PinName = FName( FSf_MessageBase::GetContextPinName( MessageType ).ToString( ) );
 }
 
 void SGraphNode_K2RegisterMessage::OnNewGraph( UEdGraph *NewGraph, UK2Node_FunctionEntry *FunctionEntry ) const

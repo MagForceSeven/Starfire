@@ -71,6 +71,7 @@ void UK2Node_StartListeningForMessage::CreatePinsForType( UScriptStruct *InType,
 	{
 		ContextPin->bHidden = FilterPin->bHidden;
 		ContextPin->PinType.PinSubCategoryObject = FilterPin->PinType.PinSubCategoryObject;
+		ContextPin->PinFriendlyName = FSf_MessageBase::GetContextPinName( InType );
 		StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "MessageContext_Tooltip", "Object context that is associated with the event." ) );
 
 		if (!bListenHierarchically)
