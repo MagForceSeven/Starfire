@@ -56,6 +56,8 @@ In C++ you can create new message types by deriving from `FSf_Message_Immediate`
 The `SET_MESSAGE_TYPE_AS_ABSTRACT` macro can be used with either type to mark message types that shouldn't be broadcast directly.
 The `SET_CONTEXT_TYPE` macro can also be used by either type to indicate a specific type of object that will be related to the broadcast.
 	- Derived types can redeclare context types, but should only become _more_ specific. `FTestStatefulContext_C` in the following example could choose a type derived from `APawn` but should not choose a type like `AActor`.
+	- Context type can be declared const (`SET_CONTEXT_TYPE( const USomeAssetType )`) for cases where the context should never be modifyable by handlers, such as when the context is an asset type.
+	- Even if the message declares the context type as non-const, handler functions can define the context parameter as const if that handler's intent is to not modify the context.
 The `SET_CONTEXT_NAME` macro can be used to customize the blueprint name of context pins.
 Properties can optionally be declared as BlueprintReadOnly if they are going to read in blueprint.
 Properties can optionally be declared as ExposeOnSpawn if they are going to be broadcast from blueprint.
