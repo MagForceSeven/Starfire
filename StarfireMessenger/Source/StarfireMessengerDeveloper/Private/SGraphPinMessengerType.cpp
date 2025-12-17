@@ -107,7 +107,13 @@ public:
 			return true;
 		}
 
+		if (!InStruct->IsChildOf( FSf_MessageBase::StaticStruct( )))
+			return false;
+		
 		if (Ignore.Contains( InStruct ))
+			return false;
+		
+		if (InStruct->HasMetaData( "Hidden" ))
 			return false;
 
 		if (!bAllowAbstract && FSf_MessageBase::IsMessageTypeAbstract( InStruct ))
