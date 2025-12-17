@@ -281,10 +281,16 @@ _MessengerTypes.h/cpp_
 
 Header with utility types used to interact with the Messenger subsystem like `EStatefulMessageEvent` and the Listener handle.
 
+#### Project Settings
 _MessengerProjectSettings.h/cpp_
 
 A developer settings that projects can use to configure how Messenger treats blueprint structures, setting the type (stateful or immediate) and the context type which can't be set the same way as it can be for C++ structures.
 The expectation is that most message types are defined in C++ where types can be discovered through reflection. There is no way to determine if a blueprint struct is meant to be a message or not, and so requires an extra step to "register" them. Structures not in this list (or defined in C++) will not be available from the dropdowns on the various blueprint nodes to interact with message data (broadcast/listen/etc).
+
+#### Unit Tests
+_CompileTests.h/cpp_
+
+An actor that functions as a unit test for the variations of handlers to double check compilation of the overloads of StartListeningForMessage. Both the cases that are expected to work as well as the ones that are expected to generate compile errors (but those are disabled by default).
 
 ### Developer
 

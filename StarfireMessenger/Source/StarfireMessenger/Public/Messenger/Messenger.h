@@ -183,21 +183,14 @@ public:
 	// Overloads to start listening for a message that does not require a context
 	template < CImmediateNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t& )> &&Callback );
-	template < CImmediateNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t& ) );
-	template < CImmediateNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t& ) const );
 
-	template < CImmediateNoContextType type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >& )> &&Callback );
-	template < CImmediateNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >& ) );
-	template < CImmediateNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >& ) const );
-
-	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t >
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >& )> &&Callback );
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) );
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) const );
+
 	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >& ) );
@@ -208,149 +201,84 @@ public:
 	// Overloads to start listening for a message that requires a context
 	template < CImmediateWithContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
-
-	template < CImmediateWithContextType type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
-	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
+
+	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
+	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
-	template < CImmediateWithContextType type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, const typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, const typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
+	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
+	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 
-	template < CImmediateWithContextType type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
-
-	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter = nullptr );
 
 	// Overloads to start listening for a stateful message that does not require a context
 	template < CStatefulNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, EStatefulMessageEvent )> &&Callback );
-	template < CStatefulNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, EStatefulMessageEvent ) );
-	template < CStatefulNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, EStatefulMessageEvent ) const );
 
-	template < CStatefulNoContextType type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent )> &&Callback );
-	template < CStatefulNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, EStatefulMessageEvent ) );
-	template < CStatefulNoContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, EStatefulMessageEvent ) const );
-	
-	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t >
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, EStatefulMessageEvent )> &&Callback );
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) );
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) const );
+
 	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent ) );
 	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent ) const );
-	
+
 	// Overloads to start listening for a stateful message that requires a context
 	template < CStatefulWithContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
-
-	template < CStatefulWithContextType type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 	
-	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
-	
-	template < CStatefulWithContextType type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 
-	template < CStatefulWithContextType type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
-	template < CStatefulWithContextType type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
+	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
+	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 
-	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
-		requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
+
+	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter = nullptr );
+	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
+		requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter = nullptr );
 
 	// Subsystem API
 	void Deinitialize( ) override;

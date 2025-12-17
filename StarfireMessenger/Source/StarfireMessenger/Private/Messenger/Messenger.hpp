@@ -99,109 +99,42 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, nullptr );
 }
 
-template < CImmediateNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t& ) )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-
-			(StrongOwner->*Callback)( Message );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
-}
-
-template < CImmediateNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t& ) const )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-
-			(StrongOwner->*Callback)( Message );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
-}
-
-template < CImmediateNoContextType type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >& )> &&Callback )
-{
-	const auto MessageType = type_t::StaticStruct( );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		InnerCallback( TypedView );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, nullptr );
-}
-
-template < CImmediateNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >& ) )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			(StrongOwner->*Callback)( TypedView );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
-}
-
-template < CImmediateNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >& ) const )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			(StrongOwner->*Callback)( TypedView );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
-}
-
-template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t >
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
 	requires SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >& )> &&Callback )
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) )
 {
 	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< owner_t > WeakOwner( Owner );
 
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
 	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			const auto &Message = View.Get< const other_type_t >( );
 
-		InnerCallback( TypedView );
+			(StrongOwner->*Callback)( Message );
+		}
 	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, nullptr );
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) const )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			const auto &Message = View.Get< const other_type_t >( );
+
+			(StrongOwner->*Callback)( Message );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
 }
 
 template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
@@ -261,8 +194,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
 }
 
-template < CImmediateWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
+template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -272,119 +206,39 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext );
 		}
 	};
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( Message, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
+
+			(StrongOwner->*Callback)( Message, TypedContext );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
+}
+
+template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -397,7 +251,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext );
 		}
@@ -406,8 +260,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -420,7 +274,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext );
 		}
@@ -428,27 +282,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-template < CImmediateWithContextType type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		const auto &Message = View.Get< const type_t >( );
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( Message, TypedContext );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
+template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -458,8 +294,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext );
 		}
@@ -467,9 +303,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
 }
 
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
+template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -479,8 +315,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext );
 		}
@@ -488,135 +324,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
 }
 
-template < CImmediateWithContextType type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, const typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( Message, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, const typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( Message, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext );
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter );
-}
-
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -629,7 +339,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext );
 		}
@@ -638,8 +348,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -652,53 +362,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename type_t::ContextType* ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< other_type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext );
-		}
-	};
-	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter );
-}
-
-template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename type_t::ContextType* ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< other_type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext );
 		}
@@ -721,8 +385,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, nullptr, false );
 }
 
-template < CStatefulNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, EStatefulMessageEvent ) )
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	TWeakObjectPtr< owner_t > WeakOwner( Owner );
@@ -731,7 +396,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
+			const auto &Message = View.Get< const other_type_t >( );
 
 			(StrongOwner->*Callback)( Message, Type );
 		}
@@ -739,8 +404,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
 }
 
-template < CStatefulNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, EStatefulMessageEvent ) const )
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) const )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
@@ -749,81 +415,12 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
+			const auto &Message = View.Get< const other_type_t >( );
 
 			(StrongOwner->*Callback)( Message, Type );
 		}
 	};
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
-}
-
-template < CStatefulNoContextType type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent )> &&Callback )
-{
-	const auto MessageType = type_t::StaticStruct( );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		InnerCallback( TypedView, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, nullptr, false );
-}
-
-template < CStatefulNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, EStatefulMessageEvent ) )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			(StrongOwner->*Callback)( TypedView, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
-}
-
-template < CStatefulNoContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, EStatefulMessageEvent ) const )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			(StrongOwner->*Callback)( TypedView, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
-}
-
-template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t >
-		requires SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, EStatefulMessageEvent )> &&Callback )
-{
-	const auto MessageType = type_t::StaticStruct( );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		InnerCallback( TypedView, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, nullptr, false );
 }
 
 template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
@@ -883,8 +480,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< 
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
 }
 
-template < CStatefulWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
+template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -894,119 +492,39 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext, Type );
 		}
 	};
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( Message, TypedContext, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > &&  SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
+
+			(StrongOwner->*Callback)( Message, TypedContext, Type );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
+}
+
+template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1019,7 +537,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
 		}
@@ -1028,8 +546,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires (!SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >)
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1042,7 +560,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
 		}
@@ -1050,27 +568,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-template < CStatefulWithContextType type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		const auto &Message = View.Get< const type_t >( );
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( Message, TypedContext, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
+template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1080,8 +580,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext, Type );
 		}
@@ -1089,9 +589,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
 }
 
-template < CStatefulWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
+template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, const typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1101,8 +601,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	{
 		if (const auto StrongOwner = WeakOwner.Get())
 		{
-			const auto &Message = View.Get< const type_t >( );
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto &Message = View.Get< const other_type_t >( );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( Message, TypedContext, Type );
 		}
@@ -1110,93 +610,9 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
 }
 
-template < CStatefulWithContextType type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-		
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
-
-	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		if (const auto StrongOwner = WeakOwner.Get())
-		{
-			TConstStructView< type_t > TypedView;
-			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
-		}
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, MutableFilter, true );
-}
-
-template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter )
-{
-	const auto MessageType = type_t::StaticStruct( );
-	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
-
-	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
-	{
-		TConstStructView< other_type_t > TypedView;
-		TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
-		
-		const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
-
-		InnerCallback( TypedView, TypedContext, Type );
-	};
-	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, MutableFilter, true );
-}
-
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType*, EStatefulMessageEvent ), typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1209,7 +625,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
 		}
@@ -1218,8 +634,8 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Ow
 }
 
 template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t >
-	requires SFstd::is_mutable_pointer< typename type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, typename type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
+	requires SFstd::is_mutable_pointer< typename other_type_t::ContextType* > && SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const typename other_type_t::ContextType*, EStatefulMessageEvent ) const, typename type_t::ContextType *ContextFilter )
 {
 	const auto MessageType = type_t::StaticStruct( );
 	auto MutableFilter = const_cast< std::remove_cv_t< typename type_t::ContextType >* >( ContextFilter );
@@ -1232,7 +648,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TConstStructView< other_type_t > TypedView;
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
-			const auto TypedContext = CastChecked< typename type_t::ContextType >( Context );
+			const auto TypedContext = CastChecked< typename other_type_t::ContextType >( Context );
 
 			(StrongOwner->*Callback)( TypedView, TypedContext, Type );
 		}
