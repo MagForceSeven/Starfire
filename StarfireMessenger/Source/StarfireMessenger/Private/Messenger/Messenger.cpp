@@ -465,7 +465,7 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage_K2( UObject 
 			}
 		};
 
-		const auto bExpectingContext = FSf_MessageBase::GetContextType( MessageType ) != nullptr;
+		const auto bExpectingContext = FSf_MessageBase::DoesStatefulTypeRequireContext( MessageType );
 		
 		return StartListeningForStatefulMessageInternal( MessageType, Callback, WorldContext, Context, bExpectingContext );
 	}

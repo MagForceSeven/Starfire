@@ -1,6 +1,8 @@
 
 #include "Module/StarfireMessenger.h"
 
+#include "Messenger/MessageTypes.h"
+
 #define LOCTEXT_NAMESPACE "StarfireMessenger"
 
 DEFINE_LOG_CATEGORY( LogStarfireMessenger );
@@ -8,6 +10,8 @@ DEFINE_LOG_CATEGORY( LogStarfireMessenger );
 void FStarfireMessenger::StartupModule( )
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	
+	FSf_MessageBase::RemapMessageContextData( );
 }
 
 void FStarfireMessenger::ShutdownModule( )

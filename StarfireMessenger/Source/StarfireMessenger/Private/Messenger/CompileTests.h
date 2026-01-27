@@ -217,3 +217,216 @@ struct FStatefulTest_NoContext_C : public FStatefulTest_NoContext
 	GENERATED_BODY( )
 public:
 };
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Abstract : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FBroadcastTest_Abstract )
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Abstract : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FBroadcastTest_Context_Abstract )
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Abstract_Stateful : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FBroadcastTest_Abstract_Stateful )
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Abstract_Stateful : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FBroadcastTest_Context_Abstract_Stateful )
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Stateful : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Stateful : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Constructor : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Constructor() = default;
+	FBroadcastTest_Constructor( int i, float f ) { }
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Constructor : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Context_Constructor() = default;
+	FBroadcastTest_Context_Constructor( int i, float f ) { }
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Stateful_Constructor : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Stateful_Constructor() = default;
+	FBroadcastTest_Stateful_Constructor( int i, float f ) { }
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Stateful_Constructor : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Context_Stateful_Constructor() = default;
+	FBroadcastTest_Context_Stateful_Constructor( int i, float f ) { }
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Initializer : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+
+	int i;
+
+	float f;
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Initializer : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+
+	int i;
+
+	float f;
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Stateful_Initializer : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+
+	int i;
+
+	float f;
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Stateful_Initializer : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+
+	int i;
+
+	float f;
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Mixed : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Mixed() = default;
+	FBroadcastTest_Mixed( const FString& s ) { j = 0; g = 0.0f; }
+
+	int j;
+
+	float g;
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Mixed : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Context_Mixed() = default;
+	FBroadcastTest_Context_Mixed( const FString& s ) { j = 0; g = 0.0f; }
+
+	int j;
+
+	float g;
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Stateful_Mixed : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Stateful_Mixed() = default;
+	FBroadcastTest_Stateful_Mixed( const FString& s ) { j = 0; g = 0.0f; }
+
+	int j;
+
+	float g;
+};
+
+USTRUCT( meta = (Hidden) )
+struct FBroadcastTest_Context_Stateful_Mixed : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+	FBroadcastTest_Context_Stateful_Mixed() = default;
+	FBroadcastTest_Context_Stateful_Mixed( const FString& s ) { j = 0; g = 0.0f; }
+
+	int j;
+
+	float g;
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};

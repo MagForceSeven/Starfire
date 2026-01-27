@@ -12,6 +12,43 @@ void AMessengerCompileTests::BeginPlay( )
 	Super::BeginPlay( );
 
 	const auto Router = UStarfireMessenger::GetSubsystem( this );
+	
+#if SFM_CHECK_ERRORS
+	Router->Broadcast< FBroadcastTest_Abstract >( );
+	Router->Broadcast< FBroadcastTest_Context_Abstract >( this );
+	Router->Broadcast< FBroadcastTest_Abstract_Stateful >( );
+	Router->Broadcast< FBroadcastTest_Context_Abstract_Stateful >( this );
+
+	Router->Broadcast< FBroadcastTest >( this );
+	Router->Broadcast< FBroadcastTest_Context >( );
+	Router->Broadcast< FBroadcastTest_Stateful >( this );
+	Router->Broadcast< FBroadcastTest_Context_Stateful >( );
+#endif
+
+	Router->Broadcast< FBroadcastTest >( );
+	Router->Broadcast< FBroadcastTest_Context >( this );
+	Router->Broadcast< FBroadcastTest_Stateful >( );
+	Router->Broadcast< FBroadcastTest_Context_Stateful >( this );
+
+	Router->Broadcast< FBroadcastTest_Constructor >( 42, 3.14f );
+	Router->Broadcast< FBroadcastTest_Context_Constructor >( this, 42, 3.14f );
+	Router->Broadcast< FBroadcastTest_Stateful_Constructor >( 42, 3.14f );
+	Router->Broadcast< FBroadcastTest_Context_Stateful_Constructor >( this, 42, 3.14f );
+
+	Router->Broadcast< FBroadcastTest_Initializer >( { .i = 42, .f = 3.14f } );
+	Router->Broadcast< FBroadcastTest_Context_Initializer >( { .i = 42, .f = 3.14f }, this );
+	Router->Broadcast< FBroadcastTest_Stateful_Initializer >( { .i = 42, .f = 3.14f } );
+	Router->Broadcast< FBroadcastTest_Context_Stateful_Initializer >( { .i = 42, .f = 3.14f }, this );
+
+	FBroadcastTest_Mixed Test = FBroadcastTest_Mixed( FString( ) );
+	Router->Broadcast< FBroadcastTest_Mixed >( Test );
+	//FBroadcastTest_Mixed Test2 = { .j = 42, .f = 3.14f };
+/*
+	Router->Broadcast< FBroadcastTest_Mixed >( { .j = 42, .f = 3.14f } );
+	Router->Broadcast< FBroadcastTest_Context_Mixed >( { .j = 42, .f = 3.14f }, this );
+	Router->Broadcast< FBroadcastTest_Stateful_Mixed >( { .j = 42, .f = 3.14f } );
+	Router->Broadcast< FBroadcastTest_Context_Stateful_Mixed >( { .j = 42, .f = 3.14f }, this );
+*/
 
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::Handler );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstHandler );

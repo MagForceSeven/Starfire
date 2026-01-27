@@ -146,7 +146,20 @@ FTestStatefulContext_C Message( ... );
 Messenger->Broadcast( Message, MessageContext );
 ```
 
-However, a simpler alternative is also available.
+Designated initializers are supported (assuming designated initializers work for the message type already)
+```
+FTestImmediateNoContext_C = { .Test1 = 42, .Test2 = 3.14f );
+
+Messenger->Broadcast< FTestImmediateNoContext_C >( { .Test1 = 42, .Test2 = 3.14f } );
+```
+and if a Context type is specified, a context parameter is again required
+```
+FTestImmediateNoContext_C = { .Test1 = 42, .Test2 = 3.14f );
+
+Messenger->Broadcast< FTestImmediateNoContext_C >( { .Test1 = 42, .Test2 = 3.14f }, MessageContext );
+```
+
+Another simple alternative is also available.
 Broadcast can also be called and passed constructor parameters directly similar to `TArray::Emplace`
 ```
 FTestImmediateNoContext_C( int Test1, float Test2 );
@@ -159,6 +172,7 @@ FTestStatefulContext_C( int Test1, float Test2 );
 
 Messenger->Broadcast< FTestStatefulContext_C >( MessageContext, 1, 2.0f );
 ```
+(Note: declaring a constructor no longer allows designated initializers to be used to construct the message. That's just C++.)
 
 Blueprint provides a single Broadcast node:
 

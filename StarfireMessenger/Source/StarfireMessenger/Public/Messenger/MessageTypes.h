@@ -70,40 +70,54 @@ struct FSf_MessageBase
 {
 	GENERATED_BODY( )
 public:
-	virtual ~FSf_MessageBase() = default;
-
 	// The expected context type for messages. Hidden/Overridden by derived types using the SET_CONTEXT_TYPE macro
 	using ContextType = nullptr_t;
-	[[nodiscard]] virtual UClass* GetContextType( ) const { return nullptr; }
 
-	// Utility for finding a message types context type at runtime
-	[[nodiscard]] STARFIREMESSENGER_API  static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
 	// Utility for checking if a message type is stateful at runtime
-	[[nodiscard]] STARFIREMESSENGER_API  static bool IsMessageTypeStateful( const UScriptStruct *MessageType );
+	[[nodiscard]] STARFIREMESSENGER_API static bool IsMessageTypeStateful( const UScriptStruct *MessageType );
+	// Utility for the runtime check necessary for Stateful messages having associated context data
+	[[nodiscard]] STARFIREMESSENGER_API static bool DoesStatefulTypeRequireContext( const UScriptStruct *MessageType );
 #if WITH_EDITORONLY_DATA
+	// Utility for finding a message types context type at runtime
+	[[nodiscard]] STARFIREMESSENGER_API static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
 	// Utility for runtime checking if a type is abstract
-	[[nodiscard]] STARFIREMESSENGER_API  static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
-	// An override name to give to context pins for messages of this type
-	[[nodiscard]] STARFIREMESSENGER_API virtual FText GetContextPinName( ) const { return { }; }
+	[[nodiscard]] STARFIREMESSENGER_API static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
 	// Utility for getting the override name to give context pins of the specified type
 	[[nodiscard]] STARFIREMESSENGER_API static FText GetContextPinName( const UScriptStruct *MessageType );
+
+private:
+	friend class FStarfireMessengerEditor;
+	// Use the pre-main-init data to construct the desired Editor runtime data
+	STARFIREMESSENGER_API static void RemapMessageContextEditorData( );
 #endif
+	friend class FStarfireMessenger;
+	STARFIREMESSENGER_API static void RemapMessageContextData( );
 };
 SET_MESSAGE_TYPE_AS_ABSTRACT( FSf_MessageBase )
 
 // Macro to update the context type for derived types
 #define SET_CONTEXT_TYPE( Type ) \
 	using ContextType = Type; \
-	UClass* GetContextType( ) const override { return std::remove_cv_t< Type >::StaticClass( ); }
+	static inline const FMessageContextTypeMarker ContextTypeMarker{ &StaticStruct, &std::remove_cv_t< Type >::StaticClass };
 
-// Macro to update the context type for derived types
-#if WITH_EDITOR
-#define SET_CONTEXT_NAME( ContextPinName )	\
-	FText GetContextPinName( ) const { return NSLOCTEXT( "StarfireMessenger", ContextPinName, ContextPinName ); }
-#else
+// An intermediary type that allows us to keep track of context type for Editor tooling and runtime functionality
+struct STARFIREMESSENGER_API FMessageContextTypeMarker
+{
+	FMessageContextTypeMarker( UScriptStruct* (*StructGetter)(void), UClass*(*TypeGetter)(void) );
+};
+
+#if !WITH_EDITORONLY_DATA
 	#define SET_CONTEXT_NAME( ... )
-#endif
+#else
+	#define SET_CONTEXT_NAME( ContextPinName )	\
+	static inline const FMessageContextNameMarker ContextNameMarker{ &StaticStruct, ContextPinName };
 
+// An intermediary type that allows us to keep track of abstract types in editor builds for editor reasons
+struct STARFIREMESSENGER_API FMessageContextNameMarker
+{
+	FMessageContextNameMarker( UScriptStruct* (*StructGetter)(void), const char* ContextName );
+};
+#endif
 
 // Base for standard fire-and-forget messages
 USTRUCT( BlueprintType )
