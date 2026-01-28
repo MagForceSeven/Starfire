@@ -12,23 +12,83 @@ void AMessengerCompileTests::BeginPlay( )
 	Super::BeginPlay( );
 
 	const auto Router = UStarfireMessenger::GetSubsystem( this );
-	
+
 #if SFM_CHECK_ERRORS
+	// Can't broadcast abstract instances
+	Router->Broadcast< FBroadcastTest_Abstract >( { } );
+	Router->Broadcast< FBroadcastTest_Context_Abstract >( { }, this );
+	Router->Broadcast< FBroadcastTest_Abstract_Stateful >( { } );
+	Router->Broadcast< FBroadcastTest_Context_Abstract_Stateful >( { }, this );
+
+	// Can't broadcast with matching constructor
 	Router->Broadcast< FBroadcastTest_Abstract >( );
 	Router->Broadcast< FBroadcastTest_Context_Abstract >( this );
 	Router->Broadcast< FBroadcastTest_Abstract_Stateful >( );
 	Router->Broadcast< FBroadcastTest_Context_Abstract_Stateful >( this );
 
+	// Mismatch message type & Context data - but also abstract
+	Router->Broadcast< FBroadcastTest_Abstract >( this );
+	Router->Broadcast< FBroadcastTest_Context_Abstract >( );
+	Router->Broadcast< FBroadcastTest_Abstract_Stateful >( this );
+	Router->Broadcast< FBroadcastTest_Context_Abstract_Stateful >( );
+
+	// Mismatch message type & Context input
 	Router->Broadcast< FBroadcastTest >( this );
 	Router->Broadcast< FBroadcastTest_Context >( );
 	Router->Broadcast< FBroadcastTest_Stateful >( this );
 	Router->Broadcast< FBroadcastTest_Context_Stateful >( );
+
+	// Mismatch message type & Context input
+	Router->Broadcast< FBroadcastTest >( { }, this );
+	Router->Broadcast< FBroadcastTest_Context >( FBroadcastTest_Context( ) );
+	Router->Broadcast< FBroadcastTest_Stateful >( { }, this );
+	Router->Broadcast< FBroadcastTest_Context_Stateful >( FBroadcastTest_Context_Stateful( ) );
+
+	// Can't clear abstract message types
+	Router->ClearStatefulMessage< FBroadcastTest_Abstract_Stateful >( );
+	Router->ClearStatefulMessage< FBroadcastTest_Abstract_Stateful >( this );
+	Router->ClearStatefulMessage< FBroadcastTest_Context_Abstract_Stateful >( );
+	Router->ClearStatefulMessage< FBroadcastTest_Context_Abstract_Stateful >( this );
+
+	// Mismatch message type & Context input
+	Router->ClearStatefulMessage< FBroadcastTest_Stateful >( this );
+	Router->ClearStatefulMessage< FBroadcastTest_Context_Stateful >( );
+
+	// Can't check stateful status for abstract types
+	Router->HasStatefulMessage< FBroadcastTest_Abstract_Stateful >( );
+	Router->HasStatefulMessage< FBroadcastTest_Abstract_Stateful >( this );
+	Router->HasStatefulMessage< FBroadcastTest_Context_Abstract_Stateful >( );
+	Router->HasStatefulMessage< FBroadcastTest_Context_Abstract_Stateful >( this );
+	
+	// Mismatch message type & Context input
+	Router->HasStatefulMessage< FBroadcastTest_Stateful >( this );
+	Router->HasStatefulMessage< FBroadcastTest_Context_Stateful >( );
 #endif
 
 	Router->Broadcast< FBroadcastTest >( );
 	Router->Broadcast< FBroadcastTest_Context >( this );
 	Router->Broadcast< FBroadcastTest_Stateful >( );
 	Router->Broadcast< FBroadcastTest_Context_Stateful >( this );
+	
+	{
+		FBroadcastTest Test;
+		Router->Broadcast< FBroadcastTest >( Test );
+	}
+
+	{
+		FBroadcastTest_Context Test;
+		Router->Broadcast< FBroadcastTest_Context >( Test, this  );
+	}
+
+	{
+		FBroadcastTest_Stateful Test;
+		Router->Broadcast< FBroadcastTest_Stateful >( Test );
+	}
+
+	{
+		FBroadcastTest_Context_Stateful Test;
+		Router->Broadcast< FBroadcastTest_Context_Stateful >( Test, this  );
+	}
 
 	Router->Broadcast< FBroadcastTest_Constructor >( 42, 3.14f );
 	Router->Broadcast< FBroadcastTest_Context_Constructor >( this, 42, 3.14f );
@@ -39,6 +99,12 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->Broadcast< FBroadcastTest_Context_Initializer >( { .i = 42, .f = 3.14f }, this );
 	Router->Broadcast< FBroadcastTest_Stateful_Initializer >( { .i = 42, .f = 3.14f } );
 	Router->Broadcast< FBroadcastTest_Context_Stateful_Initializer >( { .i = 42, .f = 3.14f }, this );
+	
+	Router->ClearStatefulMessage< FBroadcastTest_Stateful >( );
+	Router->ClearStatefulMessage< FBroadcastTest_Context_Stateful >( this );
+
+	Router->HasStatefulMessage< FBroadcastTest_Stateful >( );
+	Router->HasStatefulMessage< FBroadcastTest_Context_Stateful >( this );
 
 	FBroadcastTest_Mixed Test = FBroadcastTest_Mixed( FString( ) );
 	Router->Broadcast< FBroadcastTest_Mixed >( Test );
