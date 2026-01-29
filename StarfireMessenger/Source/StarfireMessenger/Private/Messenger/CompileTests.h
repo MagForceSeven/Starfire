@@ -40,7 +40,9 @@ public:
 	static void StaticHandler( const FMessageTest&, AMessengerCompileTests* ) { }
 	static void StaticConstContextHandler( const FMessageTest&, const AMessengerCompileTests* ) { }
 	void HandlerC( const FMessageTest_C&, AMessengerCompileTests* ) { }
+	void ConstHandlerC( const FMessageTest_C&, AMessengerCompileTests* ) const { }
 	void ConstContextHandlerC( const FMessageTest_C&, const AMessengerCompileTests* ) { }
+	void ConstContextConstHandlerC( const FMessageTest_C&, const AMessengerCompileTests* ) const { }
 
 	void Handler_H( const TConstStructView< FMessageTest >&, AMessengerCompileTests* ) { }
 	void ConstHandler_H( const TConstStructView< FMessageTest >&, AMessengerCompileTests* ) const { }
@@ -49,7 +51,9 @@ public:
 	static void StaticHandler_H( const TConstStructView< FMessageTest >&, AMessengerCompileTests* ) { }
 	static void StaticConstContextHandler_H( const TConstStructView< FMessageTest >&, const AMessengerCompileTests* ) { }
 	void HandlerC_H( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) { }
+	void ConstHandlerC_H( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) const { }
 	void ConstContextHandlerC_H( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) { }
+	void ConstContextConstHandlerC_H( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) const { }
 
 	void Stateful_Handler( const FStatefulTest&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_ConstHandler( const FStatefulTest&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
@@ -58,7 +62,9 @@ public:
 	static void Stateful_StaticHandler( const FStatefulTest&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	static void Stateful_StaticConstContextHandler( const FStatefulTest&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_HandlerC( const FStatefulTest_C&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstHandlerC( const FStatefulTest_C&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 	void Stateful_ConstContextHandlerC( const FStatefulTest_C&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstContextConstHandlerC( const FStatefulTest_C&, const AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 
 	void Stateful_Handler_H( const TConstStructView< FStatefulTest >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_ConstHandler_H( const TConstStructView< FStatefulTest >&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
@@ -67,7 +73,9 @@ public:
 	static void Stateful_StaticHandler_H( const TConstStructView< FStatefulTest >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	static void Stateful_StaticConstContextHandler_H( const TConstStructView< FStatefulTest >&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_HandlerC_H( const TConstStructView< FStatefulTest_C >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstHandlerC_H( const TConstStructView< FStatefulTest_C >&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 	void Stateful_ConstContextHandlerC_H( const TConstStructView< FStatefulTest_C >&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstContextConstHandlerC_H( const TConstStructView< FStatefulTest_C >&, const AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 
 	void Handler_C( const FMessageTest_Const&, AMessengerCompileTests* ) { }
 	void ConstHandler_C( const FMessageTest_Const&, AMessengerCompileTests* ) const { }
@@ -76,7 +84,9 @@ public:
 	static void StaticHandler_C( const FMessageTest_Const&, AMessengerCompileTests* ) { }
 	static void StaticConstContextHandler_C( const FMessageTest_Const&, const AMessengerCompileTests* ) { }
 	void HandlerC_C( const FMessageTest_Const_C&, AMessengerCompileTests* ) { }
+	void ConstHandlerC_C( const FMessageTest_Const_C&, AMessengerCompileTests* ) const { }
 	void ConstContextHandlerC_C( const FMessageTest_Const_C&, const AMessengerCompileTests* ) { }
+	void ConstContextConstHandlerC_C( const FMessageTest_Const_C&, const AMessengerCompileTests* ) const { }
 
 	void Handler_H_C( const TConstStructView< FMessageTest_Const >&, AMessengerCompileTests* ) { }
 	void ConstHandler_H_C( const TConstStructView< FMessageTest_Const >&, AMessengerCompileTests* ) const { }
@@ -85,7 +95,9 @@ public:
 	static void StaticHandler_H_C( const TConstStructView< FMessageTest_Const >&, AMessengerCompileTests* ) { }
 	static void StaticConstContextHandler_H_C( const TConstStructView< FMessageTest_Const >&, const AMessengerCompileTests* ) { }
 	void HandlerC_H_C( const TConstStructView< FMessageTest_Const_C >&, AMessengerCompileTests* ) { }
+	void ConstHandlerC_H_C( const TConstStructView< FMessageTest_Const_C >&, AMessengerCompileTests* ) const { }
 	void ConstContextHandlerC_H_C( const TConstStructView< FMessageTest_Const_C >&, const AMessengerCompileTests* ) { }
+	void ConstContextConstHandlerC_H_C( const TConstStructView< FMessageTest_Const_C >&, const AMessengerCompileTests* ) const { }
 
 	void Stateful_Handler_C( const FStatefulTest_Const&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_ConstHandler_C( const FStatefulTest_Const&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
@@ -94,7 +106,9 @@ public:
 	static void Stateful_StaticHandler_C( const FStatefulTest_Const&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	static void Stateful_StaticConstContextHandler_C( const FStatefulTest_Const&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_HandlerC_C( const FStatefulTest_Const_C&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstHandlerC_C( const FStatefulTest_Const_C&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 	void Stateful_ConstContextHandlerC_C( const FStatefulTest_Const_C&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstContextConstHandlerC_C( const FStatefulTest_Const_C&, const AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 
 	void Stateful_Handler_H_C( const TConstStructView< FStatefulTest_Const >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_ConstHandler_H_C( const TConstStructView< FStatefulTest_Const >&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
@@ -103,27 +117,33 @@ public:
 	static void Stateful_StaticHandler_H_C( const TConstStructView< FStatefulTest_Const >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	static void Stateful_StaticConstContextHandler_H_C( const TConstStructView< FStatefulTest_Const >&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
 	void Stateful_HandlerC_H_C( const TConstStructView< FStatefulTest_Const_C >&, AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstHandlerC_H_C( const TConstStructView< FStatefulTest_Const_C >&, AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 	void Stateful_ConstContextHandlerC_H_C( const TConstStructView< FStatefulTest_Const_C >&, const AMessengerCompileTests*, EStatefulMessageEvent ) { }
+	void Stateful_ConstContextConstHandlerC_H_C( const TConstStructView< FStatefulTest_Const_C >&, const AMessengerCompileTests*, EStatefulMessageEvent ) const { }
 
 	void NC_Handler( const FMessageTest_NoContext& ) { }
 	void NC_ConstHandler( const FMessageTest_NoContext& ) const { }
 	static void NC_StaticHandler( const FMessageTest_NoContext& ) { }
 	void NC_HandlerC( const FMessageTest_NoContext_C& ) { }
+	void NC_ConstHandlerC( const FMessageTest_NoContext_C& ) const { }
 
 	void NC_Handler_H( const TConstStructView< FMessageTest_NoContext >& ) { }
 	void NC_ConstHandler_H( const TConstStructView< FMessageTest_NoContext >& ) const { }
 	static void NC_StaticHandler_H( const TConstStructView< FMessageTest_NoContext >& ) { }
 	void NC_HandlerC_H( const TConstStructView< FMessageTest_NoContext_C >& ) { }
+	void NC_ConstHandlerC_H( const TConstStructView< FMessageTest_NoContext_C >& ) const { }
 
 	void NC_Stateful_Handler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) { }
 	void NC_Stateful_ConstHandler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) const { }
 	static void NC_Stateful_StaticHandler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) { }
 	void NC_Stateful_HandlerC( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) { }
+	void NC_Stateful_ConstHandlerC( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) const { }
 
 	void NC_Stateful_Handler_H( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) { }
 	void NC_Stateful_ConstHandler_H( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) const { }
 	static void NC_Stateful_StaticHandler_H( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) { }
 	void NC_Stateful_HandlerC_H( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) { }
+	void NC_Stateful_ConstHandlerC_H( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) const { }
 };
 
 USTRUCT( meta = (Hidden) )
