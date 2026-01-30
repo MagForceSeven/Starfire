@@ -191,6 +191,8 @@ public:
 	// Overloads to start listening for a message that does not require a context
 	template < CImmediateNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t& )> &&Callback );
+	template < CImmediateNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t& )> &&Callback );
 
 	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
@@ -209,6 +211,8 @@ public:
 	// Overloads to start listening for a message that requires a context
 	template < CImmediateWithContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
+	template < CImmediateWithContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t&, typename type_t::ContextType* )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CImmediateWithContextType type_t, CImmediateWithContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
@@ -241,6 +245,8 @@ public:
 	// Overloads to start listening for a stateful message that does not require a context
 	template < CStatefulNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, EStatefulMessageEvent )> &&Callback );
+	template < CStatefulNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t&, EStatefulMessageEvent )> &&Callback );
 
 	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
@@ -259,6 +265,8 @@ public:
 	// Overloads to start listening for a stateful message that requires a context
 	template < CStatefulWithContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
+	template < CStatefulWithContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t&, typename type_t::ContextType*, EStatefulMessageEvent )> &&Callback, typename type_t::ContextType *ContextFilter = nullptr );
 	
 	template < CStatefulWithContextType type_t, CStatefulWithContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
