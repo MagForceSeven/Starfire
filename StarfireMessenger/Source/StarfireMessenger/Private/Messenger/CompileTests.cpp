@@ -128,12 +128,25 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest&, const AMessengerCompileTests* ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticHandler );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticConstContextHandler );
-	// Can't listen to parent type and expect a child type
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::HandlerC );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstHandlerC );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstContextHandlerC );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstContextConstHandlerC );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextHandlerC );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextConstHandlerC );
+	// Missing context parameter for message requiring a context
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextHandler );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextConstHandler );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const FMessageTest& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( &AMessengerCompileTests::StaticNoContextHandler );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticNoContextHandler );
 #endif
 
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::Handler_H );
@@ -148,12 +161,25 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest >&, const AMessengerCompileTests* ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticHandler_H );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticConstContextHandler_H );
-	// Can't listen to parent type and expect a child type
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::HandlerC_H );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstHandlerC_H );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstContextHandlerC_H );
 	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::ConstContextConstHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextConstHandlerC_H );
+	// Missing context parameter for message requiring a context
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextHandler_H );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::NoContextConstHandler_H );
+	Router->StartListeningForMessage< FMessageTest >( [ ]( const TConstStructView< FMessageTest >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest >( &AMessengerCompileTests::StaticNoContextHandler_H );
+	Router->StartListeningForMessage< FMessageTest >( this, &AMessengerCompileTests::StaticNoContextHandler_H );
 #endif
 
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::Handler );
@@ -172,13 +198,20 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstHandlerC );
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstContextHandlerC );
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstContextConstHandlerC );
-	
-	// Can't listen to parent type and expect a child type
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
 #if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FMessageTest >( [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest_C&, AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const FMessageTest_C&, const AMessengerCompileTests* ) -> void { } );
+	// Missing context parameter for message requiring a context
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextHandlerC );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextConstHandlerC );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextHandler );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextConstHandler );
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const FMessageTest& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const FMessageTest& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( &AMessengerCompileTests::StaticNoContextHandler );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::StaticNoContextHandler );
 #endif
 
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::Handler_H );
@@ -197,13 +230,20 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstHandlerC_H );
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstContextHandlerC_H );
 	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::ConstContextConstHandlerC_H );
-
-	// Can't listen to parent type and expect a child type
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
 #if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FMessageTest >( [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest_C >&, AMessengerCompileTests* ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest >( this, [ ]( const TConstStructView< FMessageTest_C >&, const AMessengerCompileTests* ) -> void { } );
+	// Missing context parameter for message requiring a context
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextConstHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextHandler_H );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::NoContextConstHandler_H );
+	Router->StartListeningForMessage< FMessageTest_C >( [ ]( const TConstStructView< FMessageTest >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( this, [ ]( const TConstStructView< FMessageTest >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_C >( &AMessengerCompileTests::StaticNoContextHandler_H );
+	Router->StartListeningForMessage< FMessageTest_C >( this, &AMessengerCompileTests::StaticNoContextHandler_H );
 #endif
 
 	Router->StartListeningForMessage< FStatefulTest >( this, &AMessengerCompileTests::Stateful_Handler );
@@ -502,105 +542,197 @@ void AMessengerCompileTests::BeginPlay( )
 
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler );
-	// Can't listen to parent type and expect a child type	
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext& ) -> void { } );
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type	
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_HandlerC );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandlerC );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext_C& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext_C& ) -> void { } );
+	// Too many parameters
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_HandlerC_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandlerC_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext_C&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext_C&, int ) -> void { } );
 #endif
 
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler_H );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler_H );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler_H );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_H );
-	// Can't listen to parent type and expect a child type	
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type	
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_HandlerC_H );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
+	// Too many parameters
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_HandlerC_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandlerC_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext_C >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext_C >&, int ) -> void { } );
 #endif
 
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_Handler );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandler );
-	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const FMessageTest_NoContext& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( &AMessengerCompileTests::NC_StaticHandler );
-	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const FMessageTest_NoContext& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_StaticHandler );
-	// Can't listen to parent type and expect a child type
-#if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const FMessageTest_NoContext_C& ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const FMessageTest_NoContext_C& ) -> void { } );
-#endif
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const FMessageTest_NoContext& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const FMessageTest_NoContext& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_HandlerC );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandlerC );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const FMessageTest_NoContext_C& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const FMessageTest_NoContext_C& ) -> void { } );
+#if SFM_CHECK_ERRORS
+	// Too many parameters
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_Handler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( &AMessengerCompileTests::NC_StaticHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_StaticHandler_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const FMessageTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const FMessageTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_HandlerC_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandlerC_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const FMessageTest_NoContext_C&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const FMessageTest_NoContext_C&, int ) -> void { } );
+#endif
 
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_Handler_H );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandler_H );
-	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( &AMessengerCompileTests::NC_StaticHandler_H );
-	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_StaticHandler_H );
-	// Can't listen to parent type and expect a child type
-#if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
-	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
-#endif
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_HandlerC_H );
 	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandlerC_H );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const TConstStructView< FMessageTest_NoContext_C >& ) -> void { } );
+#if SFM_CHECK_ERRORS
+	// Too many parameters
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_Handler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( &AMessengerCompileTests::NC_StaticHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_StaticHandler_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const TConstStructView< FMessageTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const TConstStructView< FMessageTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_HandlerC_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, &AMessengerCompileTests::NC_ConstHandlerC_H_Extra );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( [ ]( const TConstStructView< FMessageTest_NoContext_C >&, int ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext_C >( this, [ ]( const TConstStructView< FMessageTest_NoContext_C >&, int ) -> void { } );
+#endif
 
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler );
-	// Can't listen to parent type and expect a child type
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_HandlerC );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
+	// Incorrect callback signature
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext_C&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext_C&, int ) -> void { } );
 #endif
 
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler_H );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H );
-	// Can't listen to parent type and expect a child type
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 #if SFM_CHECK_ERRORS
+	// Can't listen to parent type and expect a child type
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_H );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_H );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
+	// Incorrect callback signature
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
 #endif
 
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_Handler );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler );
-	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( &AMessengerCompileTests::NC_Stateful_StaticHandler );
-	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler );
-	// Can't listen to parent type and expect a child type
-#if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
-#endif
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const FStatefulTest_NoContext&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_HandlerC );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const FStatefulTest_NoContext_C&, EStatefulMessageEvent ) -> void { } );
+#if SFM_CHECK_ERRORS
+	// Incorrect callback signature
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_Handler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( &AMessengerCompileTests::NC_Stateful_StaticHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const FStatefulTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const FStatefulTest_NoContext&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const FStatefulTest_NoContext_C&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const FStatefulTest_NoContext_C&, int ) -> void { } );
+#endif
 
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_Handler_H );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H );
-	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H );
-	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H );
-	// Can't listen to parent type and expect a child type
-#if SFM_CHECK_ERRORS
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
-	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
-#endif
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_H );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_H );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, EStatefulMessageEvent ) -> void { } );
+#if SFM_CHECK_ERRORS
+	// Incorrect callback signature
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_Handler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_H_Wrong );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
+#endif
 }
