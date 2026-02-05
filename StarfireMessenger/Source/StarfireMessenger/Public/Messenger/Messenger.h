@@ -372,7 +372,7 @@ private:
 
 	// Register for messages of a specific type and possibly from a specific context
 	UFUNCTION( BlueprintCallable, BlueprintInternalUseOnly, meta = (WorldContext = "WorldContext") )
-	FMessageListenerHandle StartListeningForMessage_K2( UObject *WorldContext, UScriptStruct *MessageType, UObject *Context, FName FunctionName );
+	FMessageListenerHandle StartListeningForMessage_K2( UObject *WorldContext, const UScriptStruct *MessageType, UObject *Context, FName FunctionName );
 
 	// Unregister for a specific message registered for previously
 	UFUNCTION( BlueprintCallable, Category = "Starfire Messenger", DisplayName = "Stop Listening for Message" )
@@ -395,6 +395,7 @@ private:
 	friend class UK2Node_StartListeningForMessage;
 	friend class UK2Node_Messenger_ClearStateful;
 	friend class UK2Node_Messenger_HasStateful;
+	friend class UDynamicStarfireMessageBinding;
 
 	// A bunch of deleted/deprecated overloads of the templated member functions
 	// They have been deleted to produce a single error message (instead of pages of template errors)

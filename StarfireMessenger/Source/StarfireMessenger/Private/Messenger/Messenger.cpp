@@ -415,7 +415,7 @@ DEFINE_FUNCTION(UStarfireMessenger::execBroadcastMessage_K2)
 	}
 }
 
-FMessageListenerHandle UStarfireMessenger::StartListeningForMessage_K2( UObject *WorldContext, UScriptStruct *MessageType, UObject *Context, FName FunctionName )
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage_K2( UObject *WorldContext, const UScriptStruct *MessageType, UObject *Context, FName FunctionName )
 {
 	ensureAlways( WorldContext != nullptr );
 	ensureAlways( MessageType != nullptr );
