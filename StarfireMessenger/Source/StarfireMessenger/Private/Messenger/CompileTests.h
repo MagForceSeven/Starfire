@@ -480,3 +480,24 @@ public:
 
 	SET_CONTEXT_TYPE( AMessengerCompileTests )
 };
+
+// Message types used for documentation images
+//
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( )
+struct FTestImmediateNoContext : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( )
+struct FTestStatefulContext : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
