@@ -15,10 +15,12 @@
 #include "KismetPins/SGraphPinObject.h"
 #include "Templates/SharedPointer.h"
 #include "Widgets/DeclarativeSyntaxSupport.h"
+#include "StructViewerModule.h"
 
 class SWidget;
 class UEdGraphPin;
 class UScriptStruct;
+struct FStarfireMessageType;
 
 /////////////////////////////////////////////////////
 // SGraphPinEventType
@@ -30,7 +32,9 @@ public:
 	SLATE_END_ARGS()
 
 	void Construct( const FArguments& InArgs, UEdGraphPin* InGraphPinObj, bool bImmediate, bool bStateful, bool bAbstract );
-	void Construct( const FArguments& InArgs, UEdGraphPin* InGraphPinObj, UScriptStruct *BaseType, bool bAbstract );
+	void Construct( const FArguments& InArgs, UEdGraphPin* InGraphPinObj, const UScriptStruct *BaseType, bool bAbstract );
+
+	STARFIREMESSENGERDEVELOPER_API static TSharedRef<SWidget> CreateTypeListing( const FStarfireMessageType& FilterInfo, const FOnStructPicked& OnStructPickedDelegate );
 
 protected:
 	// Called when a new struct was picked via the asset picker
@@ -48,5 +52,5 @@ protected:
 	bool bAllowStateful = false;
 	bool bAllowAbstract = false;
 
-	UScriptStruct *BaseAllowedType = nullptr;
+	const UScriptStruct *BaseAllowedType = nullptr;
 };

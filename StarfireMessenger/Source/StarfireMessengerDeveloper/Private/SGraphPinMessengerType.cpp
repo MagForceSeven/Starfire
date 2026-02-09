@@ -5,6 +5,7 @@
 #include "SGraphPinMessengerType.h"
 
 #include "Messenger/MessageTypes.h"
+#include "Messenger/MessageProperty.h"
 #include "Messenger/MessengerProjectSettings.h"
 
 #include "Containers/UnrealString.h"
@@ -50,7 +51,7 @@ void SGraphPinMessengerType::Construct( const FArguments& InArgs, UEdGraphPin* I
 	bAllowAbstract = bAbstract;
 }
 
-void SGraphPinMessengerType::Construct( const FArguments& InArgs, UEdGraphPin* InGraphPinObj, UScriptStruct *BaseType, bool bAbstract )
+void SGraphPinMessengerType::Construct( const FArguments& InArgs, UEdGraphPin* InGraphPinObj, const UScriptStruct *BaseType, bool bAbstract )
 {
 	SGraphPin::Construct(SGraphPin::FArguments(), InGraphPinObj);
 	BaseAllowedType = BaseType;
@@ -144,33 +145,43 @@ public:
 	}
 };
 
-TSharedRef<SWidget> SGraphPinMessengerType::GenerateAssetPicker()
+TSharedRef<SWidget> SGraphPinMessengerType::CreateTypeListing( const FStarfireMessageType& FilterInfo, const FOnStructPicked& OnStructPickedDelegate )
 {
-	FStructViewerModule& StructViewerModule = FModuleManager::LoadModuleChecked<FStructViewerModule>("StructViewer");
-
 	// Fill in options
 	FStructViewerInitializationOptions Options;
 	Options.Mode = EStructViewerMode::StructPicker;
 	Options.bShowNoneOption = false;
 
-	TSharedRef<FGraphPinStructFilter> StructFilter = MakeShared<FGraphPinStructFilter>();
+	TSharedRef< FGraphPinStructFilter > StructFilter = MakeShared< FGraphPinStructFilter >( );
 	Options.StructFilter = StructFilter;
 	StructFilter->Settings = GetDefault< UMessengerProjectSettings >( );
 	StructFilter->Ignore = { FSf_MessageBase::StaticStruct( ), FSf_Message_Immediate::StaticStruct( ), FSf_Message_Stateful::StaticStruct( ) };
-	StructFilter->bAllowAbstract = bAllowAbstract;
-	StructFilter->bAllowBlueprint = (BaseAllowedType == nullptr);
+	StructFilter->bAllowAbstract = FilterInfo.bAllowAbstract;
+	StructFilter->bAllowBlueprint = (FilterInfo.CustomBaseType == nullptr);
+
+	if (FilterInfo.CustomBaseType != nullptr)
+		StructFilter->MetaStruct = FilterInfo.CustomBaseType;
+	else if (FilterInfo.bAllowImmediate && FilterInfo.bAllowStateful)
+		StructFilter->MetaStruct = FSf_MessageBase::StaticStruct( );
+	else if (FilterInfo.bAllowImmediate)
+		StructFilter->MetaStruct = FSf_Message_Immediate::StaticStruct( );
+	else if (FilterInfo.bAllowStateful)
+		StructFilter->MetaStruct = FSf_Message_Stateful::StaticStruct( );
 
 	for (const auto& Type : StructFilter->Settings->AdditionalListenExclusionTypes)
 		StructFilter->Ignore.Push( Type.Get( ) );
 	
-	if (BaseAllowedType != nullptr)
-		StructFilter->MetaStruct = BaseAllowedType;
-	else if (bAllowImmediate && bAllowStateful)
-		StructFilter->MetaStruct = FSf_MessageBase::StaticStruct( );
-	else if (bAllowImmediate)
-		StructFilter->MetaStruct = FSf_Message_Immediate::StaticStruct( );
-	else if (bAllowStateful)
-		StructFilter->MetaStruct = FSf_Message_Stateful::StaticStruct( );
+	auto& StructViewerModule = FModuleManager::LoadModuleChecked< FStructViewerModule >( "StructViewer" );
+	return StructViewerModule.CreateStructViewer( Options, OnStructPickedDelegate );
+}
+
+TSharedRef<SWidget> SGraphPinMessengerType::GenerateAssetPicker()
+{
+	FStarfireMessageType FilterInfo;
+	FilterInfo.CustomBaseType = BaseAllowedType;
+	FilterInfo.bAllowImmediate = bAllowImmediate;
+	FilterInfo.bAllowStateful = bAllowStateful;
+	FilterInfo.bAllowAbstract = bAllowAbstract;
 
 	return
 		SNew(SBox)
@@ -186,7 +197,7 @@ TSharedRef<SWidget> SGraphPinMessengerType::GenerateAssetPicker()
 				.Padding(4)
 				.BorderImage( FAppStyle::GetBrush("ToolPanel.GroupBorder") )
 				[
-					StructViewerModule.CreateStructViewer(Options, FOnStructPicked::CreateSP(this, &SGraphPinMessengerType::OnPickedNewStruct))
+					CreateTypeListing(FilterInfo, FOnStructPicked::CreateSP(this, &SGraphPinMessengerType::OnPickedNewStruct))
 				]
 			]			
 		];

@@ -3,9 +3,6 @@
 
 #include "K2Node_HandleMessage.h"
 
-// Blueprint Graph
-#include "K2Node_CustomEvent.h"
-
 // KismetCompiler
 #include "KismetCompiler.h"
 
@@ -15,7 +12,7 @@
 
 UK2Node_ListenForMessage_Event_Immediate::UK2Node_ListenForMessage_Event_Immediate( )
 {
-	bAllowImmediate = true;
+	MessageType.bAllowImmediate = true;
 }
 
 void UK2Node_ListenForMessage_Event_Immediate::AllocateDefaultPins( )
@@ -59,8 +56,8 @@ void UK2Node_ListenForMessage_Event_Immediate::ExpandNode( FKismetCompilerContex
 	///////////////////////////////////////////////////////////////////////////////////
 	// Place a custom event that has the signature to be triggered by the Messenger
 	const auto EventNode = CompilerContext.SpawnIntermediateNode< UK2Node_HandleMessage >( this, SourceGraph );
-	EventNode->MessageType = MessageType;
-	EventNode->CustomFunctionName = *FString::Printf( TEXT( "ListenerHandler_%s_%s" ), *MessageType->GetName( ), *CompilerContext.GetGuid( this ) );
+	EventNode->MessageType = MessageType.MessageType;
+	EventNode->CustomFunctionName = *FString::Printf( TEXT( "ListenerHandler_%s_%s" ), *MessageType.MessageType->GetName( ), *CompilerContext.GetGuid( this ) );
 	EventNode->AllocateDefaultPins( );
 
 	const auto Event_Message = EventNode->CreateUserDefinedPin( Listen_Message->PinName, Listen_Message->PinType, EGPD_Output );
@@ -81,12 +78,12 @@ FText UK2Node_ListenForMessage_Event_Immediate::GetNodeTitle( ENodeTitleType::Ty
 	if ((TitleType == ENodeTitleType::ListView) || (TitleType == ENodeTitleType::MenuTitle))
 		return LOCTEXT( "NodeTitle", "Handle Message" );
 
-	if (MessageType != nullptr)
+	if (MessageType.MessageType != nullptr)
 	{
 		if (CachedNodeTitle.IsOutOfDate( this ))
 		{
 			FFormatNamedArguments Args;
-			Args.Add( TEXT( "TypeName" ), MessageType->GetDisplayNameText( ) );
+			Args.Add( TEXT( "TypeName" ), MessageType.MessageType->GetDisplayNameText( ) );
 
 			// FText::Format() is slow, so we cache this to save on performance
 			CachedNodeTitle.SetCachedText( FText::Format( LOCTEXT( "NodeTitle_Format", "Handle Message\n{TypeName}" ), Args ), this );

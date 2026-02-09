@@ -7,7 +7,6 @@
 
 // Blueprint Graph
 #include "K2Node_SwitchEnum.h"
-#include "K2Node_CustomEvent.h"
 
 // KismetCompiler
 #include "KismetCompiler.h"
@@ -22,7 +21,7 @@ const FName UK2Node_ListenForMessage_Event_Stateful::MessageClearPinName( "Messa
 
 UK2Node_ListenForMessage_Event_Stateful::UK2Node_ListenForMessage_Event_Stateful( )
 {
-	bAllowStateful = true;
+	MessageType.bAllowStateful = true;
 }
 
 void UK2Node_ListenForMessage_Event_Stateful::AllocateDefaultPins( )
@@ -84,8 +83,8 @@ void UK2Node_ListenForMessage_Event_Stateful::ExpandNode( FKismetCompilerContext
 	static const FEdGraphPinType EnumPinType( UEdGraphSchema_K2::PC_Byte, NAME_None, Enum, EPinContainerType::None, false, { } );
 
 	const auto EventNode = CompilerContext.SpawnIntermediateNode< UK2Node_HandleMessage >( this, SourceGraph );
-	EventNode->MessageType = MessageType;
-	EventNode->CustomFunctionName = *FString::Printf( TEXT( "ListenerHandler_%s_%s" ), *MessageType->GetName( ), *CompilerContext.GetGuid( this ) );
+	EventNode->MessageType = MessageType.MessageType;
+	EventNode->CustomFunctionName = *FString::Printf( TEXT( "ListenerHandler_%s_%s" ), *MessageType.MessageType->GetName( ), *CompilerContext.GetGuid( this ) );
 	EventNode->AllocateDefaultPins( );
 
 	const auto Event_Message = EventNode->CreateUserDefinedPin( Listen_Message->PinName, Listen_Message->PinType, EGPD_Output );
@@ -127,12 +126,12 @@ FText UK2Node_ListenForMessage_Event_Stateful::GetNodeTitle( ENodeTitleType::Typ
 	if ((TitleType == ENodeTitleType::ListView) || (TitleType == ENodeTitleType::MenuTitle))
 		return LOCTEXT( "NodeTitle", "Handle Stateful Message" );
 
-	if (MessageType != nullptr)
+	if (MessageType.MessageType != nullptr)
 	{
 		if (CachedNodeTitle.IsOutOfDate( this ))
 		{
 			FFormatNamedArguments Args;
-			Args.Add( TEXT( "TypeName" ), MessageType->GetDisplayNameText( ) );
+			Args.Add( TEXT( "TypeName" ), MessageType.MessageType->GetDisplayNameText( ) );
 
 			// FText::Format() is slow, so we cache this to save on performance
 			CachedNodeTitle.SetCachedText( FText::Format( LOCTEXT( "NodeTitle_Format", "Handle Stateful Message\n{TypeName}" ), Args ), this );

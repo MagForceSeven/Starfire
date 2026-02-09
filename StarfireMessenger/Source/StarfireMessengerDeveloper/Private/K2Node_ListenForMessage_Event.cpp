@@ -30,6 +30,7 @@ const FName UK2Node_ListenForMessage_Event::MessageContextPinName( "MessageConte
 
 UK2Node_ListenForMessage_Event::UK2Node_ListenForMessage_Event( )
 {
+	MessageType.bAllowAbstract = true;
 }
 
 void UK2Node_ListenForMessage_Event::AllocateDefaultPins( )
@@ -54,9 +55,15 @@ bool UK2Node_ListenForMessage_Event::CheckForErrors( const FKismetCompilerContex
 {
 	bool bErrors = false;
 	
-	if (MessageType == nullptr)
+	FString MessageTypeError;
+	if (MessageType.IsNull( ))
 	{
 		CompilerContext.MessageLog.Error( *LOCTEXT( "MessageEvent_NoMessage", "@@ node does not specify a message type to listen to." ).ToString( ), this );
+		bErrors = true;
+	}
+	if (!MessageType.IsValid( &MessageTypeError ))
+	{
+		CompilerContext.MessageLog.Error(*FText::Format(LOCTEXT("MessageEvent_WrongMessage", "@@ node is not configured with valid message type: {0}"), FText::FromString(MessageTypeError)).ToString(), this);
 		bErrors = true;
 	}
 	
@@ -68,13 +75,13 @@ void UK2Node_ListenForMessage_Event::OnMessageTypeChange( void )
 	const auto ContextPin = GetMessageContextPin( );
 	const auto MessageDataPin = GetMessageDataPin(  );
 
-	if (MessageType != nullptr)
+	if (MessageType.MessageType != nullptr)
 	{
-		if (const auto ContextType = FSf_MessageBase::GetContextType( MessageType ))
+		if (const auto ContextType = FSf_MessageBase::GetContextType( MessageType.MessageType ))
 		{
 			ContextPin->bHidden = false;
 			ContextPin->PinType.PinSubCategoryObject = ContextType.Get( );
-			ContextPin->PinFriendlyName = FSf_MessageBase::GetContextPinName( MessageType );
+			ContextPin->PinFriendlyName = FSf_MessageBase::GetContextPinName( MessageType.MessageType );
 			StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "ContextPin_Tooltip", "Object context that is to be associated with the event (allows for event filtering so listeners don't have to listen to all messages of a certain type)" ) );
 			StarfireK2Utilities::RefreshAllowedConnections( this, ContextPin );
 		}
@@ -87,7 +94,7 @@ void UK2Node_ListenForMessage_Event::OnMessageTypeChange( void )
 
 		if (!bListenHierarchically)
 		{
-			MessageDataPin->PinType.PinSubCategoryObject = const_cast<UScriptStruct*>(MessageType.Get());
+			MessageDataPin->PinType.PinSubCategoryObject = const_cast<UScriptStruct*>(MessageType.MessageType.Get());
 			StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
 		}
 		StarfireK2Utilities::RefreshAllowedConnections( this, MessageDataPin );
@@ -99,11 +106,11 @@ void UK2Node_ListenForMessage_Event::OnMessageTypeChange( void )
 
 		if (!bListenHierarchically)
 		{
-			if (bAllowImmediate && bAllowStateful)
+			if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
-			else if (bAllowImmediate)
+			else if (MessageType.bAllowImmediate)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Immediate::StaticStruct( );
-			else if (bAllowStateful)
+			else if (MessageType.bAllowStateful)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Stateful::StaticStruct( );
 			else
 				ensureAlways( false );
@@ -131,13 +138,13 @@ void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChang
 
 		if (bListenHierarchically)
 			MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
-		else if (MessageType != nullptr)
-			MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.Get( ) );
-		else if (bAllowImmediate && bAllowStateful)
+		else if (MessageType.MessageType != nullptr)
+			MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.MessageType.Get( ) );
+		else if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
 			MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
-		else if (bAllowImmediate)
+		else if (MessageType.bAllowImmediate)
 			MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Immediate::StaticStruct( );
-		else if (bAllowStateful)
+		else if (MessageType.bAllowStateful)
 			MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Stateful::StaticStruct( );
 		else
 			ensureAlways( false );
@@ -150,48 +157,27 @@ void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChang
 		FBlueprintEditorUtils::MarkBlueprintAsModified( GetBlueprint( ) );
 	}
 	else if (ChainNode->GetValue( )->GetFName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_ListenForMessage_Event, MessageType ))
+		// This catches both the changes to the FStarfireMessage type instance as well as the MessageType member of that type
 	{
 		const auto MessageDataPin = GetMessageDataPin( );
 
-		if (MessageType != nullptr)
+		if (MessageType.MessageType != nullptr)
 		{
-			if (bAllowImmediate && bAllowStateful)
-			{
-				if (!MessageType->IsChildOf< FSf_MessageBase >( ))
-					MessageType = nullptr;
-			}
-			else if (bAllowImmediate)
-			{
-				if (!MessageType->IsChildOf< FSf_Message_Immediate >( ))
-					MessageType = nullptr;
-			}
-			else if (bAllowStateful)
-			{
-				if (!MessageType->IsChildOf< FSf_Message_Stateful >( ))
-					MessageType = nullptr;
-			}
-			else
-			{
-				ensureAlways( false );
-			}
-
 			if (!bListenHierarchically)
-			{
-				MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.Get( ) );
-			}
+				MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.MessageType.Get( ) );
 		}
 		else
 		{
-			if (bAllowImmediate && bAllowStateful)
+			if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
-			else if (bAllowImmediate)
+			else if (MessageType.bAllowImmediate)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Immediate::StaticStruct( );
-			else if (bAllowStateful)
+			else if (MessageType.bAllowStateful)
 				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Stateful::StaticStruct( );
 			else
 				ensureAlways( false );
 		}
-		
+
 		OnMessageTypeChange( );
 
 		// Poke the graph to update the visuals based on the above changes
@@ -254,7 +240,7 @@ bool UK2Node_ListenForMessage_Event::IsCompatibleWithGraph( const UEdGraph *Grap
 
 void UK2Node_ListenForMessage_Event::GetMenuActions( FBlueprintActionDatabaseRegistrar &ActionRegistrar ) const
 {
-	if (bAllowImmediate || bAllowStateful)
+	if (MessageType.bAllowImmediate || MessageType.bAllowStateful)
 		StarfireK2Utilities::DefaultGetMenuActions( this, ActionRegistrar );
 }
 

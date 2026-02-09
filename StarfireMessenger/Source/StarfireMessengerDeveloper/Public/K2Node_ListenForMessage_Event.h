@@ -1,8 +1,10 @@
 
 #pragma once
 
-#include "K2Node_MessengerNodeBase.h"
+#include "K2Node.h"
 #include "K2Node_EventNodeInterface.h"
+
+#include "Messenger/MessageProperty.h"
 
 #include "K2Node_ListenForMessage_Event.generated.h"
 
@@ -39,6 +41,9 @@ public:
 	[[nodiscard]] UEdGraphPin* GetMessageDataPin( ) const;
 	// The context object associated with the message when broadcast
 	[[nodiscard]] UEdGraphPin* GetMessageContextPin( ) const;
+	
+	// Get the struct for the messages that we are going to recieve
+	[[nodiscard]] const UScriptStruct* GetMessageType( void ) const { return MessageType.MessageType; }
 
 protected:
 	// Pin Names
@@ -51,18 +56,13 @@ protected:
 
 	// The type of message this listener should handle
 	UPROPERTY( EditDefaultsOnly, Category="Starfire Messenger" )
-	TObjectPtr< const UScriptStruct > MessageType;
+	FStarfireMessageType MessageType;
 	
 	// Hook for derived nodes to handle the message type changing
 	virtual void OnMessageTypeChange( void );
 	
 	// Hook for checking node configuration error prior to compile
 	[[nodiscard]] virtual bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) const;
-
-	// Whether the derived type should allow immediate message types
-	bool bAllowImmediate = false;
-	// Whether the derived type should allow stateful message types
-	bool bAllowStateful = false;
 
 	// copied from Epic's ConstructObjectFromClass node
 	// Constructing FText strings can be costly, so we cache the node's title

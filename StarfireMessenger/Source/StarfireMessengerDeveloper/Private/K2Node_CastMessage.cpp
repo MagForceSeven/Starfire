@@ -5,6 +5,7 @@
 #include "Module/StarfireMessenger.h"
 
 #include "K2Node_StartListeningForMessage.h"
+#include "K2Node_ListenForMessage_Event.h"
 
 #include "StarfireK2Utilities.h"
 
@@ -201,7 +202,7 @@ bool UK2Node_CastMessage::CheckForErrors( const FKismetCompilerContext &Compiler
 	return bErrors;
 }
 
-UScriptStruct* UK2Node_CastMessage::GetBaseAllowedType( void ) const
+const UScriptStruct* UK2Node_CastMessage::GetBaseAllowedType( void ) const
 {
 	static const FName MD_BaseStruct( "BaseStruct" );
 	
@@ -236,6 +237,11 @@ UScriptStruct* UK2Node_CastMessage::GetBaseAllowedType( void ) const
 		if (const auto MessageType = ListeningNode->GetMessageType( ))
 			return MessageType;
 	}
+	else if (const auto HandlingNode = Cast< UK2Node_ListenForMessage_Event >( OwningNode ))
+	{
+		if (const auto MessageType = HandlingNode->GetMessageType( ))
+			return MessageType;
+	}
 
 	if (BaseStructMeta.IsEmpty( ))
 		return FSf_MessageBase::StaticStruct( );
@@ -261,7 +267,7 @@ void UK2Node_CastMessage::PinConnectionListChanged( UEdGraphPin *Pin )
 		{
 			const auto MessageTypePin = GetTypePin( );
 			MessageTypePin->BreakAllPinLinks( );
-			MessageTypePin->DefaultObject = BaseAllowedType;
+			MessageTypePin->DefaultObject = const_cast< UScriptStruct* >( BaseAllowedType );
 
 			CachedNodeTitle.MarkDirty( );
 			

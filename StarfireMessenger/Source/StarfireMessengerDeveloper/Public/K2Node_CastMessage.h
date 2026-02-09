@@ -34,7 +34,7 @@ public:
 
 	// Determine what the most restrictive type for the outputs should be
 	// based on the 'BaseStruct' metadata of the CastSource input pin
-	UScriptStruct* GetBaseAllowedType( void ) const;
+	const UScriptStruct* GetBaseAllowedType( void ) const;
 
 private:
 	// Pin Names
