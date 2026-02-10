@@ -6,7 +6,11 @@
 // Core UObject
 #include "StructUtils/InstancedStruct.h"
 
+#include UE_INLINE_GENERATED_CPP_BY_NAME(MessageTypes)
+
 #if PLATFORM_UNIX
+// Linux doesn't like using the pointer hash for function pointers implicitly like windows
+// so we'll just declare an explicit one
 [[nodiscard]] inline uint32 PointerHash( UScriptStruct*(*Key)(void) )
 {
 	return PointerHash( (const void*)Key );
@@ -15,13 +19,20 @@
 
 TSet< FString > StatefulTypesWithContexts;
 TMap< UScriptStruct*(*)(void), UClass*(*)(void) > ContextPinTypes_Pending;
+TSet< FString > AbstractTypes;
 
 #if WITH_EDITORONLY_DATA
-TSet< FString > AbstractTypes;
 TMap< FString, const UClass* > ContextPinTypes;
 TMap< FString, FText > ContextPinNameOverrides;
 
 TMap< UScriptStruct*(*)(void), FText > ContextPinNameOverrides_Pending;
+
+FMessageContextNameMarker::FMessageContextNameMarker( UScriptStruct* (*StructGetter)(void), const char* ContextName )
+{
+	ContextPinNameOverrides_Pending.Add( StructGetter, FText::FromString( ContextName ) );
+}
+
+#endif
 
 FAbstractMarker::FAbstractMarker( const char* Typename )
 {
@@ -29,23 +40,15 @@ FAbstractMarker::FAbstractMarker( const char* Typename )
 	AbstractTypes.Add( Name.RightChop( 1 ) );
 }
 
-FMessageContextNameMarker::FMessageContextNameMarker( UScriptStruct* (*StructGetter)(void), const char* ContextName )
+FMessageContextTypeMarker::FMessageContextTypeMarker( UScriptStruct* (*StructGetter)(void), UClass*(*TypeGetter)(void) )
 {
-	ContextPinNameOverrides_Pending.Add( StructGetter, FText::FromString( ContextName ) );
+	ContextPinTypes_Pending.Add( StructGetter, TypeGetter );
 }
 
 bool FSf_MessageBase::IsMessageTypeAbstract( const UScriptStruct *MessageType )
 {
 	return AbstractTypes.Contains( MessageType->GetName( ) );
 }
-#endif
-
-FMessageContextTypeMarker::FMessageContextTypeMarker( UScriptStruct* (*StructGetter)(void), UClass*(*TypeGetter)(void) )
-{
-	ContextPinTypes_Pending.Add( StructGetter, TypeGetter );
-}
-
-#include UE_INLINE_GENERATED_CPP_BY_NAME(MessageTypes)
 
 #if WITH_EDITOR
 TSoftClassPtr< UObject > FSf_MessageBase::GetContextType( const UScriptStruct *MessageType )

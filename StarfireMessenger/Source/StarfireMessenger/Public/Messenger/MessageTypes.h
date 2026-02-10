@@ -46,11 +46,6 @@ template < class TType >
 constexpr bool Sf_MessageType_IsAbstract( ) { return false; }
 
 // Helper macro to make it easier for clients to declare the specialization correctly
-#if !WITH_EDITORONLY_DATA
-#define SET_MESSAGE_TYPE_AS_ABSTRACT( Type ) \
-	template < >	\
-	constexpr bool Sf_MessageType_IsAbstract< Type >( ) { return true; }
-#else
 #define SET_MESSAGE_TYPE_AS_ABSTRACT( Type ) \
 	template < >	\
 	constexpr bool Sf_MessageType_IsAbstract< Type >( ) { return true; } \
@@ -61,7 +56,6 @@ struct STARFIREMESSENGER_API FAbstractMarker
 {
 	explicit FAbstractMarker( const char* Typename );
 };
-#endif
 
 // Base type for all messages supported by Starfire Messenger
 // This is purposefully not fully exported. Client messages should derive from FSf_Message_Immediate or FSf_Message_Stateful. Not directly from this structure
@@ -77,11 +71,11 @@ public:
 	[[nodiscard]] STARFIREMESSENGER_API static bool IsMessageTypeStateful( const UScriptStruct *MessageType );
 	// Utility for the runtime check necessary for Stateful messages having associated context data
 	[[nodiscard]] STARFIREMESSENGER_API static bool DoesStatefulTypeRequireContext( const UScriptStruct *MessageType );
+	// Utility for runtime checking if a type is abstract
+	[[nodiscard]] STARFIREMESSENGER_API static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
 #if WITH_EDITORONLY_DATA
 	// Utility for finding a message types context type at runtime
 	[[nodiscard]] STARFIREMESSENGER_API static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
-	// Utility for runtime checking if a type is abstract
-	[[nodiscard]] STARFIREMESSENGER_API static bool IsMessageTypeAbstract( const UScriptStruct *MessageType );
 	// Utility for getting the override name to give context pins of the specified type
 	[[nodiscard]] STARFIREMESSENGER_API static FText GetContextPinName( const UScriptStruct *MessageType );
 

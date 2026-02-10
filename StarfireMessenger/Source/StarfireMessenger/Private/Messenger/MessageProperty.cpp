@@ -61,7 +61,7 @@ bool FStarfireMessageType::IsValid( FString *ErrorMsg ) const
 		if ((CustomBaseType != nullptr) && !MessageType->IsChildOf( CustomBaseType ))
 		{
 			if (ErrorMsg != nullptr)
-				*ErrorMsg = FString::Printf( TEXT("Selected Message Type is not a child of required base message type '%s'."), *CustomBaseType->GetDisplayNameText( ).ToString( ));
+				*ErrorMsg = FString::Printf( TEXT("Selected Message Type is not a child of required base message type '%s'."), *CustomBaseType->GetName( ));
 
 			return false;
 		}
@@ -96,7 +96,7 @@ bool FStarfireMessageType::IsValid( FString *ErrorMsg ) const
 		if (CustomBaseType != nullptr)
 		{
 			if (ErrorMsg != nullptr)
-				*ErrorMsg = FString::Printf( TEXT("Blueprint Message Types not allowed when base message type '%s' is required."), *CustomBaseType->GetDisplayNameText( ).ToString( ));
+				*ErrorMsg = FString::Printf( TEXT("Blueprint Message Types not allowed when base message type '%s' is required."), *CustomBaseType->GetName( ));
 
 			return false;
 		}
