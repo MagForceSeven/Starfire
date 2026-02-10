@@ -113,7 +113,7 @@ void UK2Node_StartListeningForMessage_Immediate::ExpandNode( FKismetCompilerCont
 	CompilerContext.MovePinLinksToIntermediate( *Listen_Then, *Register_ThenPin );
 
 	CompilerContext.MovePinLinksToIntermediate( *Listen_Messenger, *Register_SelfPin );
-	StarfireK2Utilities::MovePinLinksOrCopyDefaults( CompilerContext, Listen_MessageType, Register_MessageTypePin );
+	CompilerContext.MovePinLinksToIntermediate( *Listen_MessageType, *Register_MessageTypePin );
 	CompilerContext.MovePinLinksToIntermediate( *Listen_Filter, *Register_ContextPin );
 	CompilerContext.MovePinLinksToIntermediate( *Listen_Handle, *Register_ReturnValue );
 	

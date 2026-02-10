@@ -15,6 +15,7 @@ namespace StarfireK2Utilities
 	static const FName PN_WorldContextObject( TEXT( "WorldContextObject" ) );
 
 	// Handle the copy of data from one pin to another either moving the links or copying the default value data
+	UE_DEPRECATED(5.7, "Just call MovePinLinksToIntermediate on the context directly, it handles defaults too.")
 	STARFIREUTILITIESDEVELOPER_API void MovePinLinksOrCopyDefaults( FKismetCompilerContext &CompilerContext, UEdGraphPin *Source, UEdGraphPin *Dest );
 
 	// Forcibly detach and attempt to reattach all the links from the pin to other pins

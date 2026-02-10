@@ -63,7 +63,7 @@ void UK2Node_MessengerFunctionCall::ExpandNode( FKismetCompilerContext& Compiler
 	}
 
 	CompilerContext.MovePinLinksToIntermediate( *This_Messenger, *Call_Messenger );
-	StarfireK2Utilities::MovePinLinksOrCopyDefaults( CompilerContext, This_MessageType, Call_MessageType );
+	CompilerContext.MovePinLinksToIntermediate( *This_MessageType, *Call_MessageType );
 	CompilerContext.MovePinLinksToIntermediate( *This_Context, *Call_Context );
 
 	Call_NeedContext->DefaultValue = This_Context->bHidden ? "false" : "true";
