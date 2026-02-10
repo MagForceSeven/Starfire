@@ -138,6 +138,10 @@ TArray< UEdGraphPin* > StarfireK2Utilities::CreateFunctionPins( UK2Node *Node, c
 
 	const auto Schema = GetDefault< UEdGraphSchema_K2 >( );
 
+	const auto HideMeta = Signature->GetMetaData( "HidePinAssetPicker" );
+	TArray< FString > HidePickerArray;
+	HideMeta.ParseIntoArray( HidePickerArray, TEXT(",") );
+
 	TArray< UEdGraphPin* > NewPins;
 
 	for (TFieldIterator< FProperty > ParamIt( Signature ); ParamIt; ++ParamIt)
@@ -160,6 +164,12 @@ TArray< UEdGraphPin* > StarfireK2Utilities::CreateFunctionPins( UK2Node *Node, c
 				ParamPin->PinToolTip = GetPinTooltip.Execute( *ParamIt ).ToString( );
 
 			ParamPin->bAdvancedView = bMakeAdvanced;
+
+			if ((ParamPin->PinType.PinCategory == UEdGraphSchema_K2::PC_Object) && HidePickerArray.Contains( NewPinName ))
+			{
+				ParamPin->PinType.bIsConst = true;
+				ParamPin->PinType.bIsReference = true;
+			}
 
 			NewPins.Push( ParamPin );
 		}
