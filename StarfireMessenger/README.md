@@ -35,7 +35,7 @@ Pull requests and feature requests are happily accepted.
 
 ## Dependencies
 
-In addition to the dependencies on plugins from the Engine, Starfire Messenger is also dependent on the Starfire Utilities plugin found in this repository. These dependencies are actually fairly minor: _TypeUtiliesSF.h/hpp/cpp_ and _StarfireK2Utilities.h/cpp_. These files could be copied from Starfire Utilities instead of using the plugin entirely.
+In addition to the dependencies on plugins from the Engine, Starfire Messenger is also dependent on the Starfire Utilities plugin found in this repository. These dependencies are actually fairly minor and could be copied from Starfire Utilities instead of using the plugin entirely.
 
 To provide a reasonable amount of type safety in blueprint for hierarchical messages, the [MDMetaDataEditor plugin](https://github.com/DoubleDeez/MDMetaDataEditor) by Dylan Dumesnil has been directly included in the StarfireMessenger plugin. If you have that plugin installed separately, you can remove it from Messenger and it will work just fine (you'll need to update the uplugin appropriately as well). You will just have to add a new project setting entry for Instanced Structs for a string type named "BaseStruct" and a new entry for ExposeOnSpawn that supports structures (these can be copied to your DefaultEditor.ini from below). You can ignore the meta-data if you want, the 'Register for Message' will prepopulate it if you use it to create new functions/events. However the plugin allows user editing if you need to go back or change your mind, or are creating the functions/events manually.
 
@@ -47,7 +47,7 @@ To provide a reasonable amount of type safety in blueprint for hierarchical mess
 
 ### Epic
 
-To make the custom nodes work as required, [a modification](https://github.com/EpicGames/UnrealEngine/pull/11771) is required to an Engine node. To prevent users from having to also modify their engine, some nodes have been duplicated and renamed in order to support the plugin nodes. They've been modified so that they shouldn't interfere with normal use of blueprints, even though there are technically two of the same kind of node type present. These duplicates will be removed if/when the associated pull requests are merged into the Engine.
+To make the custom nodes work as required, [a modification](https://github.com/EpicGames/UnrealEngine/pull/11771) is required to an Engine node. To prevent users from having to also modify their engine, some nodes have been duplicated and renamed in order to support the plugin nodes. They've been modified so that they shouldn't interfere with normal use of blueprints, even though there are technically two of the same kind of node type present. These duplicates will be removed if/when the associated pull request is merged into the Engine.
 
 ## Detailed Usage
 
@@ -191,13 +191,14 @@ Selecting a Message Type allows the ability to set all the members of the messag
 In C++, messages can be listened for through another suite of template functions and overloads.
 These can be a bit overwhelming, but they have been setup to get the compiler/IDE to catch mismatches as quickly as possible.
 
-For regular listening, either a `TFunction< void( FMessageType& ) >` or member function that takes the message structure. The use of a `TFunction` allows a wide variety of handlers like static function and lambdas.
+For regular listening, either a `TFunction< void( FMessageType& ) >` or member function that takes the message structure. The use of a `TFunction` allows a wide variety of handlers like static functions and lambdas. A `TFunction` callback can also take an optional `Owner` input (as a first parameter to match other `StartListening` versions) which is used to associate the callback with an object so that it can be stopped along with member callbacks when using `StopListeningForAllMessages`.
 ```
 void Handler( const FTestImmediateNoContext_C& );
 static void HandlerStatic( const FTestImmediateNoContext_C& );
 
 Messenger->StartListeningForMessage( this, &UClassName::Handler );
 Messenger->StartListeningForMessage< FTestImmediateNoContext_C >( &HandlerStatic );
+Messenger->StartListeningForMessage< FTestImmediateNoContext_C >( this, &HandlerStatic );
 ```
 Note that the member function version can deduce the template type, while the TFunction one can't. One potential coding style suggestion would be always be explicit with this template parameter.
 
@@ -208,6 +209,7 @@ static void HandlerStatic( const FTestImmediateContext_C&, APawn* );
 
 Messenger->StartListeningForMessage( this, &UClassName::Handler );
 Messenger->StartListeningForMessage< FTestImmediateContext_C >( &HandlerStatic );
+Messenger->StartListeningForMessage< FTestImmediateContext_C >( this, &HandlerStatic );
 ```
 And you can also specify a context filter when you start listening as the only context you want messages from:
 ```
@@ -224,7 +226,7 @@ void HandlerNoContext( const FTestStatefulNoContext_C&, EStatefulMessageEvent );
 void HandlerContext( const FTestStatefulContext_C&, APawn*, EStatefulMessageEvent );
 ```
 
-In Blueprint, two different nodes are provided to respond to broadcast messages.
+In Blueprint, three groups of nodes are provided to respond to broadcast messages.
 
 "Register for Message" is a node that allows you to select another function or event to be called when the message occurs.
 Function signature rules are the same as in C++ where the first parameter is the message structure followed by the (optional) context and the (optional) statefulness enumeration.
@@ -236,13 +238,22 @@ The drop down also provides helpful options for creating new functions or events
 
 ![](./Resources/readme_RegisterList.png)
 
-An async node is also provided that allows responding to broadcasts directly inline without the need for a handler function.
+An async node is provided that allows responding to broadcasts directly inline without the need for a handler function.
 There are two varieties, one for Immediate mode messages and one for Stateful messages.
 In the case of Stateful messages, the statefulness enumeration is converted directly into separate execution pins.
 
 ![](./Resources/readme_MessageListen.png)
 
 In both cases, the nodes also support a Context Filter input pin which acts identically to the context filter in C++.
+
+Lastly an Event-like node is available which auto-registers & unregisters objects with the subsystem.
+Configuring the type of message to listen to is in the details panel.
+Context filtering is not supported for this type of message registration.
+These registrations are ignored by `StopListeningForAllMessages` and no handle is available. The only way the object will stop receiving messages is to be destroyed.
+([BUG](https://open.codecks.io/starfire/decks/43-starfire-messenger/card/1jc-investigate-handle-message-blueprint-node-functionality-for-level-placed): There is a known issue where these nodes only work for spawned objects. Actors placed in maps are not registered properly.)
+Again there are two versions, one for Immediate mode messages and one for Stateful messages.
+
+![](./Resources/readme_HandleMessage.png)
 
 ### Hierarchical Message Listening
 
@@ -278,6 +289,35 @@ This node functions identically to the cast node used with objects, except for f
 
 The 'BaseStruct' meta is used to limit the cast node's drop down to the potentially relevant message types. If it's not set (because you created the function yourself) or you removed it, no worries. It will still work as expected, you'll just have a larger list of types to choose from. Some of which might never be able to succeed.
 
+### Stopping Message Listening
+
+If the listener is no longer interested in getting the messages that it has registered for or is being destroyed, there are two options available:
+
+The first option is `StopListeningForMessage`, which takes the `FMessageListenerHandle` that is returned by every call to `StartListeningForMessage`.
+
+The second option is to call `StopListeningForAllMessages` and pass in an object. This call will remove all the callbacks that are associated with this object as the owner. When bound to a member function, the object passed into `StartListeningForMessage` is considered the owner. When bound to a static function or lambda, you would have needed to call the overload that supplies the owner as the first parameter.
+
+It should be considered a best practice to clear all message registrations if the listener is being destroyed (for `AActor`'s this would be during `EndPlay` at least). However the subsystem will safely handle the cases where the owner has been destroyed but not unregistered.
+
+There's is also the case of level shutdown to consider since the subsystem is a `UWorldSubsystem` and will be destroyed and recreated on level transitions. As such, any listeners that are only destroyed by level unloaded may be reasonable to skip an unregistration step.
+
+### Starfire Message Type
+
+A structure, `FStarfireMessageType`, is provided as a helpful utility which allows client code to have properties which select Message Types.
+
+Work is pending to make this structure more useful to client code.
+
+#### Properties
+
+- `MessageType` is the message type that was selected by the user
+- `bAllowAbstract`, `bAllowImmediate`, and `bAllowStateful` are all configuration flags to narrow the picking in some way
+- `CustomBaseType` is configuration that forces the minimum base class for picking to be a specific Message type
+
+#### API
+
+- `IsNull` checks if `MessageType` has been assigned a value of any sort
+- `IsValid` checks if the current value of `MessageType` conforms to the requirements of the configuration properties
+
 ## Components
 
 ### Runtime
@@ -294,6 +334,10 @@ Header with the message types that should be used as the base for any message de
 _MessengerTypes.h/cpp_
 
 Header with utility types used to interact with the Messenger subsystem like `EStatefulMessageEvent` and the Listener handle.
+
+_MessageProperty.h/cpp_
+
+Header with a custom struct that wraps a UScriptStruct pointer and other config data. Allows for creating a property customization hook so that selecting Message Types in a details panel doesn't result in an object picker that shows every structure from the entire Engine/Project.
 
 #### Project Settings
 _MessengerProjectSettings.h/cpp_
@@ -316,4 +360,4 @@ This module also has all the duplicated Epic blueprint nodes to handle the custo
 
 ### Editor
 
-There is currently nothing in this module, it is a placeholder for future features that need this module type.
+This module contains and registers the property customization for `FStarfireMessageType`.
