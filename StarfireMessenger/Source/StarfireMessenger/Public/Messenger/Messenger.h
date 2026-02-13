@@ -117,21 +117,22 @@ concept CContextlessConstructorVarArgsMatch = requires( args_t && ... args )
 	!std::is_same_v< std::tuple_element_t< std::tuple_size_v< args_t ... > - 1, std::tuple< args_t ... > >, typename type_t::ContextType* >;
 };
 
-//
+//**********************************************************************************************************************
+// Collection of concepts for checking the viability of using a functor for the specific signatures of each callback
+
 template < class message_t, class func_t >
 concept CMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t& >;
 
-//
 template < class message_t, class func_t >
 concept CContextMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, typename message_t::ContextType* >;
 
-//
 template < class message_t, class func_t >
 concept CStatefulMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, EStatefulMessageEvent >;
 
-//
 template < class message_t, class func_t >
 concept CContextStatefulMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, typename message_t::ContextType*, EStatefulMessageEvent >;
+
+//**********************************************************************************************************************
 
 // Class that acts as a centralized message bus to pass messages from indeterminate contexts, to some collection of unknown listeners
 UCLASS( )
@@ -342,6 +343,11 @@ private:
 
 	// Non-template utility for checking the existence of stateful message data for a message type & context
 	[[nodiscard]] bool HasStatefulMessage( bool bExpectingContext, const UScriptStruct *Type, const UObject *Context ) const;
+
+	// Identify a handler as coming from the HandleMessage node
+	void MarkHandlerAsAutoRegistered( const FMessageListenerHandle &Handle );
+	// A specialized unregistration for auto-registered handlers
+	void UnregisterAutoRegistered( const FMessageListenerHandle &Handle );
 
 	// All listeners that are interested in a particular type of message occurring
 	TMultiMap< TObjectPtr< const UStruct >, const FMessageListener* > MessageListeners;

@@ -250,7 +250,7 @@ Lastly an Event-like node is available which auto-registers & unregisters object
 Configuring the type of message to listen to is in the details panel.
 Context filtering is not supported for this type of message registration.
 These registrations are ignored by `StopListeningForAllMessages` and no handle is available. The only way the object will stop receiving messages is to be destroyed.
-([BUG](https://open.codecks.io/starfire/decks/43-starfire-messenger/card/1jc-investigate-handle-message-blueprint-node-functionality-for-level-placed): There is a known issue where these nodes only work for spawned objects. Actors placed in maps are not registered properly.)
+(Mea Culpa: It's possible there are map setups that don't currently (2/13/2026) work properly. I haven't been able to test every variation, I'm not that familar with all of them. If you encounter an issue, please report it so I can replicate it.)
 Again there are two versions, one for Immediate mode messages and one for Stateful messages.
 
 ![](./Resources/readme_HandleMessage.png)

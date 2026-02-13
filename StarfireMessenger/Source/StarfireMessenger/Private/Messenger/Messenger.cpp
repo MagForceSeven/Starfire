@@ -22,6 +22,9 @@ struct FMessageListener
 	TObjectPtr< const UObject > ContextFilter;
 	// Listener interested in the message
 	TObjectPtr< const UObject > Owner;
+
+	// Identifies handler as coming from the HandleMessage custom node
+	bool bAutoRegister = false;
 };
 
 // State data for broadcast stateful messages
@@ -249,6 +252,10 @@ void UStarfireMessenger::StopListeningForMessage( FMessageListenerHandle &Handle
 	if (Listener == nullptr)
 		return;
 
+	// No one should be unregistering (or even have a handle to) an auto-registered handler
+	if (!ensureAlways((*Listener)->bAutoRegister == false))
+		return;
+
 	RemoveListener( *Listener );	
 }
 
@@ -262,6 +269,9 @@ void UStarfireMessenger::StopListeningForAllMessages( const UObject *OwningObjec
 
 	for (const auto L : Listeners)
 	{
+		if (L->bAutoRegister)
+			continue; // ignore auto-registered handlers
+
 		RemoveListener( L );
 	}
 }
@@ -352,6 +362,29 @@ bool UStarfireMessenger::HasStatefulMessage( bool bExpectingContext, const UScri
 	}
 
 	return (*StatefulData)->DefaultMessage.IsValid( );
+}
+
+void UStarfireMessenger::MarkHandlerAsAutoRegistered( const FMessageListenerHandle &Handle )
+{
+	const auto Listener = HandleLookups.Find( Handle );
+	if (Listener == nullptr)
+		return;
+
+	const auto MutableListener = const_cast< FMessageListener* >( *Listener );
+	MutableListener->bAutoRegister = true;
+}
+
+void UStarfireMessenger::UnregisterAutoRegistered( const FMessageListenerHandle &Handle )
+{
+	if (!Handle.IsValid( ))
+		return;
+
+	const auto Listener = HandleLookups.Find( Handle );
+
+	if (Listener == nullptr)
+		return;
+
+	RemoveListener( *Listener );
 }
 
 void UStarfireMessenger::AddReferencedObjects( UObject *InThis, FReferenceCollector &Collector )

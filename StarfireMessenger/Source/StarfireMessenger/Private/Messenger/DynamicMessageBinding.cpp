@@ -46,6 +46,8 @@ void UDynamicStarfireMessageBinding::BindDynamicDelegates( UObject *Instance ) c
 	{
 		auto Handle = Messenger->StartListeningForMessage_K2( Instance, Binding.MessageType, nullptr, Binding.FunctionName );
 		Handles.Push( Handle );
+
+		Messenger->MarkHandlerAsAutoRegistered( Handle );
 	}
 }
 
@@ -84,7 +86,7 @@ void UDynamicStarfireMessageBinding::UnbindDynamicDelegates( UObject *Instance )
 		if (Messenger != nullptr)
 		{
 			for (auto &Handle : *Handles)
-				Messenger->StopListeningForMessage( Handle );
+				Messenger->UnregisterAutoRegistered( Handle );
 		}
 		
 		ListenerRegistrations.Remove( Instance );
