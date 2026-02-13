@@ -36,8 +36,30 @@ public:
 	// The collection of bindings to apply to instances of the blueprint
 	UPROPERTY( )
 	TArray< FStarfireMessageBinding > DynamicBindings;
-	
+
 private:
 	// Collection of registrations that have been made to simplify unbinding
+	// ReSharper disable once CppUE4ProbableMemoryIssuesWithUObjectsInContainer
 	mutable TMap< UObject*, TArray< FMessageListenerHandle > > ListenerRegistrations;
+};
+
+// A component where we can stash level bindings that we apply when loaded at game-runtime to apply to the message router
+UCLASS( Within = "WorldSettings" )
+class UWorldStarfireMessageBinding : public UActorComponent
+{
+	GENERATED_BODY( )
+public:
+	// The object that is attempting to bind to messages
+	UPROPERTY( )
+	TSoftObjectPtr< UObject > Instance;
+
+	// The bindings to apply to the object
+	UPROPERTY( )
+	TWeakObjectPtr< const UDynamicStarfireMessageBinding > Binding;
+	
+	// Actor Component API
+	void BeginPlay( ) override;
+	void EndPlay( EEndPlayReason::Type EndPlayReason ) override;
+	void PreSave( FObjectPreSaveContext SaveContext ) override;
+	void PostDuplicate( bool bDuplicateForPIE ) override;
 };
