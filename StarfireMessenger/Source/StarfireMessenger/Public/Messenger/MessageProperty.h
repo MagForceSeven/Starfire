@@ -25,13 +25,20 @@ public:
 	TObjectPtr< const UScriptStruct > MessageType;
 	
 	// Whether the derived type should allow immediate message types
+	UPROPERTY( )
 	bool bAllowImmediate = false;
 	// Whether the derived type should allow stateful message types
+	UPROPERTY( )
 	bool bAllowStateful = false;
 	// Whether the derived type should allow abstract message types
+	UPROPERTY( )
 	bool bAllowAbstract = false;
 
 	// Optional value that can force some other structure (but one still derived from Fsf_MessageBase) as the basis for picking
 	UPROPERTY( )
 	TObjectPtr< const UScriptStruct > CustomBaseType;
+	
+	// Equality
+	[[nodiscard]] bool operator==( const FStarfireMessageType &Rhs ) const { return MessageType == Rhs.MessageType; }
+	[[nodiscard]] bool operator!=( const FStarfireMessageType &Rhs ) const { return !(*this == Rhs); }
 };

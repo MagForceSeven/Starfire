@@ -59,7 +59,7 @@ struct STARFIREMESSENGER_API FAbstractMarker
 
 // Base type for all messages supported by Starfire Messenger
 // This is purposefully not fully exported. Client messages should derive from FSf_Message_Immediate or FSf_Message_Stateful. Not directly from this structure
-USTRUCT( )
+USTRUCT( BlueprintType, meta = (BlueprintInternalUseOnly = "true") )
 struct FSf_MessageBase
 {
 	GENERATED_BODY( )

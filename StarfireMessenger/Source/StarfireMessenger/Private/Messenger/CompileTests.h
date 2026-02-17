@@ -177,6 +177,7 @@ public:
 };
 
 USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
 struct FMessageTest : public FSf_Message_Immediate
 {
 	GENERATED_BODY( )
@@ -186,6 +187,7 @@ public:
 };
 
 USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
 struct FMessageTest_C : public FMessageTest
 {
 	GENERATED_BODY( )
@@ -485,7 +487,7 @@ public:
 //
 
 USTRUCT( meta = (Hidden) )
-//USTRUCT( )
+//USTRUCT( BlueprintType )
 struct FTestImmediateNoContext : public FSf_Message_Immediate
 {
 	GENERATED_BODY( )
@@ -493,11 +495,61 @@ public:
 };
 
 USTRUCT( meta = (Hidden) )
-//USTRUCT( )
+//USTRUCT( BlueprintType )
 struct FTestStatefulContext : public FSf_Message_Stateful
 {
 	GENERATED_BODY( )
 public:
 
 	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FSwitchTestFamily )
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily_Child1 : public FSwitchTestFamily
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily_Child2 : public FSwitchTestFamily
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily_Child3_Abstract : public FSwitchTestFamily
+{
+	GENERATED_BODY( )
+public:
+};
+SET_MESSAGE_TYPE_AS_ABSTRACT( FSwitchTestFamily_Child3_Abstract )
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily_GrandChild1 : public FSwitchTestFamily_Child3_Abstract
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+//USTRUCT( BlueprintType )
+struct FSwitchTestFamily_GrandChild2 : public FSwitchTestFamily_Child3_Abstract
+{
+	GENERATED_BODY( )
+public:
 };
