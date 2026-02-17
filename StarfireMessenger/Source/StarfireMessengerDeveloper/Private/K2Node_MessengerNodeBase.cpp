@@ -1,10 +1,18 @@
 
 #include "K2Node_MessengerNodeBase.h"
 
+#include "K2Node_ListenForMessage_Event.h"
+#include "K2Node_StartListeningForMessage.h"
+
+#include "Module/StarfireMessenger.h"
 #include "Messenger/Messenger.h"
 #include "Messenger/MessengerProjectSettings.h"
 
 #include "StarfireK2Utilities.h"
+
+// Blueprint Graph
+#include "K2Node_FunctionEntry.h"
+#include "K2Node_Variable.h"
 
 // KismetCompiler
 #include "KismetCompiler.h"
@@ -363,6 +371,56 @@ void UK2Node_MessengerNodeBase::SetPurity( bool bNewPurity )
 	// Poke the graph to update the visuals based on the above changes
 	GetGraph( )->NotifyGraphChanged( );
 	FBlueprintEditorUtils::MarkBlueprintAsModified( GetBlueprint( ) );
+}
+
+const UScriptStruct* UK2Node_MessengerNodeBase::GetBaseAllowedType( const UEdGraphPin *InputPin )
+{
+	static const FName MD_BaseStruct( "BaseStruct" );
+	
+	const auto LinkedTo = StarfireK2Utilities::FindTrueInputLinkage( InputPin );
+	if (LinkedTo == nullptr)
+		return FSf_MessageBase::StaticStruct( );
+
+	FString BaseStructMeta;
+	const auto OwningNode = LinkedTo->GetOwningNode( );
+	if (const auto EntryNode = Cast< UK2Node_FunctionEntry >( OwningNode ))
+	{
+		// The EntryNode function reference is incomplete so it fails to find the function properly
+		FMemberReference MemberReference;
+		MemberReference.SetDirect( EntryNode->FunctionReference.GetMemberName( ), { }, EntryNode->GetBlueprintClassFromNode( ), false );
+
+		if (const auto Function = MemberReference.ResolveMember< UFunction >(  ))
+		{
+			const auto ParamProperty = Function->FindPropertyByName( LinkedTo->PinName );
+			BaseStructMeta = ParamProperty->GetMetaData( MD_BaseStruct );
+		}
+	}
+	else if (const auto VariableNode = Cast< UK2Node_Variable >( OwningNode ))
+	{
+		if (const FProperty* VariableProperty = VariableNode->VariableReference.ResolveMember< FProperty >( VariableNode->GetBlueprintClassFromNode( ) ))
+		{
+			BaseStructMeta = VariableProperty->GetMetaData( MD_BaseStruct );
+		}
+	}
+	else if (const auto ListeningNode = Cast< UK2Node_StartListeningForMessage >( OwningNode ))
+	{
+		if (const auto MessageType = ListeningNode->GetMessageType( ))
+			return MessageType;
+	}
+	else if (const auto HandlingNode = Cast< UK2Node_ListenForMessage_Event >( OwningNode ))
+	{
+		if (const auto MessageType = HandlingNode->GetMessageType( ))
+			return MessageType;
+	}
+
+	if (BaseStructMeta.IsEmpty( ))
+		return FSf_MessageBase::StaticStruct( );
+	
+	if (const auto BaseScriptStruct = UClass::TryFindTypeSlow< UScriptStruct >( BaseStructMeta ))
+		return BaseScriptStruct;
+
+	UE_LOG( LogStarfireMessenger, Warning, TEXT( "Unable to find struct at %s." ), *BaseStructMeta );
+	return FSf_MessageBase::StaticStruct( );
 }
 
 #undef LOCTEXT_NAMESPACE

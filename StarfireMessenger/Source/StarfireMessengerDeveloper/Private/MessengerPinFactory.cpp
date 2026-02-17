@@ -13,7 +13,7 @@ TSharedPtr< SGraphPin > FMessengerPinFactory::CreatePin( UEdGraphPin *InPin ) co
 	if (const auto CastNode = Cast< UK2Node_CastMessage >( Node ))
 	{
 		if (CastNode->GetTypePin( ) == InPin)
-			return SNew( SGraphPinMessengerType, InPin, CastNode->GetBaseAllowedType( ), CastNode->bAllowsAbstract );
+			return SNew( SGraphPinMessengerType, InPin, UK2Node_MessengerNodeBase::GetBaseAllowedType( CastNode->GetCastSourcePin( ) ), CastNode->bAllowsAbstract );
 	}
 	
 	if (const auto BaseNode = Cast< UK2Node_MessengerNodeBase >( Node ))

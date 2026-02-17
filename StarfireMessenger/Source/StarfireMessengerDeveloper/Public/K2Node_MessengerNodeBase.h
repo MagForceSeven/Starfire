@@ -45,6 +45,10 @@ public:
 	// Sets the force impure state of the node
 	virtual void SetPurity( bool bNewPurity );
 
+	// Determine what the most restrictive type for the outputs should be
+	// based on the 'BaseStruct' metadata connected to an input pin
+	static const UScriptStruct* GetBaseAllowedType( const UEdGraphPin *InputPin );
+
 protected:
 	// Pin Names
 	static const FName MessengerPinName;
@@ -75,6 +79,10 @@ protected:
 	bool bAllowsAbstract = false;
 	// Whether the derived type requires to context pin to be connected
 	bool bRequiresContext = false;
+	
+	// copied from Epic's ConstructObjectFromClass node
+	// Constructing FText strings can be costly, so we cache the node's title
+	FNodeTextCache CachedNodeTitle;
 
 	friend class FMessengerPinFactory;
 };

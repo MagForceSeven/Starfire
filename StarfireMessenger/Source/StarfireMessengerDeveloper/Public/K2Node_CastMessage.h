@@ -32,10 +32,6 @@ public:
 	UEdGraphPin* GetCastSourcePin( void ) const;
 	UEdGraphPin* GetCastResultPin( void ) const;
 
-	// Determine what the most restrictive type for the outputs should be
-	// based on the 'BaseStruct' metadata of the CastSource input pin
-	const UScriptStruct* GetBaseAllowedType( void ) const;
-
 private:
 	// Pin Names
 	static const FName CastSourcePinName;
