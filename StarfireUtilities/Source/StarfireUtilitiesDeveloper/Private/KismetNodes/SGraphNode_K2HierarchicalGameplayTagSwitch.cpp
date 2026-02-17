@@ -91,6 +91,7 @@ void SGraphNode_K2HierarchicalGameplayTagSwitch::CreateOutputSideAddButton( TSha
 	OutputBox->AddSlot( )
 		.AutoHeight( )
 		.VAlign( VAlign_Center )
+		.HAlign( HAlign_Right )
 		.Padding( AddPinPadding )
 		[
 			AddPinButton
