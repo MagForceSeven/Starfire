@@ -55,6 +55,7 @@ void UK2Node_StartListeningForMessage::AllocateDefaultPins( )
 	if (bListenHierarchically)
 	{
 		MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
+		MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName_Instanced", "Instanced Message" );
 		StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
 	}
 }
@@ -111,11 +112,20 @@ void UK2Node_StartListeningForMessage::PostEditChangeChainProperty( FPropertyCha
 		const auto MessageDataPin = GetMessageDataPin(  );
 
 		if (bListenHierarchically)
+		{
 			MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
+			MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName_Instanced", "Instanced Message" );
+		}
 		else if (const auto MessageType = GetMessageType( ))
+		{
 			MessageDataPin->PinType.PinSubCategoryObject = MessageType;
+			MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName", "Message" );
+		}
 		else
+		{
 			MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
+			MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName", "Message" );
+		}
 
 		StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
 		MessageDataPin->BreakAllPinLinks(  );
