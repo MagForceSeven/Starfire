@@ -46,10 +46,6 @@ protected:
 	// Whether an instanced struct should be output instead of the desired message type
 	UPROPERTY( EditDefaultsOnly, Category="Starfire Messenger" )
 	bool bListenHierarchically = false;
-	
-	// copied from Epic's ConstructObjectFromClass node
-	// Constructing FText strings can be costly, so we cache the node's title
-	FNodeTextCache CachedNodeTitle;
 
 	// Message Node Base
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;

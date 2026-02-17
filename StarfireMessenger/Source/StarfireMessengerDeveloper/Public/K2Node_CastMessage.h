@@ -45,8 +45,4 @@ private:
 	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
-
-	// copied from Epic's ConstructObjectFromClass node
-	// Constructing FText strings can be costly, so we cache the node's title
-	FNodeTextCache CachedNodeTitle;
 };

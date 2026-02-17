@@ -35,9 +35,6 @@ protected:
 
 	// Messenger Node API
 	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
-	
-	// Constructing FText strings can be costly, so we cache the node's title
-	FNodeTextCache CachedNodeTitle;
 };
 
 // Wrapper around the 'Clear Stateful Message' function

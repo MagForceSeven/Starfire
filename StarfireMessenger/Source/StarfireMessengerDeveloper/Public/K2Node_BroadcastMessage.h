@@ -26,8 +26,4 @@ protected:
 	// Messenger Node Base API
 	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
-
-	// copied from Epic's ConstructObjectFromClass node
-	// Constructing FText strings can be costly, so we cache the node's title
-	FNodeTextCache CachedNodeTitle;
 };

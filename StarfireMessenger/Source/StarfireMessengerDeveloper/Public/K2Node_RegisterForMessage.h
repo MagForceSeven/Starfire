@@ -74,10 +74,6 @@ protected:
 	UPROPERTY( )
 	FGuid SelectedFunctionGuid;
 
-	// copied from Epic's ConstructObjectFromClass node
-	// Constructing FText strings can be costly, so we cache the node's title
-	FNodeTextCache CachedNodeTitle;
-
 	// The set of functions that define all the function signatures that are possible when registering for various event type/window combinations
 	// Used to aid in the construction of CustomEvents and Functions that match the event.
 	// ReSharper disable CppMemberFunctionMayBeStatic

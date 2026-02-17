@@ -108,6 +108,8 @@ void UK2Node_MessengerNodeBase::OnTypePinChanged( )
 
 	// Mark dirty
 	FBlueprintEditorUtils::MarkBlueprintAsModified( GetBlueprint( ) );
+
+	CachedNodeTitle.MarkDirty( );
 }
 
 void UK2Node_MessengerNodeBase::PostPlacedNewNode( )
