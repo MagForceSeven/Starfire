@@ -281,13 +281,25 @@ To get the best use from Instanced Structs, you should set the "BaseStruct" meta
 
 The good news is that if you use the 'Create matching hierarchical function/event' option of 'Register for Message' or use the 'Listen Hierarchically' checkbox of 'Listen for Message' this is all taken care for you!
 
-From there, you can use the provided 'Cast Message' node to convert the Instanced Struct parameter to the message type of your choice.
+#### Message Casting
+
+With the instanced struct parameter you can use the 'Cast Message' node to convert the Instanced Struct parameter to the message type of your choice.
 
 ![](./Resources/readme_MessageCast.png)
 
 This node functions identically to the cast node used with objects, except for fact that the desired type is selected through a pin drop down instead of there being separate nodes for each type.
 
 The 'BaseStruct' meta is used to limit the cast node's drop down to the potentially relevant message types. If it's not set (because you created the function yourself) or you removed it, no worries. It will still work as expected, you'll just have a larger list of types to choose from. Some of which might never be able to succeed.
+
+#### Switch on Message Type
+
+Another node that can be used with the instanced struct parameter is 'Switch on Message Type'. It works as a combined switch & cast when needing to check for multiple types.
+
+![](.Resources/readme_Switch.png)
+
+In addition to the regular exec pins, data pins are available that are the specified type extracted from the instanced struct.
+
+The 'BaseStruct' meta is also used here to limit the options available from the drop downs in the details panel, though it will show all message types until an input is connected.
 
 ### Stopping Message Listening
 
