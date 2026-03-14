@@ -43,13 +43,6 @@ void UK2Node_ListenForMessage_Event::AllocateDefaultPins( )
 	const auto MessageContext = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Object, MessageContextPinName );
 	MessageContext->PinFriendlyName = FSf_MessageBase::GetDefaultContextPinName( );
 	MessageContext->bHidden = true; // default, will unhide with CreatePinsForType
-
-	if (bListenHierarchically)
-	{
-		MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
-		MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName_Instanced", "Instanced Message" );
-		StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
-	}
 }
 
 bool UK2Node_ListenForMessage_Event::CheckForErrors( const FKismetCompilerContext &CompilerContext ) const
@@ -71,76 +64,42 @@ bool UK2Node_ListenForMessage_Event::CheckForErrors( const FKismetCompilerContex
 	return bErrors;
 }
 
-void UK2Node_ListenForMessage_Event::OnMessageTypeChange( void )
+void UK2Node_ListenForMessage_Event::HandleMessageTypeChanged( )
 {
 	const auto ContextPin = GetMessageContextPin( );
 	const auto MessageDataPin = GetMessageDataPin(  );
 
-	if (MessageType.MessageType != nullptr)
+	if (!MessageType.IsNull( ))
 	{
 		if (const auto ContextType = FSf_MessageBase::GetContextType( MessageType.MessageType ))
 		{
 			ContextPin->bHidden = false;
 			ContextPin->PinType.PinSubCategoryObject = ContextType.Get( );
 			ContextPin->PinFriendlyName = FSf_MessageBase::GetContextPinName( MessageType.MessageType );
-			StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "ContextPin_Tooltip", "Object context that is to be associated with the event (allows for event filtering so listeners don't have to listen to all messages of a certain type)" ) );
-			StarfireK2Utilities::RefreshAllowedConnections( this, ContextPin );
 		}
 		else
 		{
-			ContextPin->bHidden = true;
+			ContextPin->bHidden = !bListenHierarchically;
 			ContextPin->PinType.PinSubCategoryObject = UObject::StaticClass( );
-			ContextPin->BreakAllPinLinks( );
+			ContextPin->PinFriendlyName = FSf_MessageBase::GetDefaultContextPinName( );
 		}
+		StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "ContextPin_Tooltip", "Object context that is associated with the message" ) );
+		StarfireK2Utilities::RefreshAllowedConnections( this, ContextPin );
+		
+		if (bListenHierarchically)
+			MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
+		else
+			MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct* >( MessageType.MessageType.Get( ) );
 
-		if (!bListenHierarchically)
-		{
-			MessageDataPin->PinType.PinSubCategoryObject = const_cast<UScriptStruct*>(MessageType.MessageType.Get());
-			StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
-		}
-		StarfireK2Utilities::RefreshAllowedConnections( this, MessageDataPin );
+		MessageDataPin->bNotConnectable = false;
 	}
 	else
 	{
 		ContextPin->bHidden = true;
 		ContextPin->BreakAllPinLinks( );
 
-		if (!bListenHierarchically)
-		{
-			if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
-			else if (MessageType.bAllowImmediate)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Immediate::StaticStruct( );
-			else if (MessageType.bAllowStateful)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Stateful::StaticStruct( );
-			else
-				ensureAlways( false );
-			
-			MessageDataPin->BreakAllPinLinks(  );
-			StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
-		}
-		else
-		{
-			StarfireK2Utilities::RefreshAllowedConnections( this, MessageDataPin );
-		}
-	}
-
-	CachedNodeTitle.MarkDirty( );
-}
-
-void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChangedChainEvent &PropertyChangedEvent )
-{
-	Super::PostEditChangeChainProperty( PropertyChangedEvent );
-
-	const auto ChainNode = PropertyChangedEvent.PropertyChain.GetActiveNode( );
-	if (ChainNode->GetValue( )->GetFName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_ListenForMessage_Event, bListenHierarchically ))
-	{
-		const auto MessageDataPin = GetMessageDataPin( );
-
 		if (bListenHierarchically)
 			MessageDataPin->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
-		else if (MessageType.MessageType != nullptr)
-			MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.MessageType.Get( ) );
 		else if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
 			MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
 		else if (MessageType.bAllowImmediate)
@@ -150,13 +109,30 @@ void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChang
 		else
 			ensureAlways( false );
 
-		if (bListenHierarchically)
-			MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName_Instanced", "Instanced Message" );
-		else
-			MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName", "Message" );
+		MessageDataPin->bNotConnectable = true;
+	}
 
-		StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
-		MessageDataPin->BreakAllPinLinks(  );
+	if (bListenHierarchically)
+		MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName_Instanced", "Instanced Message" );
+	else
+		MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName", "Message" );
+
+	StarfireK2Utilities::SetPinToolTip( MessageDataPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
+	StarfireK2Utilities::RefreshAllowedConnections( this, MessageDataPin );
+
+	CachedNodeTitle.MarkDirty( );
+
+	OnMessageTypeChanged( );
+}
+
+void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChangedChainEvent &PropertyChangedEvent )
+{
+	Super::PostEditChangeChainProperty( PropertyChangedEvent );
+
+	const auto ChainNode = PropertyChangedEvent.PropertyChain.GetActiveNode( );
+	if (ChainNode->GetValue( )->GetFName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_ListenForMessage_Event, bListenHierarchically ))
+	{
+		HandleMessageTypeChanged( );
 		
 		// Poke the graph to update the visuals based on the above changes
 		GetGraph( )->NotifyGraphChanged( );
@@ -165,26 +141,7 @@ void UK2Node_ListenForMessage_Event::PostEditChangeChainProperty( FPropertyChang
 	else if (ChainNode->GetValue( )->GetFName( ) == GET_MEMBER_NAME_CHECKED( UK2Node_ListenForMessage_Event, MessageType ))
 		// This catches both the changes to the FStarfireMessage type instance as well as the MessageType member of that type
 	{
-		const auto MessageDataPin = GetMessageDataPin( );
-
-		if (MessageType.MessageType != nullptr)
-		{
-			if (!bListenHierarchically)
-				MessageDataPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct*>( MessageType.MessageType.Get( ) );
-		}
-		else
-		{
-			if (MessageType.bAllowImmediate && MessageType.bAllowStateful)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_MessageBase::StaticStruct( );
-			else if (MessageType.bAllowImmediate)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Immediate::StaticStruct( );
-			else if (MessageType.bAllowStateful)
-				MessageDataPin->PinType.PinSubCategoryObject = FSf_Message_Stateful::StaticStruct( );
-			else
-				ensureAlways( false );
-		}
-
-		OnMessageTypeChange( );
+		HandleMessageTypeChanged( );
 
 		// Poke the graph to update the visuals based on the above changes
 		GetGraph( )->NotifyGraphChanged( );
@@ -196,14 +153,14 @@ void UK2Node_ListenForMessage_Event::PostPlacedNewNode( )
 {
 	Super::PostPlacedNewNode( );
 
-	OnMessageTypeChange( );
+	HandleMessageTypeChanged( );
 }
 
 void UK2Node_ListenForMessage_Event::ReallocatePinsDuringReconstruction( TArray< UEdGraphPin* > &OldPins )
 {
-	AllocateDefaultPins();
+	AllocateDefaultPins( );
 
-	OnMessageTypeChange( );
+	HandleMessageTypeChanged( );
 
 	RestoreSplitPins( OldPins );
 }

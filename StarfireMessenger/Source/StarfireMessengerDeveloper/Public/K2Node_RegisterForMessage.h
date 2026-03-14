@@ -58,13 +58,6 @@ protected:
 
 	// Determine what the current signature should be based on the node settings and inputs
 	void UpdateFunctionSignature( const UScriptStruct *InType = nullptr );
-	
-	// Based on pins and configuration options, determine which function should be used to format the delegate
-	[[nodiscard]] UFunction* DetermineSignatureFunction( const UScriptStruct *InType = nullptr ) const;
-
-	// Hold onto a reference to the function that defines the signature of the delegate
-	UPROPERTY( )
-	TSoftObjectPtr< UFunction > SignatureFunction;
 
 	// The function name that should be registered
 	UPROPERTY( meta = (BlueprintSearchable = true) )
@@ -73,6 +66,9 @@ protected:
 	// A stable identifier for the function that should be registered
 	UPROPERTY( )
 	FGuid SelectedFunctionGuid;
+
+	// Flag that the SGraphNode can set to temporarily adjust the signature for generated functions & events
+	bool bListenHeirarchical = false;
 
 	// The set of functions that define all the function signatures that are possible when registering for various event type/window combinations
 	// Used to aid in the construction of CustomEvents and Functions that match the event.
@@ -86,4 +82,6 @@ protected:
 	UFUNCTION( )
 	void StatefulContextSignature( const FSf_MessageBase &Message, EStatefulMessageEvent Type, UObject *Context ) { }
 	// ReSharper restore CppMemberFunctionMayBeStatic
+
+	friend class SGraphNode_K2RegisterMessage;
 };

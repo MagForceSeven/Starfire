@@ -45,9 +45,6 @@ void UK2Node_RegisterForMessage::AllocateDefaultPins( )
 	const auto HandlePin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Struct, FMessageListenerHandle::StaticStruct( ), HandlePinName );
 	HandlePin->PinFriendlyName = LOCTEXT( "HandlePin_FriendlyName", "Listener Handle" );
 	HandlePin->PinToolTip = LOCTEXT( "HandlePin_Tooltip", "A handle that can be used to refer to/modify this event registration" ).ToString( );
-
-	if (SignatureFunction == nullptr)
-		SignatureFunction = DetermineSignatureFunction( );
 }
 
 bool UK2Node_RegisterForMessage::IsMessageVarPin( UEdGraphPin *Pin ) const
@@ -155,7 +152,6 @@ void UK2Node_RegisterForMessage::CreatePinsForType( const UScriptStruct *InType,
 
 	if (InType == nullptr)
 	{
-		SignatureFunction = nullptr;
 		SelectedFunctionName = { };
 		SelectedFunctionGuid.Invalidate( );
 	}
@@ -166,33 +162,8 @@ void UK2Node_RegisterForMessage::CreatePinsForType( const UScriptStruct *InType,
 }
 
 void UK2Node_RegisterForMessage::UpdateFunctionSignature( const UScriptStruct *InType )
-{
-	SignatureFunction = DetermineSignatureFunction( InType );
-	
+{	
 	HandleAnyChange( true );
-}
-
-UFunction* UK2Node_RegisterForMessage::DetermineSignatureFunction( const UScriptStruct *InType ) const
-{
-	const auto MessageType = (InType == nullptr) ? GetMessageType( ) : InType;
-	if (MessageType == nullptr)
-		return nullptr;
-
-	const auto ContextType = FSf_MessageBase::GetContextType( MessageType );
-	const auto RegisterNode_CDO = GetDefault< UK2Node_RegisterForMessage >( );
-
-	if (FSf_MessageBase::IsMessageTypeStateful( MessageType ))
-	{
-		if (ContextType != nullptr)
-			return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, StatefulContextSignature ) );
-		
-		return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, StatefulSignature ) );
-	}
-
-	if (ContextType != nullptr)
-		return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, ImmediateContextSignature ) );
-	
-	return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, ImmediateSignature ) );
 }
 
 bool UK2Node_RegisterForMessage::IsFunctionCompatible( const UFunction *Function ) const
@@ -202,21 +173,10 @@ bool UK2Node_RegisterForMessage::IsFunctionCompatible( const UFunction *Function
 		return false;
 
 	const auto bIsStateful = FSf_MessageBase::IsMessageTypeStateful( MessageType );
-	const auto ContextType = FSf_MessageBase::GetContextType( MessageType ).Get( );
 
-	int NumExpectedParams = 1; // Always have message data
-
-	if (bIsStateful)
-		++NumExpectedParams; // Stateful handlers add another parameter
-
-	if (ContextType != nullptr)
-		++NumExpectedParams; // A context adds another parameter
-
-	if (Function->NumParms != NumExpectedParams)
-		return false; // params won't possibly match up, bail
-
-	const auto InstancedStructType = TBaseStructure< FInstancedStruct >::Get( );
-	const auto StatefulEventTypeEnum = StaticEnum< EStatefulMessageEvent >( );
+	const FStructProperty *MessageParam = nullptr;
+	const FEnumProperty *StatefulnessParam = nullptr;
+	const FObjectPropertyBase *ContextParam = nullptr;
 
 	int ParamCount = 0;
 	for (TFieldIterator< FProperty > It( Function ); It; ++It)
@@ -234,60 +194,76 @@ bool UK2Node_RegisterForMessage::IsFunctionCompatible( const UFunction *Function
 		const auto bIsContextParam = (!bIsStateful && (ParamCount == 1)) || (bIsStateful && (ParamCount == 2));
 
 		if (bIsMessageParam)
-		{
-			const auto StructProperty = CastField< FStructProperty >( ParamProperty );
-			if (StructProperty == nullptr)
-				return false; // Not remotely the right parameter type
-
-			if (!StructProperty->HasAllPropertyFlags( CPF_ReferenceParm ))
-				return false; // Message data must be getting passed by reference, not value
-
-			if (StructProperty->Struct == InstancedStructType)
-			{
-				static const FName MD_BaseStruct( "BaseStruct" );
-				if (StructProperty->HasMetaData( MD_BaseStruct ))
-				{
-					const auto &BaseStructName = StructProperty->GetMetaData( MD_BaseStruct );
-					const auto InstancedBaseStruct = UClass::TryFindTypeSlow< UScriptStruct >( BaseStructName );
-					if (InstancedBaseStruct == nullptr)
-						return false; // Probably a bad string, we should only be dealing with native types in this case
-
-					if (!MessageType->IsChildOf( InstancedBaseStruct ))
-						return false; // Message data must be a child-type of the instanced structs minimum configured type
-				}
-				// a non-restricted instanced struct is compatible with any type
-			}
-			else if (!MessageType->IsChildOf( StructProperty->Struct ))
-			{
-				return false; // Message data must be a child-type of the handler param type
-			}
-		}
+			MessageParam = CastField< FStructProperty >( ParamProperty );
 		else if (bIsStatefulnessParam)
-		{
-			const auto EnumProperty = CastField< FEnumProperty >( ParamProperty );
-			if (EnumProperty == nullptr)
-				return false; // Not remotely the right parameter type
-
-			const auto PropertyEnum = EnumProperty->GetEnum( );
-
-			if (PropertyEnum != StatefulEventTypeEnum)
-				return false; // Enumeration param must be the statefulness enum type
-		}
+			StatefulnessParam = CastField< FEnumProperty >( ParamProperty );
 		else if (bIsContextParam)
-		{
-			const auto ObjectProperty = CastField< FObjectPropertyBase >( ParamProperty );
-			if (ObjectProperty == nullptr)
-				return false; // Not remotely the right parameter type
-
-			// Allow the message handler context to be any parent type of the expected context type.
-			// We'll auto-create the most specific one, but if someone wants to make one that takes UObject for some reason, it shouldn't matter
-			if (!ContextType->IsChildOf( ObjectProperty->PropertyClass ))
-				return false;
-		}
+			ContextParam = CastField< FObjectPropertyBase >( ParamProperty );
 
 		++ParamCount;
 	}
-	
+
+	if (MessageParam == nullptr)
+		return false;
+	if (!MessageParam->HasAllPropertyFlags( CPF_ReferenceParm ))
+		return false; // Message data must be getting passed by reference, not value
+
+	static const auto InstancedStructType = TBaseStructure< FInstancedStruct >::Get( );
+	const auto bHierarchicalListening = (MessageParam->Struct == InstancedStructType);
+
+	if (bHierarchicalListening)
+	{
+		static const FName MD_BaseStruct( "BaseStruct" );
+		if (MessageParam->HasMetaData( MD_BaseStruct ))
+		{
+			const auto &BaseStructName = MessageParam->GetMetaData( MD_BaseStruct );
+			const auto InstancedBaseStruct = UClass::TryFindTypeSlow< UScriptStruct >( BaseStructName );
+			if (InstancedBaseStruct == nullptr)
+				return false; // Probably a bad string, we should only be dealing with native types in this case
+
+			if (!MessageType->IsChildOf( InstancedBaseStruct ))
+				return false; // Message data must be a child-type of the instanced structs minimum configured type
+		}
+		// a non-restricted instanced struct is compatible with any type
+	}
+	else if (!MessageType->IsChildOf( MessageParam->Struct ))
+	{
+		return false; // Message data must be a child-type of the handler param type
+	}
+
+	if (bIsStateful)
+	{
+		if (StatefulnessParam == nullptr)
+			return false;
+
+		static const auto StatefulEventTypeEnum = StaticEnum< EStatefulMessageEvent >( );
+		const auto PropertyEnum = StatefulnessParam->GetEnum( );
+
+		if (PropertyEnum != StatefulEventTypeEnum)
+			return false; // Enumeration param must be the statefulness enum type
+	}
+
+	auto ContextType = FSf_MessageBase::GetContextType( MessageType ).Get( );
+	if ((ContextType != nullptr) && (ContextParam == nullptr))
+		return false; // when expecting a context parameter, we have to have one
+
+	if (bHierarchicalListening && (ContextParam == nullptr))
+		return false; // when listening hierarchically, should always have a context param
+	if (!bHierarchicalListening && (ContextType == nullptr) && (ContextParam != nullptr))
+		return false; // for non-hierarchical, no context param is allowed if no context is expected
+
+	// when the context in null and we're listening hierarchically, the only safe param type is UObject
+	if ((ContextType == nullptr) && bHierarchicalListening)
+	{
+		if (ContextParam->PropertyClass != UObject::StaticClass( ))
+			return false;
+	}
+
+	// Allow the message handler context to be any parent type of the expected context type.
+	// We'll auto-create the most specific one, but if someone wants to make one that takes UObject for some reason, it shouldn't matter
+	if ((ContextType != nullptr) && !ContextType->IsChildOf( ContextParam->PropertyClass ))
+		return false;
+
 	return true;
 }
 
@@ -386,7 +362,25 @@ void UK2Node_RegisterForMessage::SetDelegateFunction( FName Name )
 
 UFunction* UK2Node_RegisterForMessage::GetDelegateSignature( ) const
 {
-	return SignatureFunction.Get( );
+	const auto MessageType = GetMessageType( );
+	if (MessageType == nullptr)
+		return nullptr;
+
+	const auto ContextType = FSf_MessageBase::GetContextType( MessageType );
+	const auto RegisterNode_CDO = GetDefault< UK2Node_RegisterForMessage >( );
+
+	if (FSf_MessageBase::IsMessageTypeStateful( MessageType ))
+	{
+		if ((ContextType != nullptr) || bListenHeirarchical)
+			return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, StatefulContextSignature ) );
+		
+		return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, StatefulSignature ) );
+	}
+
+	if ((ContextType != nullptr) || bListenHeirarchical)
+		return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, ImmediateContextSignature ) );
+	
+	return RegisterNode_CDO->FindFunctionChecked( GET_FUNCTION_NAME_CHECKED( UK2Node_RegisterForMessage, ImmediateSignature ) );
 }
 
 FName UK2Node_RegisterForMessage::GetDelegateFunctionName( ) const

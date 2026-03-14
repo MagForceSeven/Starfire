@@ -121,13 +121,17 @@ void SGraphNode_K2RegisterMessage::OnNewFunction( UFunction *NewFunction ) const
 
 void SGraphNode_K2RegisterMessage::OnFunctionSelected( TSharedPtr< FString > FunctionItemData, ESelectInfo::Type SelectInfo )
 {
+	const auto Node = CastChecked< UK2Node_RegisterForMessage >( GraphNode );
+
 	if (FunctionItemData == CreateMatchingHierarchicalFunctionData)
 	{
+		Node->bListenHeirarchical = true;
 		bCreateHierarchical = true;
 		SGraphNode_K2SelectDelegate::OnFunctionSelected( CreateMatchingFunctionData, SelectInfo );
 	}
 	else if (FunctionItemData == CreateMatchingHierarchicalEventData)
 	{
+		Node->bListenHeirarchical = true;
 		bCreateHierarchical = true;
 		SGraphNode_K2SelectDelegate::OnFunctionSelected( CreateMatchingEventData, SelectInfo );
 	}
@@ -136,6 +140,7 @@ void SGraphNode_K2RegisterMessage::OnFunctionSelected( TSharedPtr< FString > Fun
 		SGraphNode_K2SelectDelegate::OnFunctionSelected( FunctionItemData, SelectInfo );
 	}
 
+	Node->bListenHeirarchical = false;
 	bCreateHierarchical = false;
 }
 

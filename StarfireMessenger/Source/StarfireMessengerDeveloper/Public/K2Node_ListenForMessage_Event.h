@@ -57,11 +57,14 @@ protected:
 	// The type of message this listener should handle
 	UPROPERTY( EditDefaultsOnly, Category="Starfire Messenger" )
 	FStarfireMessageType MessageType;
-	
+
+	// Respond to changes that affect the message type and/or context pin
+	void HandleMessageTypeChanged( void );
+
 	// Hook for derived nodes to handle the message type changing
-	virtual void OnMessageTypeChange( void );
-	
-	// Hook for checking node configuration error prior to compile
+	virtual void OnMessageTypeChanged( void ) { };
+
+	// Hook for checking node configuration errors prior to compile
 	[[nodiscard]] virtual bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) const;
 
 	// copied from Epic's ConstructObjectFromClass node

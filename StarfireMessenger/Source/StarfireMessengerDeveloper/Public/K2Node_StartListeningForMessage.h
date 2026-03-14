@@ -46,10 +46,12 @@ protected:
 	// Whether an instanced struct should be output instead of the desired message type
 	UPROPERTY( EditDefaultsOnly, Category="Starfire Messenger" )
 	bool bListenHierarchically = false;
+	
+	//
+	void HandleMessageTypeChange( const UScriptStruct *InType );
 
 	// Message Node Base
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
-	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 
 	// Spawn the node that can be used to call the Messenger's 'Start Listening for Message K2' function
