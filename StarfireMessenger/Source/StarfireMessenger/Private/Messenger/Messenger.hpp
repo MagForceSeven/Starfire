@@ -7,6 +7,35 @@
 #include "StructView.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
+template < CImmediateWithContextType type_t, class in_context_t >
+	requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+typename type_t::ContextType* UStarfireMessenger::CastContext( in_context_t *Context )
+{
+	return CastChecked< typename type_t::ContextType >( Context );
+}
+
+template < CImmediateWithContextType type_t, class in_context_t >
+	requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+const typename type_t::ContextType* UStarfireMessenger::CastContext( const in_context_t *Context )
+{
+	return CastChecked< typename type_t::ContextType >( Context );
+}
+
+template < CStatefulWithContextType type_t, class in_context_t >
+	requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+typename type_t::ContextType* UStarfireMessenger::CastContext( in_context_t *Context )
+{
+	return CastChecked< typename type_t::ContextType >( Context );
+}
+
+template < CStatefulWithContextType type_t, class in_context_t >
+	requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+const typename type_t::ContextType* UStarfireMessenger::CastContext( const in_context_t *Context )
+{
+	return CastChecked< typename type_t::ContextType >( Context );
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CImmediateNoContextType type_t >
 	requires (!CAbstractMessageType< type_t >)
 void UStarfireMessenger::Broadcast( const type_t &Message )
@@ -117,6 +146,38 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const UObje
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
 }
 
+template < CImmediateNoContextType type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, UObject* )> &&Callback )
+{
+	const auto MessageType = type_t::StaticStruct( );
+
+	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		const auto &Message = View.Get< const type_t >( );
+
+		InnerCallback( Message, Context );
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, nullptr, nullptr );
+}
+
+template < CImmediateNoContextType type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const UObject *Owner, TFunction< void ( const TConstStructView< type_t >&, UObject* )> &&Callback )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const UObject > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (WeakOwner.IsValid( ))
+		{
+			const auto &Message = View.Get< const type_t >( );
+
+			InnerCallback( Message, Context );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
 template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
 	requires SFstd::derived_from< type_t, other_type_t >
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) )
@@ -190,6 +251,86 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
 			(StrongOwner->*Callback)( TypedView );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, UObject* ) )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Context );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, UObject* ) const )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Context );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const UObject* ) )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Context );
+		}
+	};
+	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
+}
+
+template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const UObject* ) const )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Context );
 		}
 	};
 	return StartListeningForMessageInternal( MessageType, BoxedCallback, Owner, nullptr );
@@ -441,6 +582,38 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const UObje
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
 }
 
+template < CStatefulNoContextType type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent, UObject* )> &&Callback )
+{
+	const auto MessageType = type_t::StaticStruct( );
+
+	auto BoxedCallback = [ InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		const auto &Message = View.Get< const type_t >( );
+
+		InnerCallback( Message, Type, Context );
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, nullptr, nullptr, false );
+}
+
+template < CStatefulNoContextType type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const UObject *Owner, TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent, UObject* )> &&Callback )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const UObject > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, InnerCallback = MoveTemp( Callback ) ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (WeakOwner.IsValid( ))
+		{
+			const auto &Message = View.Get< const type_t >( );
+
+			InnerCallback( Message, Type, Context );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
+}
+
 template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
 	requires SFstd::derived_from< type_t, other_type_t >
 FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) )
@@ -514,6 +687,86 @@ FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner
 			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
 
 			(StrongOwner->*Callback)( TypedView, Type );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
+}
+
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, UObject* ) )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Type, Context );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
+}
+
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, UObject* ) const )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Type, Context );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
+}
+
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, const UObject* ) )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Type, Context );
+		}
+	};
+	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );
+}
+
+template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t >
+	requires SFstd::derived_from< type_t, other_type_t >
+FMessageListenerHandle UStarfireMessenger::StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, const UObject* ) const )
+{
+	const auto MessageType = type_t::StaticStruct( );
+	TWeakObjectPtr< const owner_t > WeakOwner( Owner );
+
+	auto BoxedCallback = [ WeakOwner, Callback ]( const FConstStructView &View, UObject* Context, EStatefulMessageEvent Type ) -> void
+	{
+		if (const auto StrongOwner = WeakOwner.Get())
+		{
+			TConstStructView< other_type_t > TypedView;
+			TypedView.SetStructData( View.GetScriptStruct( ), View.GetMemory( ) );
+
+			(StrongOwner->*Callback)( TypedView, Type, Context );
 		}
 	};
 	return StartListeningForStatefulMessageInternal( MessageType, BoxedCallback, Owner, nullptr, false );

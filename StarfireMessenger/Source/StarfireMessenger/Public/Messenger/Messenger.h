@@ -121,13 +121,13 @@ concept CContextlessConstructorVarArgsMatch = requires( args_t && ... args )
 // Collection of concepts for checking the viability of using a functor for the specific signatures of each callback
 
 template < class message_t, class func_t >
-concept CMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t& >;
+concept CMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t& > || std::is_invocable_r_v< void, std::decay_t< func_t >, const TConstStructView< message_t >&, UObject* >;
 
 template < class message_t, class func_t >
 concept CContextMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, typename message_t::ContextType* >;
 
 template < class message_t, class func_t >
-concept CStatefulMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, EStatefulMessageEvent >;
+concept CStatefulMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, EStatefulMessageEvent > || std::is_invocable_r_v< void, std::decay_t< func_t >, const TConstStructView< message_t >&, EStatefulMessageEvent, UObject* >;
 
 template < class message_t, class func_t >
 concept CContextStatefulMessageCallbackCallable = std::is_invocable_r_v< void, std::decay_t< func_t >, const message_t&, typename message_t::ContextType*, EStatefulMessageEvent >;
@@ -142,6 +142,27 @@ class STARFIREMESSENGER_API UStarfireMessenger : public UWorldSubsystem
 public:
 	// Subsystem Accessor
 	[[nodiscard]] static UStarfireMessenger* GetSubsystem( const UObject *WorldContext );
+	
+	template < CImmediateWithContextType type_t, class in_context_t >
+		requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+	[[nodiscard]] static typename type_t::ContextType* CastContext( in_context_t *Context );
+	template < CImmediateWithContextType type_t, class in_context_t >
+		requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+	[[nodiscard]] static const typename type_t::ContextType* CastContext( const in_context_t *Context );
+
+	template < CStatefulWithContextType type_t, class in_context_t >
+		requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+	[[nodiscard]] static typename type_t::ContextType* CastContext( in_context_t *Context );
+	template < CStatefulWithContextType type_t, class in_context_t >
+		requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
+	[[nodiscard]] static const typename type_t::ContextType* CastContext( const in_context_t *Context );
+	
+	template < CImmediateWithContextType type_t, class in_context_t >
+		requires (SFstd::derived_from< typename type_t::ContextType, in_context_t > && !SFstd::is_mutable_pointer< typename type_t::ContextType* >)
+	[[nodiscard]] static typename type_t::ContextType* CastContext( in_context_t* ) = delete;
+	template < CStatefulWithContextType type_t, class in_context_t >
+		requires (SFstd::derived_from< typename type_t::ContextType, in_context_t > && !SFstd::is_mutable_pointer< typename type_t::ContextType* >)
+	[[nodiscard]] static typename type_t::ContextType* CastContext( in_context_t* ) = delete;
 
 	// Broadcast an immediate message out to the listeners that have registered for it
 	template < CImmediateNoContextType type_t >
@@ -211,6 +232,11 @@ public:
 	template < CImmediateNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t& )> &&Callback );
 
+	template < CImmediateNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, UObject* )> &&Callback );
+	template < CImmediateNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const TConstStructView< type_t >&, UObject* )> &&Callback );
+
 	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t& ) );
@@ -224,6 +250,20 @@ public:
 	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >& ) const );
+
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, UObject* ) );
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, UObject* ) const );
+
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const UObject* ) );
+	template < CImmediateNoContextType type_t, CImmediateNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, const UObject* ) const );
 
 	// Overloads to start listening for a message that requires a context
 	template < CImmediateWithContextType type_t >
@@ -265,6 +305,11 @@ public:
 	template < CStatefulNoContextType type_t >
 	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const type_t&, EStatefulMessageEvent )> &&Callback );
 
+	template < CStatefulNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent, UObject* )> &&Callback );
+	template < CStatefulNoContextType type_t >
+	FMessageListenerHandle StartListeningForMessage( const UObject *Owner, TFunction< void ( const TConstStructView< type_t >&, EStatefulMessageEvent, UObject* )> &&Callback );
+
 	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const other_type_t&, EStatefulMessageEvent ) );
@@ -278,6 +323,21 @@ public:
 	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
 		requires SFstd::derived_from< type_t, other_type_t >
 	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent ) const );
+
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, UObject* ) );
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, UObject* ) const );
+
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, const UObject* ) );
+	template < CStatefulNoContextType type_t, CStatefulNoContextType other_type_t, class owner_t = UObject >
+		requires SFstd::derived_from< type_t, other_type_t >
+	FMessageListenerHandle StartListeningForMessage( const owner_t *Owner, void (owner_t::* Callback)( const TConstStructView< other_type_t >&, EStatefulMessageEvent, const UObject* ) const );
+
 
 	// Overloads to start listening for a stateful message that requires a context
 	template < CStatefulWithContextType type_t >

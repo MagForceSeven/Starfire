@@ -571,6 +571,20 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_H );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >& ) -> void { } );
+
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler_H_Context );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler_H_Context);
+	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler_H_Context );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_H_Context );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >&, UObject* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >&, UObject* ) -> void { } );
+
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_Handler_H_ConstContext );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_ConstHandler_H_ConstContext );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( &AMessengerCompileTests::NC_StaticHandler_H_ConstContext );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_StaticHandler_H_ConstContext );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( [ ]( const TConstStructView< FMessageTest_NoContext >&, const UObject* ) -> void { } );
+	Router->StartListeningForMessage< FMessageTest_NoContext >( this, [ ]( const TConstStructView< FMessageTest_NoContext >&, const UObject* ) -> void { } );
 #if SFM_CHECK_ERRORS
 	// Can't listen to parent type and expect a child type	
 	Router->StartListeningForMessage< FMessageTest_NoContext >( this, &AMessengerCompileTests::NC_HandlerC_H );
@@ -669,6 +683,21 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent ) -> void { } );
+
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler_H_Context );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H_Context );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Context );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H_Context );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, UObject* ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, UObject* ) -> void { } );
+
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_Handler_H_ConstContext );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_ConstHandler_H_ConstContext );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( &AMessengerCompileTests::NC_Stateful_StaticHandler_H_ConstContext );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_StaticHandler_H_ConstContext );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, const UObject* ) -> void { } );
+	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, [ ]( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, const UObject* ) -> void { } );
+
 #if SFM_CHECK_ERRORS
 	// Can't listen to parent type and expect a child type
 	Router->StartListeningForMessage< FStatefulTest_NoContext >( this, &AMessengerCompileTests::NC_Stateful_HandlerC_H );
@@ -734,5 +763,61 @@ void AMessengerCompileTests::BeginPlay( )
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, &AMessengerCompileTests::NC_Stateful_ConstHandlerC_H_Wrong );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
 	Router->StartListeningForMessage< FStatefulTest_NoContext_C >( this, [ ]( const TConstStructView< FStatefulTest_NoContext_C >&, int ) -> void { } );
+#endif
+}
+
+void AMessengerCompileTests::CastContext_Immediate( const TConstStructView< FMessageTest_Cast_Base_NoContext >&, UObject *InContext )
+{
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child1 >( InContext ); }
+#if SFM_CHECK_ERRORS
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child2 >( InContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child3 >( InContext ); }
+
+	APlayerController *FailContext = nullptr;
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child1 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child2 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child3 >( FailContext ); }
+#endif
+}
+
+void AMessengerCompileTests::CastConstContext_Immediate( const TConstStructView< FMessageTest_Cast_Base_NoContext >&, const UObject *InContext )
+{
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child1 >( InContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child3 >( InContext ); }
+#if SFM_CHECK_ERRORS
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child2 >( InContext ); }
+
+	APlayerController *FailContext = nullptr;
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child1 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child2 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FMessageTest_Cast_Child3 >( FailContext ); }
+#endif
+}
+
+void AMessengerCompileTests::CastContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, UObject *InContext )
+{
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child1 >( InContext ); }
+#if SFM_CHECK_ERRORS
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child2 >( InContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child3 >( InContext ); }
+
+	APlayerController *FailContext = nullptr;
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child1 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child2 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child3 >( FailContext ); }
+#endif
+}
+
+void AMessengerCompileTests::CastConstContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, const UObject *InContext )
+{
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child1 >( InContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child3 >( InContext ); }
+#if SFM_CHECK_ERRORS
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child2 >( InContext ); }
+
+	APlayerController *FailContext = nullptr;
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child1 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child2 >( FailContext ); }
+	{ const auto Context = UStarfireMessenger::CastContext< FStatefulMessageTest_Cast_Child3 >( FailContext ); }
 #endif
 }

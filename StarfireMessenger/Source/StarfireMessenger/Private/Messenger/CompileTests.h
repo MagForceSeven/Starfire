@@ -22,6 +22,9 @@ struct FStatefulTest_Const_C;
 struct FMessageTest_NoContext_C;
 struct FStatefulTest_NoContext_C;
 
+struct FMessageTest_Cast_Base_NoContext;
+struct FStatefulMessageTest_Cast_Base_NoContext;
+
 enum class EStatefulMessageEvent : uint8;
 
 //
@@ -153,6 +156,13 @@ public:
 	void NC_HandlerC_H_Extra( const TConstStructView< FMessageTest_NoContext_C >&, int ) { }
 	void NC_ConstHandlerC_H_Extra( const TConstStructView< FMessageTest_NoContext_C >&, int ) const { }
 
+	void NC_Handler_H_Context( const TConstStructView< FMessageTest_NoContext >&, UObject* ) { }
+	void NC_ConstHandler_H_Context( const TConstStructView< FMessageTest_NoContext >&, UObject* ) const { }
+	static void NC_StaticHandler_H_Context( const TConstStructView< FMessageTest_NoContext >&, UObject* ) { }
+	void NC_Handler_H_ConstContext( const TConstStructView< FMessageTest_NoContext >&, const UObject* ) { }
+	void NC_ConstHandler_H_ConstContext( const TConstStructView< FMessageTest_NoContext >&, const UObject* ) const { }
+	static void NC_StaticHandler_H_ConstContext( const TConstStructView< FMessageTest_NoContext >&, const UObject* ) { }
+
 	void NC_Stateful_Handler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) { }
 	void NC_Stateful_ConstHandler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) const { }
 	static void NC_Stateful_StaticHandler( const FStatefulTest_NoContext&, EStatefulMessageEvent ) { }
@@ -174,6 +184,19 @@ public:
 	static void NC_Stateful_StaticHandler_H_Wrong( const TConstStructView< FStatefulTest_NoContext >&, int ) { }
 	void NC_Stateful_HandlerC_H_Wrong( const TConstStructView< FStatefulTest_NoContext_C >&, int ) { }
 	void NC_Stateful_ConstHandlerC_H_Wrong( const TConstStructView< FStatefulTest_NoContext_C >&, int ) const { }
+
+	void NC_Stateful_Handler_H_Context( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, UObject* ) { }
+	void NC_Stateful_ConstHandler_H_Context( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, UObject* ) const { }
+	static void NC_Stateful_StaticHandler_H_Context( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, UObject* ) { }
+	void NC_Stateful_Handler_H_ConstContext( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, const UObject* ) { }
+	void NC_Stateful_ConstHandler_H_ConstContext( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, const UObject* ) const { }
+	static void NC_Stateful_StaticHandler_H_ConstContext( const TConstStructView< FStatefulTest_NoContext >&, EStatefulMessageEvent, const UObject* ) { }
+
+	void CastContext_Immediate( const TConstStructView< FMessageTest_Cast_Base_NoContext >&, UObject* );
+	void CastConstContext_Immediate( const TConstStructView< FMessageTest_Cast_Base_NoContext >&, const UObject* );
+	void CastContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, UObject* );
+	void CastConstContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, const UObject* );
+};
 };
 
 USTRUCT( meta = (Hidden) )

@@ -274,6 +274,16 @@ and child types can be extracted through use of the `TConstStructView::GetPtr` A
 const FTestImmediateNoContext_C* Maybe_C = Message.GetPtr< FTestImmediateContext_C >( );
 ```
 
+To support all hierarchical cases, this variation of message handler is also allowed:
+```
+void Handler( const TConstStructView< FTestImmediateNoContext >& Message, UObject* Context );
+```
+This is because while `FTestImmediateNoContext` may be a message type that doesn't require a context, a derived message type may have a context type.
+The Messenger subsystem provides a helpful utility wrapper around `Cast` to safely cast to the expected type:
+```
+auto CastContext = UStarfireMessenger::CastContext< FChildMessage >( Context );
+```
+
 Unfortunately, this solution is not directly available to Blueprint and instead the system relies on Instanced Structs.
 
 Instanced Structs are a struct that can act as a structure of any type and attempt to provide versions of itself of related types.
