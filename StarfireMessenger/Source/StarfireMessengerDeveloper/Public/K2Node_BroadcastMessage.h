@@ -24,6 +24,6 @@ public:
 	
 protected:
 	// Messenger Node Base API
-	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
+	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
 };

@@ -34,7 +34,7 @@ protected:
 	FMemberReference FunctionReference;
 
 	// Messenger Node API
-	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
+	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins ) override;
 };
 
 // Wrapper around the 'Clear Stateful Message' function

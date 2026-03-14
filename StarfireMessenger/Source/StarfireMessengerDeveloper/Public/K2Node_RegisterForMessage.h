@@ -49,7 +49,7 @@ protected:
 	static const FName HandlePinName;
 
 	// Message Node Base API
-	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
+	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
 

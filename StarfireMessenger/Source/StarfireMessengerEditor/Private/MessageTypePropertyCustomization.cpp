@@ -135,6 +135,9 @@ FText FStarfireMessageTypePropertyCustomization::GetMessageTypeName( void ) cons
 	
 	if (Structs.Num( ) > 1)
 		return LOCTEXT("Multiples", "Multiple Values");
+		
+	if (Structs[ 0 ] == nullptr)
+		return LOCTEXT("None", "None");
 	
 	if (Structs[ 0 ]->MessageType == nullptr)
 		return LOCTEXT("None", "None");

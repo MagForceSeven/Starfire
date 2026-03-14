@@ -60,7 +60,7 @@ void UK2Node_MessengerNodeBase::AllocateDefaultPins( )
 	ThenPin->bHidden = bIsPure;
 }
 
-void UK2Node_MessengerNodeBase::CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
+void UK2Node_MessengerNodeBase::CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
 {
 	const auto ContextPin = GetContextPin( );
 
@@ -192,7 +192,7 @@ bool UK2Node_MessengerNodeBase::HasExternalDependencies( TArray< UStruct* > *Opt
 	const auto MessageType = GetMessageType( );
 	if ((MessageType != nullptr) && (OptionalOutput != nullptr))
 	{
-		OptionalOutput->AddUnique( MessageType );
+		OptionalOutput->AddUnique( const_cast< UScriptStruct* >( MessageType ) );
 
 		if (const auto ContextType = FSf_MessageBase::GetContextType( MessageType ))
 		{
@@ -262,7 +262,7 @@ UEdGraphPin* UK2Node_MessengerNodeBase::GetContextPin( void ) const
 	return FindPinChecked( ContextPinName );
 }
 
-UScriptStruct* UK2Node_MessengerNodeBase::GetMessageType( const TArray< UEdGraphPin* > *PinsToSearch ) const
+const UScriptStruct* UK2Node_MessengerNodeBase::GetMessageType( const TArray< UEdGraphPin* > *PinsToSearch ) const
 {
 	UScriptStruct *MessageType = nullptr;
 

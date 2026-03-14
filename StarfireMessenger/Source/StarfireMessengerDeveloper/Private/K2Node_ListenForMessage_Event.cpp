@@ -41,7 +41,7 @@ void UK2Node_ListenForMessage_Event::AllocateDefaultPins( )
 	MessageDataPin->PinFriendlyName = LOCTEXT( "MessageDataPin_FriendlyName", "Message" );
 
 	const auto MessageContext = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Object, MessageContextPinName );
-	MessageContext->PinFriendlyName = LOCTEXT( "MessageContext_FriendlyName", "Context" );
+	MessageContext->PinFriendlyName = FSf_MessageBase::GetDefaultContextPinName( );
 	MessageContext->bHidden = true; // default, will unhide with CreatePinsForType
 
 	if (bListenHierarchically)

@@ -147,7 +147,7 @@ void UK2Node_RegisterForMessage::ExpandNode( FKismetCompilerContext& CompilerCon
 	BreakAllNodeLinks( );
 }
 
-void UK2Node_RegisterForMessage::CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
+void UK2Node_RegisterForMessage::CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
 {
 	Super::CreatePinsForType( InType, OutTypePins );
 

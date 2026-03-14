@@ -39,6 +39,7 @@ private:
 
 	// Messenger Node Base
 	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
+	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
 };

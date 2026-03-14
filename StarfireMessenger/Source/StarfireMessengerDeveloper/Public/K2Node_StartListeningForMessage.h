@@ -50,6 +50,7 @@ protected:
 	// Message Node Base
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
 	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
+	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 
 	// Spawn the node that can be used to call the Messenger's 'Start Listening for Message K2' function
 	[[nodiscard]] UK2Node_CallFunction* CreateRegisterFunctionCall( FKismetCompilerContext &CompilerContext, UEdGraph *SourceGraph );

@@ -30,7 +30,7 @@ protected:
 	void OnFunctionSelected( TSharedPtr< FString > FunctionItemData, ESelectInfo::Type SelectInfo ) override;
 
 	// Configure the settings of a data pin to what they should be for the specified message type
-	void ConfigureMessagePin( const TSharedPtr< FUserPinInfo > &PinInfo, UScriptStruct *MessageType ) const;
+	void ConfigureMessagePin( const TSharedPtr< FUserPinInfo > &PinInfo, const UScriptStruct *MessageType ) const;
 
 	// Configure the settings of a context pin to what they should be for a specified message types
 	void ConfigureContextPin( const TSharedPtr< FUserPinInfo > &PinInfo, const UScriptStruct *MessageType ) const;

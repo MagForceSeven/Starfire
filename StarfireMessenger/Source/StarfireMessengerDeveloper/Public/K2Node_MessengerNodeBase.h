@@ -34,7 +34,7 @@ public:
 	[[nodiscard]] UEdGraphPin* GetContextPin( void ) const;
 
 	// Get the class that we are going to spawn, if it's defined as default value
-	[[nodiscard]] UScriptStruct* GetMessageType( const TArray< UEdGraphPin* > *PinsToSearch = nullptr ) const;
+	[[nodiscard]] const UScriptStruct* GetMessageType( const TArray< UEdGraphPin* > *PinsToSearch = nullptr ) const;
 
 	// Toggles between force impure on and off, if this is a pure function
 	virtual void TogglePurity( void );
@@ -59,7 +59,7 @@ protected:
 	[[nodiscard]] virtual bool IsMessageVarPin( UEdGraphPin *Pin ) const;
 
 	// Create new pins to show properties on archetype
-	virtual void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr );
+	virtual void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr );
 
 	// Refresh pins when type is changed
 	void OnTypePinChanged( );

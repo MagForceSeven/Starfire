@@ -105,7 +105,7 @@ FSlateIcon UK2Node_MessengerFunctionCall::GetIconAndTint( FLinearColor& OutColor
 	return StarfireK2Utilities::GetFunctionIconAndTint( OutColor );
 }
 
-void UK2Node_MessengerFunctionCall::CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
+void UK2Node_MessengerFunctionCall::CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins )
 {
 	Super::CreatePinsForType( InType, OutTypePins );
 	

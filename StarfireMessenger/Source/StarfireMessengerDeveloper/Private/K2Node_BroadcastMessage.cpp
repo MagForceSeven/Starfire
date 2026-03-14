@@ -31,7 +31,7 @@ UK2Node_BroadcastMessage::UK2Node_BroadcastMessage( )
 	bRequiresContext = true;
 }
 
-void UK2Node_BroadcastMessage::CreatePinsForType( UScriptStruct *InType, TArray<UEdGraphPin *> *OutTypePins )
+void UK2Node_BroadcastMessage::CreatePinsForType( const UScriptStruct *InType, TArray<UEdGraphPin *> *OutTypePins )
 {
 	Super::CreatePinsForType( InType, OutTypePins );
 

@@ -53,6 +53,9 @@ bool FSf_MessageBase::IsMessageTypeAbstract( const UScriptStruct *MessageType )
 #if WITH_EDITOR
 TSoftClassPtr< UObject > FSf_MessageBase::GetContextType( const UScriptStruct *MessageType )
 {
+	if (MessageType == nullptr)
+		return nullptr;
+
 	if (MessageType->IsNative( ))
 	{
 		if (ensureAlways(MessageType->IsChildOf( FSf_MessageBase::StaticStruct( ) )))
@@ -104,6 +107,11 @@ FText FSf_MessageBase::GetContextPinName( const UScriptStruct *MessageType )
 		}
 	}
 
+	return GetDefaultContextPinName( );
+}
+
+FText FSf_MessageBase::GetDefaultContextPinName( )
+{
 	return NSLOCTEXT( "StarfireMessenger_Editor", "ContextPin_Default", "Context" );
 }
 

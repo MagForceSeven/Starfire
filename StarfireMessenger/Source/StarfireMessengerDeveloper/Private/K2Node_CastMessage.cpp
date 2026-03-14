@@ -56,7 +56,7 @@ void UK2Node_CastMessage::AllocateDefaultPins( )
 	ThenPin->PinFriendlyName = LOCTEXT( "ThenPin_FriendlyName", "Cast Succeeded" );
 }
 
-void UK2Node_CastMessage::CreatePinsForType( UScriptStruct *InType, TArray<UEdGraphPin *> *OutTypePins )
+void UK2Node_CastMessage::CreatePinsForType( const UScriptStruct *InType, TArray<UEdGraphPin *> *OutTypePins )
 {
 	Super::CreatePinsForType( InType, OutTypePins );
 

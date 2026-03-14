@@ -52,14 +52,14 @@ void SGraphNode_K2RegisterMessage::AddExtraDefaultOptions( UFunction* FunctionSi
 	CreateMatchingHierarchicalEventData = AddDefaultFunctionDataOption( LOCTEXT( "CreateMatchingEventOption", "[Create a matching hierarchical event]" ) );
 }
 
-void SGraphNode_K2RegisterMessage::ConfigureMessagePin( const TSharedPtr< FUserPinInfo > &PinInfo, UScriptStruct *MessageType ) const
+void SGraphNode_K2RegisterMessage::ConfigureMessagePin( const TSharedPtr< FUserPinInfo > &PinInfo, const UScriptStruct *MessageType ) const
 {
 	check( PinInfo->PinType.PinCategory == UEdGraphSchema_K2::PC_Struct );
 
 	if (bCreateHierarchical)
 		PinInfo->PinType.PinSubCategoryObject = TBaseStructure< FInstancedStruct >::Get( );
 	else
-		PinInfo->PinType.PinSubCategoryObject = MessageType;
+		PinInfo->PinType.PinSubCategoryObject = const_cast< UScriptStruct* >( MessageType );
 }
 
 // ReSharper disable once CppMemberFunctionMayBeStatic

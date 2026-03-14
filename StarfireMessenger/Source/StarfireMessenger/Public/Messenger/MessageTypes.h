@@ -78,6 +78,8 @@ public:
 	[[nodiscard]] STARFIREMESSENGER_API static TSoftClassPtr< UObject > GetContextType( const UScriptStruct *MessageType );
 	// Utility for getting the override name to give context pins of the specified type
 	[[nodiscard]] STARFIREMESSENGER_API static FText GetContextPinName( const UScriptStruct *MessageType );
+	// Utility for getting the name for context pins when not specified by the message type
+	[[nodiscard]] STARFIREMESSENGER_API static FText GetDefaultContextPinName( void );
 
 private:
 	friend class FStarfireMessengerEditor;
