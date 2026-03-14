@@ -291,6 +291,8 @@ To get the best use from Instanced Structs, you should set the "BaseStruct" meta
 
 The good news is that if you use the 'Create matching hierarchical function/event' option of 'Register for Message' or use the 'Listen Hierarchically' checkbox of 'Listen for Message' this is all taken care for you!
 
+When listening heirarchically to messages in blueprint, a context pin is always available for similar reasons outlined above for code. The message type you're listening for may not have a context, but a child type might.
+
 #### Message Casting
 
 With the instanced struct parameter you can use the 'Cast Message' node to convert the Instanced Struct parameter to the message type of your choice.
@@ -298,6 +300,7 @@ With the instanced struct parameter you can use the 'Cast Message' node to conve
 ![](./Resources/readme_MessageCast.png)
 
 This node functions identically to the cast node used with objects, except for fact that the desired type is selected through a pin drop down instead of there being separate nodes for each type.
+It also has input and output pins for the message context. The input pin will always be available, but the output pin will only be available if the output message type actually requires a context.
 
 The 'BaseStruct' meta is used to limit the cast node's drop down to the potentially relevant message types. If it's not set (because you created the function yourself) or you removed it, no worries. It will still work as expected, you'll just have a larger list of types to choose from. Some of which might never be able to succeed.
 

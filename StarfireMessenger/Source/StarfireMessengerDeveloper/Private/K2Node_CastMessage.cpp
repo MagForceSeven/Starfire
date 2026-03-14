@@ -11,6 +11,7 @@
 #include "K2Node_CallFunction.h"
 #include "K2Node_TemporaryVariable.h"
 #include "K2Node_AssignmentStatement.h"
+#include "K2Node_DynamicCast.h"
 
 // Kismet Compiler
 #include "KismetCompiler.h"
@@ -27,6 +28,7 @@
 
 const FName UK2Node_CastMessage::CastSourcePinName( "Message" );
 const FName UK2Node_CastMessage::CastResultPinName( "Result" );
+const FName UK2Node_CastMessage::ContextCastResultPinName( "Context" );
 
 UK2Node_CastMessage::UK2Node_CastMessage( )
 {
@@ -44,30 +46,56 @@ void UK2Node_CastMessage::AllocateDefaultPins( )
 	const auto CastSourcePin = CreatePin( EGPD_Input, UEdGraphSchema_K2::PC_Struct, TBaseStructure< FInstancedStruct >::Get( ), CastSourcePinName );
 	CastSourcePin->PinType.bIsConst = true;
 	CastSourcePin->PinType.bIsReference = true;
+	CastSourcePin->PinFriendlyName = LOCTEXT( "CastSourcePin_FriendlyName", "Instanced Message" );
 
 	const auto CastResultPin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Struct, FSf_MessageBase::StaticStruct( ), CastResultPinName );
 	CastResultPin->PinType.bIsConst = true;
 	CastResultPin->PinType.bIsReference = true;
+	
+	const auto ContextCastResultPin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Object, UObject::StaticClass( ), ContextCastResultPinName );
+	ContextCastResultPin->PinType.bIsConst = true;
+	ContextCastResultPin->PinType.bIsReference = true;
+	ContextCastResultPin->bHidden = true;
+	StarfireK2Utilities::SetPinToolTip( ContextCastResultPin, LOCTEXT( "ContextPin_Output_Tooltip", "Context that associated with the message" ) );
 
 	const auto CastFailurePin = CreatePin( EGPD_Output, UEdGraphSchema_K2::PC_Exec, UEdGraphSchema_K2::PN_CastFailed );
 	CastFailurePin->bHidden = bIsPure;
 
 	const auto ThenPin = GetThenPin( );
 	ThenPin->PinFriendlyName = LOCTEXT( "ThenPin_FriendlyName", "Cast Succeeded" );
+
+	const auto ContextPin = GetContextPin( );	
+	ContextPin->bHidden = false;
+	StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "ContextPin_Input_Tooltip", "Object context associated with the instanced mesage" ) );
+	Pins.Remove( ContextPin );
+	Pins.Push( ContextPin );
 }
 
 void UK2Node_CastMessage::CreatePinsForType( const UScriptStruct *InType, TArray<UEdGraphPin *> *OutTypePins )
 {
 	Super::CreatePinsForType( InType, OutTypePins );
 
-	// Context is not required for casts, so we'll just re-hide it if it was made visible
+	// Duplicate the input context pin data to the result to leverage that code
+	// Then make sure the input context pin is always visible with a UObject
 	const auto ContextPin = GetContextPin( );
-	ContextPin->bHidden = true;
+	const auto ContextResultPin = GetContextCastResultPin( );
+	ContextResultPin->PinType = ContextPin->PinType;
+	ContextResultPin->PinFriendlyName = ContextPin->PinFriendlyName;
+	ContextResultPin->PinToolTip = ContextPin->PinToolTip;
+	ContextResultPin->bHidden = ContextPin->bHidden;
+	ContextPin->PinType.PinSubCategoryObject = UObject::StaticClass( );
+	ContextPin->PinFriendlyName = FSf_MessageBase::GetDefaultContextPinName( );
+	ContextPin->bHidden = false;
+
+	StarfireK2Utilities::SetPinToolTip( ContextPin, LOCTEXT( "ContextPin_Input_Tooltip", "Object context associated with the instanced mesage" ) );
+	StarfireK2Utilities::SetPinToolTip( ContextResultPin, LOCTEXT( "ContextPin_Output_Tooltip", "Context that associated with the message" ) );
+
+	StarfireK2Utilities::RefreshAllowedConnections( this, ContextResultPin );
 
 	const auto CastResultPin = GetCastResultPin( );
 	if (InType != nullptr)
 	{
-		CastResultPin->PinType.PinSubCategoryObject = InType;
+		CastResultPin->PinType.PinSubCategoryObject = const_cast< UScriptStruct* >( InType );
 		StarfireK2Utilities::SetPinToolTip( CastResultPin, LOCTEXT( "MessageData_Tooltip", "Data for the message." ) );
 		StarfireK2Utilities::RefreshAllowedConnections( this, CastResultPin );
 	}
@@ -96,8 +124,10 @@ void UK2Node_CastMessage::ExpandNode( FKismetCompilerContext &CompilerContext, U
 	// Cache off versions of all our important pins
 	const auto CastExec = GetExecPin( );
 	const auto CastSource = GetCastSourcePin( );
+	const auto CastContext = GetContextPin( );
 
 	const auto CastResult = GetCastResultPin( );
+	const auto CastResultContext = GetContextCastResultPin( );
 	const auto CastSuccess = GetCastSuccessPin( );
 	const auto CastFailure = GetCastFailurePin( );
 
@@ -128,7 +158,7 @@ void UK2Node_CastMessage::ExpandNode( FKismetCompilerContext &CompilerContext, U
 	CompilerContext.MovePinLinksToIntermediate( *CastSource, *Get_Input );
 
 	CompilerContext.MovePinLinksToIntermediate( *CastResult, *Get_Output );
-	CompilerContext.MovePinLinksToIntermediate( *CastFailure, *Get_Invalid );
+	CompilerContext.CopyPinLinksToIntermediate( *CastFailure, *Get_Invalid );
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Create a temporary variable of the structure type
@@ -156,13 +186,36 @@ void UK2Node_CastMessage::ExpandNode( FKismetCompilerContext &CompilerContext, U
 	CompilerContext.MovePinLinksToIntermediate( *CastSuccess, *Init_Then );
 
 	///////////////////////////////////////////////////////////////////////////////////
+	// Apply a cast to the context object (if one is expected by the message type)
+	if (!CastResultContext->bHidden)
+	{
+		const auto CastObject = CompilerContext.SpawnIntermediateNode< UK2Node_DynamicCast >( this, SourceGraph );
+		CastObject->TargetType = Cast< UClass >( CastResultContext->PinType.PinSubCategoryObject );
+		CastObject->AllocateDefaultPins( );
+
+		const auto Cast_Exec = CastObject->GetExecPin( );
+		const auto Cast_Input = CastObject->GetCastSourcePin( );
+		const auto Cast_Valid = CastObject->GetValidCastPin( );
+		const auto Cast_Invalid = CastObject->GetInvalidCastPin( );
+		const auto Cast_Output = CastObject->GetCastResultPin( );
+
+		CompilerContext.MovePinLinksToIntermediate( *Init_Then, *Cast_Valid );
+		Init_Then->MakeLinkTo( Cast_Exec );
+		CompilerContext.MovePinLinksToIntermediate( *CastContext, *Cast_Input );
+		CompilerContext.MovePinLinksToIntermediate( *CastResultContext, *Cast_Output );
+		CompilerContext.CopyPinLinksToIntermediate( *CastFailure, *Cast_Invalid );
+
+		CastObject->NotifyPinConnectionListChanged( Cast_Input );
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
 	//
 	BreakAllNodeLinks( );
 }
 
 bool UK2Node_CastMessage::IsMessageVarPin( UEdGraphPin *Pin ) const
 {
-	static const TArray< FName > PinNames { CastSourcePinName, CastResultPinName };
+	static const TArray< FName > PinNames { CastSourcePinName, CastResultPinName, ContextCastResultPinName };
 	if (PinNames.Contains( Pin->PinName ))
 		return false;
 
@@ -239,6 +292,11 @@ UEdGraphPin* UK2Node_CastMessage::GetCastSourcePin( ) const
 UEdGraphPin* UK2Node_CastMessage::GetCastResultPin( ) const
 {
 	return FindPinChecked( CastResultPinName );
+}
+
+UEdGraphPin * UK2Node_CastMessage::GetContextCastResultPin( ) const
+{
+	return FindPinChecked( ContextCastResultPinName );
 }
 
 FText UK2Node_CastMessage::GetNodeTitle( ENodeTitleType::Type TitleType ) const

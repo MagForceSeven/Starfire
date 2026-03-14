@@ -31,14 +31,15 @@ public:
 	UEdGraphPin* GetCastFailurePin( void ) const;
 	UEdGraphPin* GetCastSourcePin( void ) const;
 	UEdGraphPin* GetCastResultPin( void ) const;
+	UEdGraphPin* GetContextCastResultPin( void ) const;
 
 private:
 	// Pin Names
 	static const FName CastSourcePinName;
 	static const FName CastResultPinName;
+	static const FName ContextCastResultPinName;
 
 	// Messenger Node Base
-	void CreatePinsForType( UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	void CreatePinsForType( const UScriptStruct *InType, TArray< UEdGraphPin* > *OutTypePins = nullptr ) override;
 	[[nodiscard]] bool IsMessageVarPin( UEdGraphPin *Pin ) const override;
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) override;
