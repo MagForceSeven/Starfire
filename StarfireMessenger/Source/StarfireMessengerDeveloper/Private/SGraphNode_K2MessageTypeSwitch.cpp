@@ -42,33 +42,18 @@ void SGraphNode_K2MessageTypeSwitch::Construct( const FArguments &InArgs, UK2Nod
 
 void SGraphNode_K2MessageTypeSwitch::CreatePinWidgets()
 {
-	const auto SwitchNode = CastChecked< UK2Node_SwitchMessageType >( GraphNode );
-	const auto DefaultExecPin = SwitchNode->GetDefaultExecPin( );
-	const auto DefaultDataPin = SwitchNode->GetDefaultDataPin( );
-
-	// Create Pin widgets for each of the pins, except for the default pin
-	for (auto PinIt = GraphNode->Pins.CreateConstIterator( ); PinIt; ++PinIt)
+	const auto CreateDefaultPin = [ this ]( UEdGraphPin *Pin ) -> void
 	{
-		const auto CurrentPin = *PinIt;
-		
-		if (CurrentPin->bHidden)
-			continue;
-		if (CurrentPin == DefaultExecPin)
-			continue;
-		if (CurrentPin == DefaultDataPin)
-			continue;
-	
-		const auto NewPin = FNodeFactory::CreatePinWidget( CurrentPin );
+		const auto NewPin = FNodeFactory::CreatePinWidget( Pin );
 		check( NewPin.IsValid( ) );
 
 		AddPin( NewPin.ToSharedRef( ) );
-	}
+	};
 
-	// Handle the default pins
-	if (DefaultExecPin != nullptr)
+	const auto CreatePinSeperator = [ Box = RightNodeBox ]( ) -> void
 	{
 		// Create some padding & the seperator line
-		RightNodeBox->AddSlot( )
+		Box->AddSlot( )
 			.AutoHeight( )
 			.HAlign( HAlign_Right )
 			.VAlign( VAlign_Center )
@@ -77,16 +62,53 @@ void SGraphNode_K2MessageTypeSwitch::CreatePinWidgets()
 				SNew( SImage )
 				.Image( FAppStyle::GetBrush( "Graph.Pin.DefaultPinSeparator" ) )
 			];
+	};
+
+	const auto SwitchNode = CastChecked< UK2Node_SwitchMessageType >( GraphNode );
+
+	const auto InputExecPin = SwitchNode->GetExecPin( );
+	const auto InputDataPin = SwitchNode->GetInputPin( );
+	const auto InputContextPin = SwitchNode->GetContextInputPin(  );
+
+	CreateDefaultPin( InputExecPin );
+	CreateDefaultPin( InputDataPin );
+	CreateDefaultPin( InputContextPin );
+
+	// Create Pin widgets for each of the pins, except for the default pin
+	for (int idx = 0; idx < SwitchNode->PinTypes.Num( ); ++idx)
+	{
+		const auto [Exec, Data, Context] = SwitchNode->GetTypePins( idx );
+
+		CreateDefaultPin( Exec );
+		CreateDefaultPin( Data );
+
+		if (!Context->bHidden)
+			CreateDefaultPin( Context );
+
+		if (idx != (SwitchNode->PinTypes.Num( ) - 1))
+			CreatePinSeperator( );
+	}
+
+	const auto DefaultExecPin = SwitchNode->GetDefaultExecPin( );
+	const auto DefaultDataPin = SwitchNode->GetDefaultDataPin( );
+	const auto DefaultContextPin = SwitchNode->GetDefaultContextPin( );
+
+	// Handle the default pins
+	if (DefaultExecPin != nullptr)
+	{
+		CreatePinSeperator( );
 
 		// Create the pins themselves
 		const auto NewExecPin = SNew( SGraphPin_HGameplayTagSwitchNodeDefaultCaseExec, DefaultExecPin );
 		AddPin( NewExecPin );
 
-		const auto NewDataPin = FNodeFactory::CreatePinWidget( DefaultDataPin );
-		check( NewDataPin.IsValid( ) );
+		CreateDefaultPin( DefaultDataPin );
 
-		AddPin( NewDataPin.ToSharedRef( ) );
+		if (!DefaultContextPin->bHidden)
+			CreateDefaultPin( DefaultContextPin );
 	}
+
+	CreatePinSeperator( );
 }
 
 void SGraphNode_K2MessageTypeSwitch::CreateOutputSideAddButton( TSharedPtr< SVerticalBox > OutputBox )

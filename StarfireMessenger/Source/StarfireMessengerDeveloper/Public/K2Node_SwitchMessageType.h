@@ -16,7 +16,9 @@ public:
 	// Pin Accessors
 	[[nodiscard]] UEdGraphPin* GetDefaultExecPin( ) const;
 	[[nodiscard]] UEdGraphPin* GetDefaultDataPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetDefaultContextPin( ) const;
 	[[nodiscard]] UEdGraphPin* GetInputPin( ) const;
+	[[nodiscard]] UEdGraphPin* GetContextInputPin( ) const;
 	
 	// Adds a new execution pin to a switch node
 	void AddPinToSwitchNode( );
@@ -52,16 +54,28 @@ protected:
 	// Pin Names
 	static const FName DefaultExecPinName;
 	static const FName DefaultDataPinName;
+	static const FName DefaultContextPinName;
 	static const FName InputPinName;
+	static const FName ContextInputPinName;
+
+	// Update the output pins and PinTypes array based on a change to the input instanced struct
+	void UpdateFromInputMessageType( void );
+
+	// Update the pins for a specific array entry for new message type data
+	void UpdateCasePins( const TArray< UEdGraphPin* > &CasePins, const FStarfireMessageType &Type, int Index );
+
+	// Get the minimum number of pins for this node (ignoring pins generated for PinType elemements)
+	int GetBaselinePinCount( void ) const;
 
 	// Utility for creating the pair of pins for each array entry
 	void CreateTypePins( const FStarfireMessageType &Type, int Index );
 	// Getter for the pair of pins for a array entry
-	std::tuple< UEdGraphPin*, UEdGraphPin* > GetTypePins( const FStarfireMessageType &Type ) const;
+	std::tuple< UEdGraphPin*, UEdGraphPin*, UEdGraphPin* > GetTypePins( int TypesIndex ) const;
 
 	// Determine if there are any configuration problems with this node instance
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext &CompilerContext ) const;
 
+	friend class SGraphNode_K2MessageTypeSwitch;
 private:
 	// Editor-only field that signals a default pin setting change
 	bool bHasDefaultPinValueChanged = false;

@@ -197,6 +197,13 @@ public:
 	void CastContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, UObject* );
 	void CastConstContext_Stateful( const TConstStructView< FStatefulMessageTest_Cast_Base_NoContext >&, EStatefulMessageEvent, const UObject* );
 };
+
+//
+UCLASS( Abstract, NotBlueprintType, NotBlueprintable )
+class AMessengerCompileTests_C : public AActor
+{
+	GENERATED_BODY( )
+public:
 };
 
 USTRUCT( meta = (Hidden) )
@@ -506,6 +513,66 @@ public:
 	SET_CONTEXT_TYPE( AMessengerCompileTests )
 };
 
+USTRUCT( meta = (Hidden) )
+struct FMessageTest_Cast_Base_NoContext : public FSf_Message_Immediate
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FMessageTest_Cast_Child1 : public FMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FMessageTest_Cast_Child2 : public FMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FMessageTest_Cast_Child3 : public FMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+	SET_CONTEXT_TYPE( const AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FStatefulMessageTest_Cast_Base_NoContext : public FSf_Message_Stateful
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FStatefulMessageTest_Cast_Child1 : public FStatefulMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
+};
+
+USTRUCT( meta = (Hidden) )
+struct FStatefulMessageTest_Cast_Child2 : public FStatefulMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+};
+
+USTRUCT( meta = (Hidden) )
+struct FStatefulMessageTest_Cast_Child3 : public FStatefulMessageTest_Cast_Base_NoContext
+{
+	GENERATED_BODY( )
+public:
+	SET_CONTEXT_TYPE( const AMessengerCompileTests )
+};
+
 // Message types used for documentation images
 //
 
@@ -550,6 +617,7 @@ struct FSwitchTestFamily_Child2 : public FSwitchTestFamily
 {
 	GENERATED_BODY( )
 public:
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
 };
 
 USTRUCT( meta = (Hidden) )
@@ -558,6 +626,7 @@ struct FSwitchTestFamily_Child3_Abstract : public FSwitchTestFamily
 {
 	GENERATED_BODY( )
 public:
+	SET_CONTEXT_TYPE( AMessengerCompileTests )
 };
 SET_MESSAGE_TYPE_AS_ABSTRACT( FSwitchTestFamily_Child3_Abstract )
 
@@ -575,4 +644,6 @@ struct FSwitchTestFamily_GrandChild2 : public FSwitchTestFamily_Child3_Abstract
 {
 	GENERATED_BODY( )
 public:
+	SET_CONTEXT_TYPE( AMessengerCompileTests_C )
+	SET_CONTEXT_NAME( "TestContext" )
 };

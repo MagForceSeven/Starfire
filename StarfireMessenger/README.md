@@ -308,9 +308,9 @@ The 'BaseStruct' meta is used to limit the cast node's drop down to the potentia
 
 Another node that can be used with the instanced struct parameter is 'Switch on Message Type'. It works as a combined switch & cast when needing to check for multiple types.
 
-![](.Resources/readme_Switch.png)
+![](./Resources/readme_Switch.png)
 
-In addition to the regular exec pins, data pins are available that are the specified type extracted from the instanced struct.
+The output types/cases are configurable through the node's details panel. Each case get an exec pin (On ...) and a message pin (As ...). If the case's message type is configured to have a context, a context pin will also be available of the correct type.
 
 The 'BaseStruct' meta is also used here to limit the options available from the drop downs in the details panel, though it will show all message types until an input is connected.
 
