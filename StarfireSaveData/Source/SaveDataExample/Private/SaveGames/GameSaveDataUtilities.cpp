@@ -32,6 +32,20 @@ static TAutoConsoleVariable< FString > CVar_QuickSaveSlotName( TEXT( "Game.SaveG
 FString Ex_GetQuickSaveSlotName( void ) { return CVar_QuickSaveSlotName.GetValueOnAnyThread( ); }
 FString Ex_GetQuickSaveDisplayName( void ) { return NSLOCTEXT( "Game_SaveGames", "QuickSaveFriendlyName", "Quick Save" ).ToString( ); }
 
+void UpdateSlotName( FString& SlotName, ESaveDataType SaveType )
+{
+	switch (SaveType)
+	{
+		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
+			break;
+		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
+			break;
+
+		default: // other types don't modify the slot name
+			break;
+	}
+}
+
 FEnumeratedSaveDataHeader::FEnumeratedSaveDataHeader( const USaveDataUtilities::FEnumeratedHeader_Core &Core ) :
 	SlotName( Core.SlotName ),
 	LoadingResult( Core.LoadingResult ),
@@ -97,17 +111,7 @@ bool UGameSaveDataUtilities::SaveToSlot( const UObject *WorldContext, FString Sl
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 
-	ensureAlways( SaveType != ESaveDataType::Quick ); // this is probably an error as saving a checkpoint is automated, but quick should always be user triggered
-	switch (SaveType)
-	{
-		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
-			break;
-		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
-			break;
-
-		default: // other types don't modify the slot name
-			break;
-	}
+	UpdateSlotName( SlotName, SaveType );
 
 	const auto Header = CreateSaveGameHeader( SaveData, SaveType, DisplayNameOverride );
 	if (!ensureAlways( Header != nullptr ))
@@ -134,18 +138,6 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, FStr
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 
-	ensureAlways( SaveType != ESaveDataType::Quick ); // this is probably an error as saving a checkpoint is automated, but quick should always be user triggered
-	switch (SaveType)
-	{
-		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
-			break;
-		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
-			break;
-
-		default: // other types don't modify the slot name
-			break;
-	}
-
 	const auto AsyncFillComplete = FCreateCheckpointComplete::CreateLambda( [ SlotName, UserIndex, SaveType, DisplayNameOverride, OnCompletion ]( const UObject *WorldContext, const UGameSaveData* CheckpointData, bool Success )
 	{
 		if (!Success)
@@ -154,6 +146,9 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, FStr
 			return;
 		}
 		
+		FString FinalSlotName = SlotName;
+		UpdateSlotName( FinalSlotName, SaveType );
+		
 		const UGameSaveHeader* Header = CreateSaveGameHeader( CheckpointData, SaveType, DisplayNameOverride );
 		if (!ensureAlways( Header != nullptr ))
 		{
@@ -161,7 +156,7 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, FStr
 			return;
 		}
 
-		SaveDataToSlot_Async( WorldContext, Header, CheckpointData, SlotName, UserIndex, OnCompletion );
+		SaveDataToSlot_Async( WorldContext, Header, CheckpointData, FinalSlotName, UserIndex, OnCompletion );
 	});
 
 	FillAsyncSaveGameData_Async( WorldContext, SaveData, true, AsyncFillComplete );
@@ -183,16 +178,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot( const UObject *WorldContext, 
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 
 	ensureAlways( SaveType != ESaveDataType::Quick ); // this is probably an error as saving a checkpoint is automated, but quick should always be user triggered
-	switch (SaveType)
-	{
-		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
-			break;
-		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
-			break;
-
-		default: // other types don't modify the slot name
-			break;
-	}
+	UpdateSlotName( SlotName, SaveType );
 
 	const auto SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData, GetTransientPackage( ) ) );
 
@@ -250,16 +236,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 
 	ensureAlways( SaveType != ESaveDataType::Quick ); // this is probably an error as saving a checkpoint is automated, but quick should always be user triggered
-	switch (SaveType)
-	{
-		case ESaveDataType::Auto: SlotName = AutoSavePrefix + SlotName;
-			break;
-		case ESaveDataType::Developer: SlotName = Ex_DevSavePrefix + SlotName;
-			break;
-
-		default: // other types don't modify the slot name
-			break;
-	}
+	UpdateSlotName( SlotName, SaveType );
 
 	struct FSaveCheckpointTask : public FSaveDataTask
 	{
