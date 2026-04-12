@@ -42,7 +42,7 @@ bool UDataStoreUtilities::AssociateVisualizer( ADataStoreActor *DataStore, AActo
 	}
 	
 	const auto DataActorVisType = DataStore->GetVisualizerClass( );
-	if (!DataActorVisType.IsNull( ) && UVisualizerValidator::SoftIsChildOf( Visualizer->GetClass( ), DataActorVisType ))
+	if (!DataActorVisType.IsNull( ) && !UVisualizerValidator::SoftIsChildOf( Visualizer->GetClass( ), DataActorVisType ))
 	{
 		UE_LOG( LogStarfireDataActors, Error, TEXT( "Unable to associate actor of type '%s' as a visualizer for Data Store Actor of type '%s'. Data Store Actor type expects visualizers of type '%s'." ),
 			*Visualizer->GetClass( )->GetName( ), *DataStore->GetClass( )->GetName( ), *DataActorVisType.GetAssetName( ) );
