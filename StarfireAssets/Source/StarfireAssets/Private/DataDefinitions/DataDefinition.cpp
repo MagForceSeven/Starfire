@@ -7,6 +7,8 @@
 #include "Kismet/BlueprintUtilitiesSF.h"
 
 // CoreUObject
+#include "AssetValidation/AssetChecks.h"
+#include "Misc/DataValidation.h"
 #include "UObject/Class.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DataDefinition)
@@ -15,6 +17,22 @@ FPrimaryAssetId UDataDefinition::GetPrimaryAssetId( ) const
 {
 	return FPrimaryAssetId( UDataDefinition::StaticClass( )->GetFName( ), GetFName( ) );
 }
+
+#if WITH_EDITOR
+EDataValidationResult UDataDefinition::IsDataValid( FDataValidationContext &Context ) const
+{
+	auto Result = Super::IsDataValid( Context );
+
+	AssetChecks::FScopedAssetValidation ScopedContext( &Context );
+
+	IVerifiableAsset::Verify( this, nullptr );
+
+	if (Context.GetNumErrors(  ) > 0)
+		return EDataValidationResult::Invalid;
+
+	return Result;
+}
+#endif
 
 const UDataDefinitionExtension* UDataDefinition::FindExtensionByClass( const TSubclassOf< UDataDefinitionExtension > &Type ) const
 {

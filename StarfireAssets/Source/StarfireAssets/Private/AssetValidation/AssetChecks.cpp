@@ -22,8 +22,10 @@
 
 // Core
 #include "Internationalization/Regex.h"
+#include "Misc/DataValidation.h"
 
 static FString OverrideCheckChannel;
+static FDataValidationContext *ValidationContextScope = nullptr;
 
 AssetChecks::FScopedChecksChannel::FScopedChecksChannel( const FString &OverrideChannel )
 {
@@ -34,6 +36,19 @@ AssetChecks::FScopedChecksChannel::FScopedChecksChannel( const FString &Override
 AssetChecks::FScopedChecksChannel::~FScopedChecksChannel( )
 {
 	OverrideCheckChannel.Empty( );
+}
+
+AssetChecks::FScopedAssetValidation::FScopedAssetValidation( FDataValidationContext *Context )
+{
+	check( ValidationContextScope == nullptr );
+	check( Context != nullptr );
+
+	ValidationContextScope = Context;
+}
+
+AssetChecks::FScopedAssetValidation::~FScopedAssetValidation( )
+{
+	ValidationContextScope = nullptr;
 }
 
 #if WITH_EDITOR
@@ -64,8 +79,11 @@ void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset,
 	check( !Message.IsEmpty( ) );
 
 #if WITH_EDITOR
-	MessageBase( Asset, CompilerContext )
-		->AddToken( FTextToken::Create( FText::FromString( ": " + Message ) ) );
+	if (ValidationContextScope != nullptr)
+		ValidationContextScope->AddError( FText::FromString( Message ) );
+	else
+		MessageBase( Asset, CompilerContext )
+			->AddToken( FTextToken::Create( FText::FromString( ": " + Message ) ) );
 #endif
 	RedscreenImpl( WorldContext, false, File, Line, TEXT( "%s: %s" ), *Asset->GetName( ), *Message );
 }
@@ -77,9 +95,12 @@ void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset,
 	check( SecondaryReference != nullptr );
 
 #if WITH_EDITOR
-	MessageBase( Asset, CompilerContext )
-		->AddToken( FTextToken::Create( FText::FromString( ": " + Message + " - " ) ) )
-		->AddToken( FUObjectToken::Create( SecondaryReference ) );
+	if (ValidationContextScope != nullptr)
+		ValidationContextScope->AddError( FText::FromString( Message ) );
+	else
+		MessageBase( Asset, CompilerContext )
+			->AddToken( FTextToken::Create( FText::FromString( ": " + Message + " - " ) ) )
+			->AddToken( FUObjectToken::Create( SecondaryReference ) );
 #endif
 	RedscreenImpl( WorldContext, false, File, Line, TEXT( "%s: %s - %s" ), *Asset->GetName( ), *Message, *SecondaryReference->GetName( ) );
 }
@@ -129,6 +150,9 @@ void AssetChecks::MessageImpl( const char *File, int Line, const UObject *Asset,
 	// Do the text replacement and dispatch as a redscreen
 	const auto FinalText = FText::Format( FText::FromString( Message ), FormatArgs ).ToString( );
 	RedscreenImpl( WorldContext, false, File, Line, TEXT( "%s: %s" ), *Asset->GetName( ), *FinalText );
+
+	if (ValidationContextScope != nullptr)
+		ValidationContextScope->AddError( FText::FromString( FinalText ) );
 
 #if WITH_EDITOR
 	// Create a string from the end of the previous match to just before the beginning of the current match

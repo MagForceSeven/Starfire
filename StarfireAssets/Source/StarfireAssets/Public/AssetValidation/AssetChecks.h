@@ -4,6 +4,7 @@
 class UObject;
 
 class FKismetCompilerContext;
+class FDataValidationContext;
 
 namespace AssetChecks
 {
@@ -24,5 +25,12 @@ namespace AssetChecks
 	{
 		explicit FScopedChecksChannel( const FString &OverrideChannel );
 		~FScopedChecksChannel( );
+	};
+
+	// Temporarily route AssetCheck messages to a data validation context (generally a parameter to UObject::IsDataValid)
+	struct STARFIREASSETS_API FScopedAssetValidation
+	{
+		explicit FScopedAssetValidation( FDataValidationContext* Context );
+		~FScopedAssetValidation( );
 	};
 }

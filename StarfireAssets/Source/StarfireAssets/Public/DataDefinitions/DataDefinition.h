@@ -25,7 +25,10 @@ class STARFIREASSETS_API UDataDefinition : public UPrimaryDataAsset, public IVer
 	GENERATED_BODY( )
 public:
 	// Object API
-	FPrimaryAssetId GetPrimaryAssetId( ) const override;
+	[[nodiscard]] FPrimaryAssetId GetPrimaryAssetId( ) const override;
+#if WITH_EDITOR
+	[[nodiscard]] EDataValidationResult IsDataValid( FDataValidationContext &Context ) const override;
+#endif
 
 	// All the extensions that are currently affecting this definition
 	UPROPERTY( Transient, BlueprintReadOnly, Category = "Data Definition" )
