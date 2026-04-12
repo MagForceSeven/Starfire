@@ -34,9 +34,13 @@
 		{
 			"Name": "StarfireUtilitiesEditor",
 			"Type": "Editor",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PostEngineInit"
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "AssetManagerEditor",
+			"Enabled": true
+		}
 	]
 }

@@ -17,18 +17,25 @@ public class StarfireUtilitiesEditor : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[ ]
 			{
+				"EditorSubsystem",
 				"Engine",
-				"EditorSubsystem"
+				"Slate",
+				"SlateCore",
 				// ... add other public dependencies that you statically link with here ...
 			} );
 
 		PrivateDependencyModuleNames.AddRange(
 			new string[ ]
 			{
+				"AssetManagerEditor",
+				"AssetRegistry",
+				"BlueprintGraph",
 				"Core",
 				"CoreUObject",
 				"UnrealEd",
-				"BlueprintGraph",
+				"ToolMenus",
+				"DeveloperSettings",
+
 				"StarfireUtilities",
 				// ... add private dependencies that you statically link with here ...	
 			} );
