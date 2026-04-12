@@ -53,6 +53,8 @@ public:
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetEnabledFeatures( ) const;
 	// Get the names for the set of entitlements that are enabled for affecting gameplay
 	[[nodiscard]] TArray< FString > GetEnabledFeatureNames( void ) const;
+	// Get the primary asset ids for the set of entitlements that are enabled for affecting gameplay
+	[[nodiscard]] TArray< FPrimaryAssetId > GetEnabledFeatureIDs( void ) const;
 
 	// Get the entire collection of features that could be owned/enabled
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( ) const;

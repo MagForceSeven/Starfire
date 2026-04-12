@@ -208,6 +208,16 @@ TArray< FString > UFeatureContentManager::GetEnabledFeatureNames( void ) const
 	return Results;
 }
 
+TArray<FPrimaryAssetId> UFeatureContentManager::GetEnabledFeatureIDs( ) const
+{
+	TArray< FPrimaryAssetId > IDs;
+
+	for (const auto &F : EnabledFeatures)
+		IDs.Push( F->GetPrimaryAssetId( ) );
+
+	return IDs;
+}
+
 TArray< const UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures( ) const
 {
 	return KnownFeatureData;
