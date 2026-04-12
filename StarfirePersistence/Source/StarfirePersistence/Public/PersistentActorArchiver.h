@@ -41,6 +41,9 @@ protected:
 		// For Actors, whether this object is found in the level or spawned dynamically
 		bool bWasSpawned = false;
 
+		// Was this object serialized using the SaveGame markup to filter properties
+		bool bUseSaveGame = true;
+
 		// The subobjects owned by this one, used to map to default subobjects instead of trying to respawn them
 		TArray< UObject* > Subobjects;
 
@@ -51,11 +54,12 @@ protected:
 			Ar << R.PersistentID;
 			Ar << R.SubobjectName;
 			Ar << R.bWasSpawned;
+			Ar << R.bUseSaveGame;
 
 			return Ar;
 		}
 	};
-	
+
 	// A collection of the objects to serialize to or create from the provided archive
 	TArray< FPersistentObjectRecord > ReferencedObjectList;
 };
@@ -65,7 +69,7 @@ class STARFIREPERSISTENCE_API FPersistentActorWriter : public FPersistentActorAr
 {
 public:
 	explicit FPersistentActorWriter( FArchive& InInnerArchive );
-	
+
 	// Optional method to filter the Objects that should be included in the archive
 	// Function should return true if the Actor should be included in the archive
 	// This is for top level filtering of Actors w/ Persistence Components and Subsystems implementing the Persistent Subsystem interface
@@ -85,7 +89,11 @@ public:
 	FArchive& operator<<( FSoftObjectPtr& Value ) override;
 	FArchive& operator<<( FSoftObjectPath& Value ) override;
 	FArchive& operator<<( UObject*& Res ) override;
-	
+
+	// The classes of saved objects that would be loaded when reloading this data
+	// The PersistentActorReader will force load these classes, but clients could decide to load them some other way first
+	TSet< TSoftClassPtr< UObject > > SavedObjectClasses;
+
 private:
 	// Wrapper to check components for inclusion in the Archive
 	[[nodiscard]] bool ShouldIncludeComponent( const UActorComponent* Component ) const;

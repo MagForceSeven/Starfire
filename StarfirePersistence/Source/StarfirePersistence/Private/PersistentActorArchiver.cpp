@@ -33,7 +33,6 @@ FPersistentActorArchiver::FPersistentActorArchiver( FArchive &InInnerArchive, bo
 {
 	FArchive::SetIsPersistent( true );
 	FArchive::SetWantBinaryPropertySerialization( false );
-	ArIsSaveGame = true;
 }
 
 // *********************************************************************************************************************
@@ -99,6 +98,7 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 		{
 			Entry.PersistentID = Component->GetGuid( );
 			Entry.bWasSpawned = Component->WasSpawned( );
+			Entry.bUseSaveGame = Component->ShouldUseMeta( );
 
 			Component->OnPreSerialize.Broadcast( );
 		}
@@ -121,6 +121,8 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 
 		int64 Size = 0; // Reserve space for size information
 		*this << Size;
+
+		ArIsSaveGame = Entry.bUseSaveGame;
 
 		Entry.Object->Serialize( *this );
 
@@ -146,6 +148,9 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 		*this << Size;
 
 		Seek( FinalPos );
+
+		if (Entry.ClassPtr->IsAsset( ))
+			SavedObjectClasses.Add( Entry.ClassPtr );
 	}
 
 	// Reset these in case Archive is called repeatedly
@@ -509,6 +514,8 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 #endif
 
 			const int64 BlockStart = Tell( );
+
+			ArIsSaveGame = Entry.bUseSaveGame;
 
 			Entry.Object->Serialize( *this );
 			

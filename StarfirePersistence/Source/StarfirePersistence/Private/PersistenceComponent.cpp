@@ -24,6 +24,12 @@ FGuid UPersistenceComponent::GetGuid() const
 	return PersistentGuid;
 }
 
+void UPersistenceComponent::SetUseSaveGameMeta( bool bUseMeta )
+{
+	ensureAlways( !HasBegunPlay( ) );
+	bUseSaveGame = bUseMeta;
+}
+
 void UPersistenceComponent::PreSave( FObjectPreSaveContext SaveContext )
 {
 	Super::PreSave( SaveContext );

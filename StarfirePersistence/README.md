@@ -47,6 +47,8 @@ _PersistenceComponent.h/cpp_
 
 The component that identifies an actor as persistent. Tracks a GUID and whether or not the Actor was created as part of level loading or dynamically spawned.
 
+The component can also be configured to use (or not) the `SaveGame` property markup. The default behavior requires using `SaveGame` to identify the properties that should be included with the `PersistentActorArchiver`.
+
 _PersistentSubsystemInterface.h/cpp_
 
 Interface that identifies subsystems that should be included in the Persistent Actor Archiver process.
@@ -80,6 +82,8 @@ _DataStoreActor.h/cpp_
 
 A Base class for actors that are to be treated as Data Store Actors.
 Comes with a built-in Persistence Component from the Persistence module.
+The component is configured so that this type of actor ignores the `SaveGame` markup.
+The whole point of DataStoreActors is that all of their data makes up the model of the game's data.
 
 _DataStoreSingleton.h/cpp_
 

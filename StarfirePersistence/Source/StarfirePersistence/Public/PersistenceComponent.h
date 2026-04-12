@@ -29,6 +29,13 @@ public:
 	// Determine if this actor is from a level loading in or manual spawning
 	bool WasSpawned( ) const { return bSpawned; }
 
+	// Whether the owning Actor's properties should be saved by respecting the SaveGame markup
+	bool ShouldUseMeta( ) const { return bUseSaveGame; }
+
+	// Configure whether the owning Actor's properties should be saved by respecting the SaveGame markup
+	// Should be set as part of Actor defaults and will ensure if set after BeginPlay
+	void SetUseSaveGameMeta( bool bUseMeta );
+
 	// Control the persisting of the owner actor's transform
 	UPROPERTY( BlueprintReadWrite, EditAnywhere )
 	bool bPersistTransform = true;
@@ -60,4 +67,8 @@ private:
 	// Is this actor from level loading in or manual spawning
 	UPROPERTY( VisibleInstanceOnly, SaveGame, DuplicateTransient )
 	bool bSpawned = true;
+
+	// Whether the owning Actor's properties should be saved by respecting the SaveGame markup
+	UPROPERTY( EditDefaultsOnly )
+	bool bUseSaveGame = true;
 };
