@@ -239,7 +239,7 @@ void UFeatureContentManager::EnableFeatures( const TSet< const UStarfireFeatureD
 			OnFeatureEnabling.Broadcast( E );
 
 			const auto &URL = URLMapping.FindRef( E );
-			FeaturesSubsystem.LoadAndActivateGameFeaturePlugin( URL, { }, Bundles );
+			FeaturesSubsystem.LoadAndActivateGameFeaturePlugin( URL, { } );
 		}
 	}
 }
