@@ -68,7 +68,7 @@ void UPersistenceComponent::BeginPlay( )
 	if (bSpawned)
 	{
 		const auto Manager = UPersistenceManager::GetSubsystem( this );
-		Manager->AddSpawnedActor( GetOwner( ), PersistentGuid );
+		Manager->AddSpawnedActor( GetOwner( ), GetGuid( ) );
 	}
 }
 
