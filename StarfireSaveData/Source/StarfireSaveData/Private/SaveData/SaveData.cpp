@@ -17,7 +17,7 @@ void USaveData::ConfigureArchiveVersions( FArchive &Ar ) const
 	Ar.SetCustomVersion( SaveDataVersion, GameVersion, TEXT( "SaveData" ) );
 }
 
-void USaveData::SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options ) const
+void USaveData::SerializeToBytes( const UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options ) const
 {
 	FMemoryWriter MemWriter( Bytes, true );
 	FObjectAndNameAsStringProxyArchive Archive( MemWriter, false );
@@ -25,7 +25,8 @@ void USaveData::SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes, const
 	Archive.SetWantBinaryPropertySerialization( Options.bWantBinary );
 	Archive.ArIsSaveGame = Options.bSaveGame;
 
-	Object->Serialize( Archive );
+	// it's annoying have to const cast for an operation that should be be allowable with a const pointer
+	const_cast< UObject* >( Object )->Serialize( Archive );
 }
 
 void USaveData::SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options ) const

@@ -46,7 +46,7 @@ public:
 	// Configure an archive with all the applicable version information
 	void ConfigureArchiveVersions( FArchive &Ar ) const;
 	// Utility to convert an object into a collection of bytes
-	void SerializeToBytes( UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options = { } ) const;
+	void SerializeToBytes( const UObject *Object, TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options = { } ) const;
 	// Utility to convert a collection of bytes back into an object
 	void SerializeFromBytes( UObject *Object, const TArray< uint8 > &Bytes, const FSerializeBytesOptions &Options = { } ) const;
 
