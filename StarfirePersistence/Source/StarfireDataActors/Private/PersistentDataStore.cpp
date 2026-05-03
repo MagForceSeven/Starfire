@@ -87,8 +87,9 @@ void UPersistentDataStore::RemoveSingleton( ADataStoreSingleton *Actor )
 	{
 		if (Singletons.Find( InstanceType ) != nullptr)
 		{
-			const auto Value = Singletons.FindAndRemoveChecked( InstanceType );
-			ensureAlways( Value == Actor );
+			TObjectPtr< ADataStoreSingleton > Value;
+			if (Singletons.RemoveAndCopyValue( InstanceType, Value ))
+				ensureAlways( Value == Actor );
 		}
 		else if (InvalidSingletonTypes.Contains( InstanceType ))
 		{
@@ -98,7 +99,6 @@ void UPersistentDataStore::RemoveSingleton( ADataStoreSingleton *Actor )
 		InstanceType = InstanceType->GetSuperClass( );
 	}
 }
-
 
 ADataStoreSingleton* UPersistentDataStore::SpawnSingleton( TSubclassOf< ADataStoreSingleton > SingletonType, bool bDeferredSpawning )
 {

@@ -24,11 +24,11 @@ type_t* UPersistentDataStore::GetDataStoreActor( const FGuid &ID ) const
 template < SFstd::derived_from< ADataStoreSingleton > type_t >
 type_t* UPersistentDataStore::GetSingleton( void ) const
 {
-	return CastChecked< type_t >( GetSingleton( type_t::StaticClass( ) ) );
+	return CastChecked< type_t >( GetSingleton( type_t::StaticClass( ) ), ECastCheckedType::NullAllowed );
 }
 
 template < SFstd::derived_from< ADataStoreSingleton > type_t >
 type_t* UPersistentDataStore::GetSingleton( const UObject *WorldContext )
 {
-	return CastChecked< type_t >( GetDataStoreSingleton( WorldContext, type_t::StaticClass( ) ) );
+	return CastChecked< type_t >( GetDataStoreSingleton( WorldContext, type_t::StaticClass( ) ), ECastCheckedType::NullAllowed );
 }
