@@ -63,17 +63,17 @@ public:
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( const FGameplayTagQuery &Query ) const;
 
 	// Turn on an entitlement so that it can affect gameplay
-	void EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles );
-	void EnableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToEnable, const TArray< FName > &Bundles );
-	void EnableFeatures( const TSet< FString > &ToEnable, const TArray< FName > &Bundles );
+	void EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles = { } );
+	void EnableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToEnable, const TArray< FName > &Bundles = { } );
+	void EnableFeatures( const TSet< FString > &ToEnable, const TArray< FName > &Bundles = { } );
 	// Turn off an entitlement so that it will not affect gameplay
 	void DisableFeatures( const TSet< const UStarfireFeatureData* > &ToDisable );
 	void DisableFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &ToDisable );
 	void DisableFeatures( const TSet< FString > &ToDisable );
 	// Set the state of the entitlements to a specific collection of entitlements
-	void SetEnabledFeatures( const TSet< const UStarfireFeatureData* > &NewFeatures, const TArray< FName > &Bundles );
-	void SetEnabledFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &NewFeatures, const TArray< FName > &Bundles );
-	void SetEnabledFeatures( const TSet< FString > &NewFeatures, const TArray< FName > &Bundles );
+	void SetEnabledFeatures( const TSet< const UStarfireFeatureData* > &NewFeatures, const TArray< FName > &Bundles = { } );
+	void SetEnabledFeatures( const TSet< TObjectPtr< const UStarfireFeatureData > > &NewFeatures, const TArray< FName > &Bundles = { } );
+	void SetEnabledFeatures( const TSet< FString > &NewFeatures, const TArray< FName > &Bundles = { } );
 
 	// Force all the entitlements into the disabled state
 	void DisableAllFeatures( void );
@@ -114,7 +114,7 @@ public:
 
 #if !UE_BUILD_SHIPPING
 	// Enable the features specified by the DeveloperSettings as those that should be enabled for PIE
-	void EnableDeveloperPIEFeatures( const UWorld *World, const TArray< FName > &Bundles );
+	void EnableDeveloperPIEFeatures( const UWorld *World, const TArray< FName > &Bundles = { } );
 #endif
 
 	// Subsystem API
