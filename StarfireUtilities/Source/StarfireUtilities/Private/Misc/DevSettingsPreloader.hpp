@@ -4,6 +4,8 @@
 	#error You shouldn't be including this file directly
 #endif
 
+#include "Templates/ArrayTypeUtilitiesSF.h"
+
 template < CObjectType type_t >
 void IDevSettingsPreloader::Preload( const TSoftObjectPtr< type_t > &SoftPath )
 {
@@ -30,5 +32,6 @@ void IDevSettingsPreloader::Preload( const TArray< TSoftObjectPtr< type_t > > &S
 template < CObjectType type_t >
 void IDevSettingsPreloader::Preload( const TArray< TSoftClassPtr< type_t > > &SoftPaths )
 {
-	Preload( ArrayUpCast< UObject >( SoftPaths ) );
+	for (const auto &SP : SoftPaths)
+		Preload( SP.ToSoftObjectPath( ) );
 }
