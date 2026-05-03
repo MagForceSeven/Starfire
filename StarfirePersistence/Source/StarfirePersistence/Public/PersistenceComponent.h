@@ -8,8 +8,8 @@
 struct FArchivedActor;
 
 // Component that identifies an actor as needing to persist data across level loads and/or save games
-UCLASS( meta=(BlueprintSpawnableComponent) )
-class STARFIREPERSISTENCE_API UPersistenceComponent : public UActorComponent
+UCLASS( NotBlueprintable, meta=(BlueprintSpawnableComponent) )
+class STARFIREPERSISTENCE_API UPersistenceComponent final : public UActorComponent
 {
 	GENERATED_BODY( )
 public:

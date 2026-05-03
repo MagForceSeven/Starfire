@@ -8,8 +8,8 @@
 class ADataStoreActor;
 
 // Component that acts as a link between data store actors and an actor that acts as their visual representation
-UCLASS( )
-class STARFIREDATAACTORS_API UDataStoreVisualizer : public UActorComponent
+UCLASS( NotBlueprintable )
+class STARFIREDATAACTORS_API UDataStoreVisualizer final : public UActorComponent
 {
 	GENERATED_BODY( )
 public:
