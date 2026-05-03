@@ -110,6 +110,8 @@ void USaveDataAsyncManager::Deinitialize( void )
 
 	if (bHadTasks)
 		USaveDataUtilities::OnSaveDataAccessEnded.Broadcast( );
+
+	Super::Deinitialize( );
 }
 
 void USaveDataUtilities::FlushAsyncSaveTasks( const UObject *WorldContext )
