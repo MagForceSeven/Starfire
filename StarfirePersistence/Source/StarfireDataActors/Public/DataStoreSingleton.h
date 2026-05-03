@@ -12,8 +12,8 @@ class STARFIREDATAACTORS_API ADataStoreSingleton : public ADataStoreActor
 	GENERATED_BODY( )
 public:
 	// Actor API
-	void PostActorCreated( ) override;
-	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	void PostRegisterAllComponents( ) override;
+	void Destroyed( ) override;
 	
 	// Data Store Actor API
 #if WITH_EDITOR

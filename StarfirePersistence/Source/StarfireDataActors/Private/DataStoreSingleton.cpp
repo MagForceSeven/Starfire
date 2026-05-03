@@ -5,23 +5,24 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DataStoreSingleton)
 
-void ADataStoreSingleton::PostActorCreated( )
+void ADataStoreSingleton::PostRegisterAllComponents( )
 {
-	Super::PostActorCreated( );
+	Super::PostRegisterAllComponents( );
 
-	if (const auto Subsystem = UPersistentDataStore::GetSubsystem( this ))
-		Subsystem->AddSingleton( this );
+	const auto Subsystem = UPersistentDataStore::GetSubsystem( this );
+	check( Subsystem != nullptr );
+
+	Subsystem->AddSingleton( this );
 }
 
-void ADataStoreSingleton::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ADataStoreSingleton::Destroyed( )
 {
-	if ((EndPlayReason == EEndPlayReason::Destroyed) || (EndPlayReason == EEndPlayReason::RemovedFromWorld))
-	{
-		if (const auto Subsystem = UPersistentDataStore::GetSubsystem( this ))
-			Subsystem->RemoveSingleton( this );
-	}
+	const auto Subsystem = UPersistentDataStore::GetSubsystem( this );
+	check( Subsystem != nullptr );
+
+	Subsystem->RemoveSingleton( this );
 	
-	Super::EndPlay( EndPlayReason );
+	Super::Destroyed( );
 }
 
 #if WITH_EDITOR

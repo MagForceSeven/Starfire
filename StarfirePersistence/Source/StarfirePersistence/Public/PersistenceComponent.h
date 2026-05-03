@@ -20,8 +20,9 @@ public:
 	void PostDuplicate( bool bDuplicateForPIE ) override;
 
 	// Actor Component API
-	void BeginPlay( ) override;
+	void InitializeComponent( ) override;
 	void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+	void UninitializeComponent( ) override;
 
 	// Get the GUID that uniquely identifies this actor across sessions
 	FGuid GetGuid( ) const;

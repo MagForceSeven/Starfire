@@ -10,6 +10,7 @@
 
 UPersistenceComponent::UPersistenceComponent()
 {
+	bWantsInitializeComponent = true;
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
@@ -61,9 +62,9 @@ void UPersistenceComponent::PostDuplicate( bool bDuplicateForPIE )
 #endif
 }
 
-void UPersistenceComponent::BeginPlay( )
+void UPersistenceComponent::InitializeComponent( )
 {
-	Super::BeginPlay( );
+	Super::InitializeComponent( );
 
 	if (bSpawned)
 	{
@@ -79,11 +80,17 @@ void UPersistenceComponent::EndPlay( const EEndPlayReason::Type EndPlayReason )
 		const auto Manager = UPersistenceManager::GetSubsystem( this );
 		Manager->TrackActorAsDestroyed( PersistentGuid );
 	}
-	else if (bSpawned)
+
+	Super::EndPlay( EndPlayReason );
+}
+
+void UPersistenceComponent::UninitializeComponent( )
+{
+	if (bSpawned)
 	{
 		const auto Manager = UPersistenceManager::GetSubsystem( this );
 		Manager->RemoveSpawnedActor( PersistentGuid );
 	}
 
-	Super::EndPlay( EndPlayReason );
+	Super::UninitializeComponent( );
 }

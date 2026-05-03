@@ -16,20 +16,20 @@ ADataStoreActor::ADataStoreActor( )
 	PersistenceComponent->SetUseSaveGameMeta( false );
 }
 
-void ADataStoreActor::BeginPlay( )
+void ADataStoreActor::PostRegisterAllComponents( )
 {
-	Super::BeginPlay( );
+	Super::PostRegisterAllComponents( );
 
 	const auto DataStore = UPersistentDataStore::GetSubsystem( this );
 	DataStore->AddDataStoreActor( this, PersistenceComponent->GetGuid( ) );
 }
 
-void ADataStoreActor::EndPlay( const EEndPlayReason::Type EndPlayReason )
+void ADataStoreActor::Destroyed( )
 {
 	const auto DataStore = UPersistentDataStore::GetSubsystem( this );
 	DataStore->RemoveDataStoreActor( this, PersistenceComponent->GetGuid( ) );
 
-	Super::EndPlay( EndPlayReason );
+	Super::Destroyed( );
 }
 
 #if WITH_EDITOR

@@ -16,8 +16,8 @@ public:
 	ADataStoreActor( );
 
 	// Actor API
-	void BeginPlay( ) override;
-	void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+	void PostRegisterAllComponents( ) override;
+	void Destroyed( ) override;
 
 #if WITH_EDITOR
 	// Specify a custom label to disable in the level outliner
