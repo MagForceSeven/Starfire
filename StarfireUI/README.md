@@ -55,6 +55,7 @@ They are intended to be modal and the UI.Layer.Modal is the default destination 
 A custom blueprint node is available which leverages any 'Expose on Spawn' and delegate properties or event delegates to provide a really convienent way to slot these sort of modal dialogs into the flow of a UI.
 
 This is an example of the custom blueprint node opening a dialog box with two options.
+
 ![](./Resources/readme_open_dialog.png)
 
 ### Text Injection
