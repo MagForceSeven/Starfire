@@ -84,6 +84,19 @@ Highlights:
   * References to assets (or asset subobjects) are saved as paths
   * References to objects also being saved are saved with an index that is restored as a pointer to the spawned or existing object
 
+## Starfire UI
+Further extensions of CommonUI and CommonGame that I use across all my hobby projects.
+
+Highlights:
+* A flexible, prebuilt, UI layout that can either be extended or replaced
+  * Includes a built in fade widget on top of all UMG layers
+  * Includes a mouse capture widget at the bottom of all UMG layers to help identify when the cursor is over UI and when it's over the game world
+* A custom input subsystem (derived from EnhancedInput) to manage input config tags with a stack (does require an engine code tweak to enable)
+* A screen & dialog base class for simple UI interactions like shop menus and confirmation modal dialogs
+* An interface & utility for "text injection", taking an authored game string like "Deal {AtkStat} damage." and inserting a gameplay value from somewhere
+* A custom button class that provides alternate delgates with expanded signatures
+* A custom activatable widget implementation that provides a helpful way to manage input configuration
+  
 ## Dependencies
 * Starfire Utilities is only dependent on modules available from the UE5 engine
 * Starfire Assets is dependent on Starfire Utilities and Epic's Game Features plugin
@@ -93,3 +106,5 @@ Highlights:
   * The Starfire Utilities dependency is removable if desired. See the Starfire Messenger ReadMe for details
 * Starfire Persistence is dependent on Starfire Utilities
   * The Starfire Utilities dependency is removable if desired. See the Starfire Persistence ReadMe for details
+* Starfire UI is dependent on multiple Starfire plugins as well as a plugin from Lyra
+  * Additional details about those dependencies and the possibility of removal can be found in the Starfire UI ReadMe

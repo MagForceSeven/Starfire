@@ -1,0 +1,58 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.7.0",
+	"FriendlyName": "Starfire UI",
+	"Description": "Shared UI library",
+	"Category": "Other",
+	"CreatedBy": "Russell Aasland",
+	"CreatedByURL": "https://github.com/MagForceSeven/Starfire/tree/main/StarfireUI",
+	"DocsURL": "https://github.com/MagForceSeven/Starfire/blob/main/StarfireUI/README.md",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/MagForceSeven/Starfire",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EnabledByDefault": false,
+	"EditorCustomVirtualPath": "Starfire",
+	"SupportedTargetPlatforms": [
+		"Win64",
+		"Linux",
+		"LinuxArm64"
+	],
+	"Modules": [
+		{
+			"Name": "StarfireUI",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireUIDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "StarfireUIEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "StarfireUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "StarfireAssets",
+			"Enabled": true
+		},
+		{
+			"Name": "CommonGame",
+			"Enabled": true
+		},
+		{
+			"Name": "ModularGameplayActors",
+			"Enabled": true
+		}
+	]
+}
