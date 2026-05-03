@@ -11,15 +11,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PersistentDataStore)
 
-UPersistentDataStore* UPersistentDataStore::GetSubsystem( const UObject *WorldContext )
-{
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return nullptr;
-
-	return World->GetSubsystem< UPersistentDataStore >( );
-}
-
 void UPersistentDataStore::Initialize( FSubsystemCollectionBase &Collection )
 {
 	Super::Initialize( Collection );

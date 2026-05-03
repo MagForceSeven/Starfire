@@ -2,7 +2,7 @@
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
-#include "Tickable.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "SplatTaskManager.generated.h"
 
@@ -58,14 +58,10 @@ namespace SplatTaskManager
 // System for handling asynchronous task splatted across multiple frames
 // with support for limitations on the maximum number of iterations or maximum amount of time to spend each from 
 UCLASS( )
-class STARFIREUTILITIES_API USplatTaskManager : public UWorldSubsystem, public FTickableGameObject
+class STARFIREUTILITIES_API USplatTaskManager : public UTickableWorldSubsystem, public TSubsystemNativeAccessors< USplatTaskManager >
 {
 	GENERATED_BODY( )
 public:
-
-	// Utility accessor to get the subsystem based on a miscellaneous world context 
-	static USplatTaskManager* GetSubsystem( const UObject *WorldContext );
-
 	// Start a splatted task for processing a collection of data
 	// MaxCountPerFrame <= 0 results in only being bound by MaxTimePerFrame
 	// MaxTimePerFrame <= 0.0 results in only being bound by MaxCountPerFrame
@@ -90,7 +86,6 @@ public:
 	void Tick( float DeltaTime ) override;
 	ETickableTickType GetTickableTickType( ) const override;
 	bool IsTickableWhenPaused( ) const override { return true; }
-	UWorld* GetTickableGameObjectWorld( void ) const override { return Super::GetWorld( ); }
 	TStatId GetStatId( void ) const override { RETURN_QUICK_DECLARE_CYCLE_STAT( USplatTaskManager, STATGROUP_SplatTasks ); }
 
 	// Subsystem API

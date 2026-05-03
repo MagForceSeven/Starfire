@@ -4,18 +4,16 @@
 #include "Subsystems/EngineSubsystem.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameFeatureStateChangeObserver.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "LibraryGameFeatureWatcher.generated.h"
 
 // Engine subsystem that can react to game feature plugin state changes and add/remove them to/from the Library lookups
 UCLASS( )
-class UDefinitionLibrary_GameFeatureWatcher : public UEngineSubsystem, public IGameFeatureStateChangeObserver
+class UDefinitionLibrary_GameFeatureWatcher : public UEngineSubsystem, public IGameFeatureStateChangeObserver, public TSubsystemNativeAccessors< UDefinitionLibrary_GameFeatureWatcher >
 {
 	GENERATED_BODY( )
-public:
-	// Simplified global accessor
-	[[nodiscard]] static UDefinitionLibrary_GameFeatureWatcher* Get( void );
-	
+public:	
 	// Retrieve the collection of IDs that are the data definitions associated with a game feature
 	[[nodiscard]] TArray< FPrimaryAssetId > GetFeatureAssetIDs( const UGameFeatureData *GameFeatureToLoad ) const;
 

@@ -570,7 +570,7 @@ void UDataDefinitionLibrary::OnObjectPreSave( UObject *Object, FObjectPreSaveCon
 {
 	if (Object->IsA< UDataDefinition >( ) || Object->IsA< UDataDefinitionExtension >( ))
 	{
-		const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::Get( );
+		const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::GetSubsystem( );
 		const auto FeatureNames = FeatureWatcher->GetFeatureNames( );
 
 		if (!IsPathInAnyRoot( Object->GetPathName( ), FeatureNames ))
@@ -585,7 +585,7 @@ void UDataDefinitionLibrary::OnObjectPreSave( UObject *Object, FObjectPreSaveCon
 {
 	TArray< FPrimaryAssetId > Results;
 
-	const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::Get( );
+	const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::GetSubsystem( );
 	const auto FeatureNames = FeatureWatcher->GetFeatureNames( );
 	
 	for (const auto &TypeInfo : AssetTypeInfoList)
@@ -628,7 +628,7 @@ void UDataDefinitionLibrary::DetermineNonFeatureAssets( )
 static void GatherActiveFeatureAssets( TArray< FPrimaryAssetId > &LoadedAssetIDs, TArray< FPrimaryAssetId > &ActiveAssetIDs )
 {
 	auto &FeaturesSubsystem = UGameFeaturesSubsystem::Get( );
-	const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::Get( );
+	const auto FeatureWatcher = UDefinitionLibrary_GameFeatureWatcher::GetSubsystem( );
 
 	// TODO: This loop could probably be better if the GameFeatureSubsystem API was a little better
 	// There are some interesting functions like ForEachRegisteredGameFeature, but that only gives you the feature data which you can't do anything with!

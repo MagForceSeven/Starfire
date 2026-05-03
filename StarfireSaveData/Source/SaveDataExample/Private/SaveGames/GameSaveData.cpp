@@ -87,7 +87,7 @@ void UGameSaveDataUtilities::FillAsyncSaveGameData_Async( const UObject *WorldCo
 
 bool UGameSaveDataUtilities::FillCheckpointData( const UObject *WorldContext, UGameSaveData *SaveGameData )
 {
-	const auto Subsystem = UGameSaveDataSubsystem::Get( WorldContext );
+	const auto Subsystem = UGameSaveDataSubsystem::GetSubsystem( WorldContext );
 	check( Subsystem != nullptr );
 
 	return true;

@@ -19,11 +19,6 @@
 	return "/" + PluginName;
 }
 
-UDefinitionLibrary_GameFeatureWatcher* UDefinitionLibrary_GameFeatureWatcher::Get( void )
-{
-	return GEngine->GetEngineSubsystem< UDefinitionLibrary_GameFeatureWatcher >( );
-}
-
 TArray< FPrimaryAssetId > UDefinitionLibrary_GameFeatureWatcher::GetFeatureAssetIDs( const UGameFeatureData *GameFeatureToLoad ) const
 {
 	if (const auto Entry = FeatureAssets.Find( GameFeatureToLoad ))
@@ -167,7 +162,7 @@ void UDefinitionLibrary_FeatureAssetRuntimeValidator::OnGameFeatureLoading( cons
 
 	VerifiedData.Add( GameFeatureData->GetFName( ) );
 
-	const auto Watcher = UDefinitionLibrary_GameFeatureWatcher::Get( );
+	const auto Watcher = UDefinitionLibrary_GameFeatureWatcher::GetSubsystem( );
 	const auto AssetIDs = Watcher->GetFeatureAssetIDs( GameFeatureData );
 
 	const auto Library = UDataDefinitionLibrary::GetInstance( );

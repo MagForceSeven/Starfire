@@ -132,7 +132,7 @@ struct FSaveDataExecs : public FExecSF
 		bool Async = false;
 		GetParams( Cmd, Async );
 		
-		const auto Subsystem = UGameSaveDataSubsystem::Get( World );
+		const auto Subsystem = UGameSaveDataSubsystem::GetSubsystem( World );
 		check( Subsystem != nullptr );
 		
 		if (Subsystem->LastSaveSlotName.IsEmpty( ))

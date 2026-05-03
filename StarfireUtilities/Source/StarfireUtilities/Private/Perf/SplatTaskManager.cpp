@@ -8,15 +8,6 @@
 
 DEFINE_LOG_CATEGORY( LogSplatTaskManager );
 
-USplatTaskManager* USplatTaskManager::GetSubsystem( const UObject *WorldContext )
-{
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return nullptr;
-
-	return World->GetSubsystem< USplatTaskManager >( );
-}
-
 void USplatTaskManager::Tick( float DeltaTime )
 {
 	ensure( !IsTemplate( ) );

@@ -112,44 +112,36 @@ void USaveDataUtilities::CacheAllSaveGameHeaders( const UObject *WorldContext, c
 
 void USaveDataUtilities::AddHeaderToCache( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const USaveDataHeader *Header, const TSubclassOf< USaveDataHeader > &HeaderType, const ESaveDataLoadResult &Result )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
+	const auto HeaderCache = USaveDataHeaderCache::GetSubsystem( WorldContext );
+	if (HeaderCache == nullptr)
 		return;
-	
-	const auto HeaderCache = World->GetGameInstance( )->GetSubsystem< USaveDataHeaderCache >( );
 
 	HeaderCache->AddHeader( SlotName, UserIndex, Header, HeaderType, Result );
 }
 
 USaveDataUtilities::FEnumeratedHeader_Core USaveDataUtilities::GetCachedHeader( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
+	const auto HeaderCache = USaveDataHeaderCache::GetSubsystem( WorldContext );
+	if (HeaderCache == nullptr)
 		return { SlotName, ESaveDataLoadResult::NotCached, nullptr };
-	
-	const auto HeaderCache = World->GetGameInstance( )->GetSubsystem< USaveDataHeaderCache >( );
 
 	return HeaderCache->Find( SlotName, UserIndex, HeaderType );
 }
 
 void USaveDataUtilities::RemoveHeaderFromCache( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
+	const auto HeaderCache = USaveDataHeaderCache::GetSubsystem( WorldContext );
+	if (HeaderCache == nullptr)
 		return;
-	
-	const auto HeaderCache = World->GetGameInstance( )->GetSubsystem< USaveDataHeaderCache >( );
 
 	HeaderCache->RemoveHeader( SlotName, UserIndex, HeaderType );
 }
 
 void USaveDataUtilities::ClearHeaderCache( const UObject *WorldContext )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
+	const auto HeaderCache = USaveDataHeaderCache::GetSubsystem( WorldContext );
+	if (HeaderCache == nullptr)
 		return;
-	
-	const auto HeaderCache = World->GetGameInstance( )->GetSubsystem< USaveDataHeaderCache >( );
 
 	HeaderCache->ClearCache( );
 }

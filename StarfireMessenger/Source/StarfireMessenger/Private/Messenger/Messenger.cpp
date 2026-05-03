@@ -48,18 +48,6 @@ struct FStatefulMessages
 	return false;
 }
 
-UStarfireMessenger* UStarfireMessenger::GetSubsystem( const UObject *WorldContext )
-{
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World ))
-		return nullptr;
-
-	const auto Subsystem = World->GetSubsystem< UStarfireMessenger >( );
-	ensureAlways( Subsystem != nullptr );
-
-	return Subsystem;
-}
-
 [[nodiscard]] static bool ShouldBroadcastType( const UStruct *Type )
 {
 	if (Type == nullptr)

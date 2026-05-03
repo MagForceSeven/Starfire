@@ -3,23 +3,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(GameSaveDataSubsystem)
 
-UGameSaveDataSubsystem* UGameSaveDataSubsystem::Get( const UObject *WorldContext )
-{
-	if (!ensureAlways( WorldContext != nullptr ))
-		return nullptr;
-	
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return nullptr;
-
-	return Get( World->GetGameInstance( ) );
-}
-
-UGameSaveDataSubsystem* UGameSaveDataSubsystem::Get( const UGameInstance *GameInstance )
-{
-	return GameInstance->GetSubsystem< UGameSaveDataSubsystem >( );
-}
-
 #define LOCTEXT_NAMESPACE "GameSaveData_DeveloperSettings"
 
 FName UGameSaveDataSettings::GetContainerName( ) const

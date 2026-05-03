@@ -7,7 +7,7 @@
 
 TArray< FPrimaryAssetId > UStarfire_GameFeaturesProjectPolicy::GetPreloadAssetListForGameFeature( const UGameFeatureData *GameFeatureToLoad, bool bIncludeLoadedAssets ) const
 {
-	const auto Subsystem = GEngine->GetEngineSubsystem< UDefinitionLibrary_GameFeatureWatcher >( );
+	const auto Subsystem = UDefinitionLibrary_GameFeatureWatcher::GetSubsystem( );
 
 #if WITH_EDITOR
 	// In the editor, new assets may have been added since the plugin was registered

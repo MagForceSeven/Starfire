@@ -114,22 +114,6 @@ void UFeatureContentManager::OnGameFeatureUnregistering( const UGameFeatureData 
 	AssetManager.ChangeBundleStateForPrimaryAssets( { GameFeatureData->GetPrimaryAssetId( ) }, { }, { }, /*bRemoveAllBundles*/ true );
 }
 
-UFeatureContentManager* UFeatureContentManager::GetSubsystem( const UObject *WorldContext )
-{
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return nullptr;
-
-	return GetSubsystem( World->GetGameInstance( ) );
-}
-
-UFeatureContentManager* UFeatureContentManager::GetSubsystem( const UGameInstance *GameInstance )
-{
-	check( GameInstance != nullptr );
-
-	return GameInstance->GetSubsystem< UFeatureContentManager >( );
-}
-
 const UStarfireFeatureData* UFeatureContentManager::FindFeature( const FString &PluginName ) const
 {
 	if (const auto Find = DataMapping.Find( PluginName ))

@@ -8,15 +8,6 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PersistenceManager)
 
-UPersistenceManager* UPersistenceManager::GetSubsystem( const UObject *WorldContext )
-{
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
-		return nullptr;
-
-	return World->GetSubsystem< UPersistenceManager >( );
-}
-
 TOptional< AActor* > UPersistenceManager::FindActor( const FGuid &ID ) const
 {
 	if (DestroyedActors.Contains( ID ))

@@ -2,18 +2,16 @@
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "PersistenceManager.generated.h"
 
 // Manager for tracking alive and destroyed persistent actors
 UCLASS( BlueprintType )
-class STARFIREPERSISTENCE_API UPersistenceManager : public UWorldSubsystem
+class STARFIREPERSISTENCE_API UPersistenceManager : public UWorldSubsystem, public TSubsystemNativeAccessors< UPersistenceManager >
 {
 	GENERATED_BODY( )
 public:
-	// Native accessor to the subsystem
-	[[nodiscard]] static UPersistenceManager* GetSubsystem( const UObject *WorldContext );
-
 	// Find an actor based on the GUID
 	[[nodiscard]] TOptional< AActor* > FindActor( const FGuid &ID ) const;
 

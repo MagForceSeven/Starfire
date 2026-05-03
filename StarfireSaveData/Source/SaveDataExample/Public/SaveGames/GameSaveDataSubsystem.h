@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "GameSaveDataSubsystem.generated.h"
 
@@ -9,14 +10,10 @@ class UGameSaveData;
 
 // A game instance subsystem for use by the save system for various application duration tracking needs
 UCLASS( )
-class UGameSaveDataSubsystem : public UGameInstanceSubsystem
+class UGameSaveDataSubsystem : public UGameInstanceSubsystem, public TSubsystemNativeAccessors< UGameSaveDataSubsystem >
 {
 	GENERATED_BODY( )
 public:
-	// Subsystem Accessor Utilities
-	[[nodiscard]] static UGameSaveDataSubsystem* Get( const UObject *WorldContext );
-	[[nodiscard]] static UGameSaveDataSubsystem* Get( const UGameInstance *GameInstance );
-
 	// The save data that should be used to populate game objects when the map is loaded
 	UPROPERTY( )
 	TObjectPtr< const UGameSaveData > SaveGame = nullptr;

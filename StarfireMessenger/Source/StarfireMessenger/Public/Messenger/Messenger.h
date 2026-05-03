@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "Messenger/MessengerTypes.h"
 #include "Messenger/MessageTypes.h"
@@ -136,13 +137,10 @@ concept CContextStatefulMessageCallbackCallable = std::is_invocable_r_v< void, s
 
 // Class that acts as a centralized message bus to pass messages from indeterminate contexts, to some collection of unknown listeners
 UCLASS( )
-class STARFIREMESSENGER_API UStarfireMessenger : public UWorldSubsystem
+class STARFIREMESSENGER_API UStarfireMessenger : public UWorldSubsystem, public TSubsystemNativeAccessors< UStarfireMessenger >
 {
 	GENERATED_BODY( )
-public:
-	// Subsystem Accessor
-	[[nodiscard]] static UStarfireMessenger* GetSubsystem( const UObject *WorldContext );
-	
+public:	
 	template < CImmediateWithContextType type_t, class in_context_t >
 		requires SFstd::derived_from< typename type_t::ContextType, in_context_t >
 	[[nodiscard]] static typename type_t::ContextType* CastContext( in_context_t *Context );

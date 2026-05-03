@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "RedscreenManager.generated.h"
 
@@ -9,13 +10,10 @@ class UScreenBase;
 class URedscreenScreen;
 
 UCLASS( notplaceable, NotBlueprintable, Config = Redscreens )
-class URedscreenManager final : public UWorldSubsystem
+class URedscreenManager final : public UWorldSubsystem, public TSubsystemNativeAccessors< URedscreenManager >
 {
 	GENERATED_BODY( )
 public:
-	// Singleton Accessor
-	static URedscreenManager* GetSubsystem( const UObject *WorldContext );
-
 	// Add a message to the redscreen UI (possibly creating a screen if one is not active)
 	void AddRedscreen( const FString &Message, bool bOnce );
 

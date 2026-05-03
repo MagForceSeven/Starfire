@@ -92,7 +92,7 @@ void USaveDataAsyncManager::Deinitialize( void )
 	UE_LOGFMT( LogStarfireSaveData, Log, "SaveDataAsyncManager::Deinitialize" );
 
 	const bool bHadTasks = !AsyncTasks.IsEmpty( );
-	
+
 	// Make sure that any pending async work is completed at least enough to release the task
 	// The completion callbacks won't happen so no further async tasks should get started
 	// This is meant as a last ditch cleanup operation, not a guarantee that requested tasks
@@ -107,7 +107,7 @@ void USaveDataAsyncManager::Deinitialize( void )
 
 		delete Task;
 	}
-	
+
 	if (bHadTasks)
 		USaveDataUtilities::OnSaveDataAccessEnded.Broadcast( );
 }
@@ -116,12 +116,10 @@ void USaveDataUtilities::FlushAsyncSaveTasks( const UObject *WorldContext )
 {
 	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
 		return;
-	
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return;
 
-	const auto AsyncManager = World->GetSubsystem< USaveDataAsyncManager >( );
+	const auto AsyncManager = USaveDataAsyncManager::GetSubsystem( WorldContext );
+	if (!ensureAlways( AsyncManager != nullptr ))
+		return;
 
 	AsyncManager->Flush( USaveDataUtilities::FSaveDataAsyncTask::EComplete::WithoutJoin );
 }
@@ -131,36 +129,30 @@ void USaveDataUtilities::WaitOnAsyncSaveTasks( const UObject *WorldContext )
 	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
 		return;
 	
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
+	const auto AsyncManager = USaveDataAsyncManager::GetSubsystem( WorldContext );
+	if (!ensureAlways( AsyncManager != nullptr ))
 		return;
-
-	const auto AsyncManager = World->GetSubsystem< USaveDataAsyncManager >( );
 
 	AsyncManager->Flush( USaveDataUtilities::FSaveDataAsyncTask::EComplete::WithJoin );
 }
 
 bool USaveDataUtilities::AnyAsyncSaveTasksPending( const UObject *WorldContext )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
+	const auto AsyncManager = USaveDataAsyncManager::GetSubsystem( WorldContext );
+	if (!ensureAlways( AsyncManager != nullptr ))
 		return false;
-
-	const auto AsyncManager = World->GetSubsystem< USaveDataAsyncManager >( );
 
 	return AsyncManager->IsTickable( );
 }
 
 bool USaveDataUtilities::StartAsyncSaveTask_Internal( const UObject *WorldContext, FSaveDataAsyncTask *Task )
 {
-	const UWorld *World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
+	const auto AsyncManager = USaveDataAsyncManager::GetSubsystem( WorldContext );
+	if (!ensureAlways( AsyncManager != nullptr ))
 	{
 		delete Task;
 		return false;
 	}
-
-	const auto AsyncManager = World->GetSubsystem< USaveDataAsyncManager >( );
 
 	AsyncManager->AddNewTask( Task );
 
@@ -169,11 +161,10 @@ bool USaveDataUtilities::StartAsyncSaveTask_Internal( const UObject *WorldContex
 
 UWaitOnSaveAsync_AsyncAction* UWaitOnSaveAsync_AsyncAction::WaitOnSaveGameAsyncActions( UObject *WorldContext )
 {
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
+	const auto AsyncManager = USaveDataAsyncManager::GetSubsystem( WorldContext );
+	if (!ensureAlways( AsyncManager != nullptr ))
 		return nullptr;
 	
-	const auto AsyncManager = World->GetSubsystem< USaveDataAsyncManager >( );
 	const auto AsyncAction = NewObject< UWaitOnSaveAsync_AsyncAction >( AsyncManager );
 
 	return AsyncAction;

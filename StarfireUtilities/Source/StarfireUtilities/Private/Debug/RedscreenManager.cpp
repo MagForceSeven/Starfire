@@ -23,15 +23,6 @@ void Redscreens::Init( const UObject *WorldContext )
 	Manager->OnMatchStarted( WorldContext );
 }
 
-URedscreenManager* URedscreenManager::GetSubsystem( const UObject *WorldContext )
-{
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (!ensureAlways( World != nullptr ))
-		return nullptr;
-
-	return World->GetSubsystem< URedscreenManager >( );
-}
-
 void URedscreenManager::OnMatchStarted( const UObject *WorldContext )
 {
 	if (RedscreenWidgetType.IsNull( ))

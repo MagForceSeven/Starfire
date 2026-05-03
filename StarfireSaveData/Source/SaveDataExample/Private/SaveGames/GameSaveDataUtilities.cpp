@@ -309,7 +309,7 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 
 static void PostSaveGameLoad( const UObject *WorldContext, const UGameSaveHeader *Header, const UGameSaveData *SaveData, const FString &SlotName )
 {
-	const auto SaveSubsystem = UGameSaveDataSubsystem::Get( WorldContext );
+	const auto SaveSubsystem = UGameSaveDataSubsystem::GetSubsystem( WorldContext );
 	check( SaveSubsystem != nullptr );
 
 	SaveSubsystem->SaveGame = SaveData;

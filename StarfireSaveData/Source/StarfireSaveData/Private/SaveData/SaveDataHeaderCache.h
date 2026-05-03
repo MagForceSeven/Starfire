@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "SaveData/SaveDataUtilities.h"
 
@@ -36,7 +37,7 @@ public:
 
 // A subsystem acting as a persistent storage of accessed headers to remove the need to repeatedly go to the disk for header data once we've already seen it once
 UCLASS( )
-class USaveDataHeaderCache : public UGameInstanceSubsystem
+class USaveDataHeaderCache : public UGameInstanceSubsystem, public TSubsystemNativeAccessors< USaveDataHeaderCache >
 {
 	GENERATED_BODY( )
 public:

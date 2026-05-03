@@ -4,6 +4,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "GameFeatureStateChangeObserver.h"
 #include "Engine/DeveloperSettings.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "FeatureContentManager.generated.h"
 
@@ -22,14 +23,10 @@ enum class EPluginStatus
 
 // Subsystem for tracking the ownership and active nature of the content package entitlements
 UCLASS( )
-class STARFIREASSETS_API UFeatureContentManager : public UGameInstanceSubsystem, public IGameFeatureStateChangeObserver
+class STARFIREASSETS_API UFeatureContentManager : public UGameInstanceSubsystem, public IGameFeatureStateChangeObserver, public TSubsystemNativeAccessors< UFeatureContentManager >
 {
 	GENERATED_BODY( )
 public:
-	// Static accessor to the subsystem through a standard WorldContext object
-	[[nodiscard]] static UFeatureContentManager* GetSubsystem( const UObject *WorldContext );
-	[[nodiscard]] static UFeatureContentManager* GetSubsystem( const UGameInstance *GameInstance );
-
 	// Find a content entitlement by the asset name
 	[[nodiscard]] const UStarfireFeatureData* FindFeature( const FString &PluginName ) const;
 	[[nodiscard]] TSet< const UStarfireFeatureData* > FindAllFeatures( const TSet< FString > &PluginNames ) const;

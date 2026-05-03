@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Subsystems/WorldSubsystem.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "Templates/TypeUtilitiesSF.h"
 
@@ -15,13 +16,10 @@ struct FStreamableHandle;
 // Subsystem that collects all Data Store Actors and provides a single point of access for lookups
 // and singleton spawning
 UCLASS( )
-class STARFIREDATAACTORS_API UPersistentDataStore : public UWorldSubsystem
+class STARFIREDATAACTORS_API UPersistentDataStore : public UWorldSubsystem, public TSubsystemNativeAccessors< UPersistentDataStore >
 {
 	GENERATED_BODY( )
 public:
-	// Native accessor for getting at the subsystem
-	[[nodiscard]] static UPersistentDataStore* GetSubsystem( const UObject* WorldContext );
-
 	// Spawn a singleton data actor (maybe spawning a subtype based on the settings)
 	template < SFstd::derived_from< ADataStoreSingleton > type_t >
 	type_t* SpawnSingleton( bool bDeferredSpawning = false );

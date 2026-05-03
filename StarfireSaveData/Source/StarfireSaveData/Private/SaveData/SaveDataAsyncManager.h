@@ -3,6 +3,7 @@
 
 #include "Subsystems/WorldSubsystem.h"
 #include "Kismet/BlueprintAsyncActionSF.h"
+#include "Templates/SubsystemNativeAccessors.h"
 
 #include "SaveData/SaveDataUtilities.h"
 
@@ -10,7 +11,7 @@
 
 // System for handling asynchronous tasks related to save games
 UCLASS( )
-class USaveDataAsyncManager : public UWorldSubsystem, public FTickableGameObject
+class USaveDataAsyncManager : public UTickableWorldSubsystem, public TSubsystemNativeAccessors< USaveDataAsyncManager >
 {
 	GENERATED_BODY( )
 public:
@@ -25,7 +26,6 @@ public:
 	ETickableTickType GetTickableTickType() const override;
 	bool IsTickable( void ) const override;
 	bool IsTickableWhenPaused() const override { return true; }
-	UWorld* GetTickableGameObjectWorld( void ) const override { return Super::GetWorld( ); }
 	TStatId GetStatId( void ) const override { RETURN_QUICK_DECLARE_CYCLE_STAT( USaveDataAsyncManager, STATGROUP_SaveDataAsync ); }
 
 	// World Subsystem API
