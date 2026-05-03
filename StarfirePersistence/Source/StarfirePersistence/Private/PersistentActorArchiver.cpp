@@ -60,7 +60,7 @@ void FPersistentActorWriter::Archive( const UObject *WorldContext )
 	// Get all the actors that want to be persisted
 	const auto Manager = UPersistenceManager::GetSubsystem( WorldContext );
 	Manager->PersistentActors.GenerateValueArray( ArrayDownCast< AActor >( ToArchive ) );
-	
+
 	// Find all the subsystems that want to persist
 	for (TObjectIterator< USubsystem > It; It; ++It)
 	{
@@ -72,6 +72,9 @@ void FPersistentActorWriter::Archive( const UObject *WorldContext )
 
 		ToArchive.Push( *It );
 	}
+
+	if (ObjectFilter)
+		ToArchive.RemoveAll( [ Filter = ObjectFilter ]( const UObject *O ) -> bool { return !Filter( O ); } );
 
 	Archive( ToArchive );
 
@@ -225,9 +228,6 @@ bool FPersistentActorWriter::ShouldIncludeComponent( const UActorComponent *Comp
 	if (const auto Persistence = Cast< UPersistenceComponent >( Component ))
 		return Persistence->WasSpawned( ); // only keep spawned persistence components since there are no changes to one in maps
 
-	if (!Settings->ShouldPersistType( Component->GetClass( ) ))
-		return false;
-
 	if (ComponentFilter && !ComponentFilter( Component ))
 		return false;
 
@@ -256,13 +256,19 @@ void FPersistentActorWriter::RecursiveCollectObjects( UObject *Target, const UPe
 		if (ObjectToReferenceIndexMap.Contains( Reference ))
 			continue; // element already tracked, can skip this time
 
-		const auto ComponentRef = Cast< UActorComponent >( Reference );
-		if ((ComponentRef != nullptr) && !ShouldIncludeComponent( ComponentRef ))
-			continue;
-
 		const auto bIsInHierarchy = (Reference->GetOuter( ) == Target);
 		if (!bIsInHierarchy)
 			continue;
+
+		if (const auto ComponentRef = Cast< UActorComponent >( Reference ))
+		{
+			if (!ShouldIncludeComponent( ComponentRef ))
+				continue;
+		}
+		else if (SubObjectFilter && !SubObjectFilter( Reference ))
+		{
+			continue;
+		}
 
 		const auto OuterIndex = ObjectToReferenceIndexMap.Find( Reference->GetOuter( ) );
 		check( OuterIndex != nullptr ); // should have found the outer by this point

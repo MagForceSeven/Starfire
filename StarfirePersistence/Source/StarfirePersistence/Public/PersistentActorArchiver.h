@@ -71,14 +71,17 @@ public:
 	explicit FPersistentActorWriter( FArchive& InInnerArchive );
 
 	// Optional method to filter the Objects that should be included in the archive
-	// Function should return true if the Actor should be included in the archive
+	// Function should return true if the Object should be included in the archive
 	// This is for top level filtering of Actors w/ Persistence Components and Subsystems implementing the Persistent Subsystem interface
 	TFunction< bool (const UObject*) > ObjectFilter;
 
 	// Optional method to filter the Actor Components that should be included in the archive
 	// Function should return true if the component should be included in the archive
-	// This is in addition and after filtering done through UStarfirePersistenceSettings::ComponentsToPersist
 	TFunction< bool (const UActorComponent*) > ComponentFilter;
+
+	// Optional method to filter non-component sub-objects that have been identified as being included in the archive
+	// Function should return true if the object should be included in the archive
+	TFunction< bool (const UObject*) > SubObjectFilter;
 
 	// Archive all Actors with a PersistenceComponent & all Subsystem implementing the PersistentSubsystem interface
 	void Archive( const UObject* WorldContext );

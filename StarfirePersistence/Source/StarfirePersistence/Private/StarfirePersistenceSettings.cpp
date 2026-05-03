@@ -5,21 +5,6 @@
 
 #define LOCTEXT_NAMESPACE "GameSaveData_DeveloperSettings"
 
-bool UStarfirePersistenceSettings::ShouldPersistType( const UClass *ComponentType ) const
-{
-	for (const auto &PersistType : ComponentsToPersist)
-	{
-		const auto ComponentClass = PersistType.Get( );
-		if (ComponentClass == nullptr)
-			continue; // if the class isn't loaded, there can't be an instance of it anywhere, so it doesn't matter
-
-		if (ComponentType->IsChildOf( ComponentClass ))
-			return true;
-	}
-
-	return false;
-}
-
 FName UStarfirePersistenceSettings::GetContainerName( ) const
 {
 	return FName( "Project" );
