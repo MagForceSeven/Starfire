@@ -8,6 +8,8 @@
 
 #include "FeatureContentManager.generated.h"
 
+struct FGameplayTag;
+struct FGameplayTagQuery;
 class UStarfireFeatureData;
 class UGameFeaturesSubsystem;
 
@@ -55,6 +57,10 @@ public:
 
 	// Get the entire collection of features that could be owned/enabled
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( ) const;
+	// Find features with a particular gameplay tag (either as a content flag or content type)
+	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( const FGameplayTag &RequiredTag ) const;
+	// Find Features with content flags that match a given query`
+	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( const FGameplayTagQuery &Query ) const;
 
 	// Turn on an entitlement so that it can affect gameplay
 	void EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles );

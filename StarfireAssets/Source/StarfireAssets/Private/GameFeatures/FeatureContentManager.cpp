@@ -207,6 +207,34 @@ TArray< const UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures( 
 	return KnownFeatureData;
 }
 
+TArray< const UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures( const FGameplayTag &RequiredTag ) const
+{
+	TArray< const UStarfireFeatureData* > Results;
+
+	for (const auto &F : KnownFeatureData)
+	{
+		if (F->ContentFlags.HasTag( RequiredTag ))
+			Results.Push( F );
+		else if (F->ContentType.MatchesTag( RequiredTag ))
+			Results.Push( F );
+	}
+
+	return Results;
+}
+
+TArray< const UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures( const FGameplayTagQuery &Query ) const
+{
+	TArray< const UStarfireFeatureData* > Results;
+
+	for (const auto &F : KnownFeatureData)
+	{
+		if (Query.Matches( F->ContentFlags ))
+			Results.Push( F );
+	}
+
+	return Results;
+}
+
 void UFeatureContentManager::EnableFeatures( const TSet< const UStarfireFeatureData* > &ToEnable, const TArray< FName > &Bundles )
 {
 	auto &FeaturesSubsystem = UGameFeaturesSubsystem::Get( );
