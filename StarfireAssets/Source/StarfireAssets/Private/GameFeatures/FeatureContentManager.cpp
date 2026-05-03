@@ -631,15 +631,15 @@ struct FFeatureExecs : public FExecSF
 {
 	FFeatureExecs( )
 	{
-		AddExec( TEXT( "Starfire.FeatureContent.Enable" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::Enable ) );
-		AddExec( TEXT( "Starfire.FeatureContent.Disable" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::Disable ) );
-		AddExec( TEXT( "Starfire.FeatureContent.SetAsOwned" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAsOwned ) );
-		AddExec( TEXT( "Starfire.FeatureContent.SetAsDisowned" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAsDisowned ) );
+		AddExec( TEXT( "Starfire.FeatureContent.Enable" ), TEXT( "Activate a specific game feature." ), FExecDelegate::CreateStatic( &FFeatureExecs::Enable ) );
+		AddExec( TEXT( "Starfire.FeatureContent.Disable" ), TEXT( "Deactivate a specific game feature." ), FExecDelegate::CreateStatic( &FFeatureExecs::Disable ) );
+		AddExec( TEXT( "Starfire.FeatureContent.SetAsOwned" ), TEXT( "Mark a specific game feature as owned by the player." ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAsOwned ) );
+		AddExec( TEXT( "Starfire.FeatureContent.SetAsDisowned" ), TEXT( "Mark a specific game feature as unowned by the player." ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAsDisowned ) );
 
-		AddExec( TEXT( "Starfire.FeatureContent.EnableAll" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::EnableAll ) );
-		AddExec( TEXT( "Starfire.FeatureContent.DisableAll" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::DisableAll ) );
-		AddExec( TEXT( "Starfire.FeatureContent.SetAllOwned" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAllOwned ) );
-		AddExec( TEXT( "Starfire.FeatureContent.SetAllDisowned" ), TEXT( "Save the current state of the game" ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAllDisowned ) );
+		AddExec( TEXT( "Starfire.FeatureContent.EnableAll" ), TEXT( "Activate all game features present in the project." ), FExecDelegate::CreateStatic( &FFeatureExecs::EnableAll ) );
+		AddExec( TEXT( "Starfire.FeatureContent.DisableAll" ), TEXT( "Deactivate all game features present in the project." ), FExecDelegate::CreateStatic( &FFeatureExecs::DisableAll ) );
+		AddExec( TEXT( "Starfire.FeatureContent.SetAllOwned" ), TEXT( "Set all game features as owned by the player." ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAllOwned ) );
+		AddExec( TEXT( "Starfire.FeatureContent.SetAllDisowned" ), TEXT( "Set all game features as unowned by the player." ), FExecDelegate::CreateStatic( &FFeatureExecs::SetAllDisowned ) );
 	}
 
 	static void Enable( const UWorld *World, const TCHAR *Cmd, FOutputDevice &Ar )
