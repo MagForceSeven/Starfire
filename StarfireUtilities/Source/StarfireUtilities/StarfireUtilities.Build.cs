@@ -37,5 +37,11 @@ public class StarfireUtilities : ModuleRules
 			{
 				// ... add any modules that your module loads dynamically here ...
 			} );
+
+		if (Target.bBuildEditor)
+		{
+			PublicDependencyModuleNames.Add( "EditorSubsystem" );
+			PublicDependencyModuleNames.Add( "UnrealEd" );
+		}
 	}
 }

@@ -74,6 +74,18 @@ Once you add the interface to the Developer Setting class and implement the Prel
 
 Currently no blueprint support, but Developer Settings aren't supported as Blueprint subtypes anyway (yet)
 
+### Native Accessor Mixins
+_SubsystemNativeAccessors.h/cpp_
+
+A utility structure that can be used to add `GetSubsystem` static functions to subsystems. Depending on the type of subsystem, different overloads will be included.
+
+So for Game Instance subsystems, it would add an overload with a `const UObject*` world context and one with a `const UGameInstance*`.
+While a World Subsystem would add an overload with a `const UObject*` world context and one with a `const UWorld*`.
+
+_ActorSingletonAccessor.h/cpp_
+
+A utility structure that can be used to add `GetSingleton` static functions to `AActor` types that function as world singletons.
+
 ### Self Registering Exec Helper
 _ExecSF.h/hpp/cpp_
 
