@@ -10,6 +10,7 @@
 struct FActorSpawnParameters;
 
 class ADataStoreActor;
+class UDataStoreVisualizer;
 
 // Collection of utilities for working with Data Store Actors and their visualizer actors
 UCLASS( )
@@ -29,6 +30,8 @@ public:
 	static AActor* GetVisualizer( const ADataStoreActor *DataStore );
 	// Retrieve the Data Actor being visualized by an Actor
 	static ADataStoreActor* GetDataStoreActor( const AActor *Actor );
+	// Retrieve the Data Actor being visualized by an Actor
+	static ADataStoreActor* GetDataStoreActor( const UDataStoreVisualizer *Component );
 
 	// Retrieve the Actor (as a specific subtype) current being used to visualize a Data Actor
 	template < SFstd::derived_from< AActor > type_t >

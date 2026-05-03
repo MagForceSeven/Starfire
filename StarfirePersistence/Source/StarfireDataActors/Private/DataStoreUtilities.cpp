@@ -106,6 +106,14 @@ ADataStoreActor* UDataStoreUtilities::GetDataStoreActor( const AActor *Actor )
 	return Component->DataStoreActor;
 }
 
+ADataStoreActor* UDataStoreUtilities::GetDataStoreActor( const UDataStoreVisualizer *Component )
+{
+	if (!IsValid( Component ))
+		return nullptr;
+
+	return Component->DataStoreActor;
+}
+
 AActor* UDataStoreUtilities::SpawnVisualizer( ADataStoreActor *DataStore, const FTransform &Transform, FActorSpawnParameters SpawnParameters, const TSubclassOf< AActor > &VisualizerOverride )
 {
 	if (!ensureAlways( DataStore != nullptr ))
