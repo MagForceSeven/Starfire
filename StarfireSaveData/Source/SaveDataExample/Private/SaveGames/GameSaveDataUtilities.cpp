@@ -249,7 +249,10 @@ void UGameSaveDataUtilities::SaveCheckpointToSlot_Async( const UObject *WorldCon
 
 		void DoWork( )
 		{
-			SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObject( CheckpointData.Get( ), GetTransientPackage( ) ) );
+			auto Parameters = InitStaticDuplicateObjectParams( CheckpointData.Get( ), GetTransientPackage( ) );
+			Parameters.bSkipPostLoad = true; // we don't need any functionality from PostLoad and skipping allows us to run duplicate threaded
+			
+			SaveGameData = CastChecked< UGameSaveData >( StaticDuplicateObjectEx(Parameters) );
 			if (SaveGameData == nullptr)
 				return;
 
