@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Engine/DeveloperSettings.h"
+#include "Misc/DevSettingsPreloader.h"
 
 #include "DataStoreSettings.generated.h"
 
@@ -9,7 +10,7 @@ class ADataStoreSingleton;
 
 // Project configuration options for the Persistent Data Store Actors
 UCLASS( DefaultConfig, Config = "Game" )
-class STARFIREDATAACTORS_API UDataStoreSettings : public UDeveloperSettings
+class STARFIREDATAACTORS_API UDataStoreSettings : public UDeveloperSettings, public IDevSettingsPreloader
 {
 	GENERATED_BODY( )
 public:
@@ -26,4 +27,8 @@ public:
 	FText GetSectionText( ) const override;
 	FText GetSectionDescription( ) const override;
 #endif
+
+protected:
+	// Dev Settings Preloader API
+	void PreloadAll( const UWorld *World ) override;
 };

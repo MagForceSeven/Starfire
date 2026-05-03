@@ -1,9 +1,16 @@
 
 #include "DataStoreSettings.h"
 
+#include "DataStoreSingleton.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DataStoreSettings)
 
 #define LOCTEXT_NAMESPACE "StarfireDataActors_DeveloperSettings"
+
+void UDataStoreSettings::PreloadAll( const UWorld *World )
+{
+	Preload( SingletonTypes );
+}
 
 FName UDataStoreSettings::GetContainerName( ) const
 {
