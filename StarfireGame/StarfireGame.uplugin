@@ -1,0 +1,92 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "5.7.0",
+	"FriendlyName": "Starfire Game",
+	"Description": "A collection of useful game concept modules",
+	"Category": "Other",
+	"CreatedBy": "Russell Aasland",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"EnabledByDefault": false,
+	"EditorCustomVirtualPath": "Starfire",
+	"SupportedTargetPlatforms": [
+		"Win64",
+		"Linux",
+		"LinuxArm64"
+	],
+	"Modules": [
+		{
+			"Name": "StarfireGameCore",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ActorCollections",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "GameFacts",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "GameFeatureSubsystems",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "LevelMetadata",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "LevelMetadataEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "PlayerModes",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "PlayerModesDeveloper",
+			"Type": "UncookedOnly",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "StarfireAssets",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
+			"Name": "StarfireUtilities",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
+			"Name": "StarfireUI",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
+			"Name": "CommonGame",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
+			"Name": "ModularGameplayActors",
+			"Enabled": true,
+			"Optional": true
+		}
+	]
+}

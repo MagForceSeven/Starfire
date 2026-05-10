@@ -97,6 +97,20 @@ Highlights:
 * A custom button class that provides alternate delgates with expanded signatures
 * A custom activatable widget implementation that provides a helpful way to manage input configuration
   
+### Starfire Game
+A collection of unrelated gameplay tools that can be very useful and powerful in organizing a game.
+
+Highlights:
+* A collection of subsystems that have their lifetimes tied to the activation state of the game feature plugin their code is located in (in addition to the lifetimes defined by type of subsystem being declared)
+* A collection of classes & subsystem for manging runtime collections of Actors
+  * Most helpfully a way to configure actor types to automatically be added to certain collections
+* Conceptualizes a subset of GameplayTags as "Game Facts"
+  * A unique interface and utilities for gathering all the "facts" for a given Object/Actor
+  * A helpful structure for configuring and checking conditions through the facts on a given Object/Actor
+* Another system for modifying player experience through "Player Modes" which exist on a helpful stack and have the option of spawning/possessing new pawns with functionality specific to the mode at the top of the stack
+* A data asset base class that can be used to quickly generate custom metadata assets about and linked to map assets
+* A game instance implementation that exercises the desired preloading behavior exposed by the Data Definition Library (StarfireAssets) and Dev Settings Preloader Interface (StarfireUtilities)
+
 ## Dependencies
 * Starfire Utilities is only dependent on modules available from the UE5 engine
 * Starfire Assets is dependent on Starfire Utilities and Epic's Game Features plugin
@@ -108,3 +122,5 @@ Highlights:
   * The Starfire Utilities dependency is removable if desired. See the Starfire Persistence ReadMe for details
 * Starfire UI is dependent on multiple Starfire plugins as well as a plugin from Lyra
   * Additional details about those dependencies and the possibility of removal can be found in the Starfire UI ReadMe
+* Starfire Game is optionally dependent on multiple other Starfire plugins as well as two plugins from Lyra
+  * Additional details about those dependencies and the possibility of removal can be found in the Starfire Game ReadMe
