@@ -68,8 +68,8 @@ void UPersistenceComponent::InitializeComponent( )
 
 	if (bSpawned)
 	{
-		const auto Manager = UPersistenceManager::GetSubsystem( this );
-		Manager->AddSpawnedActor( GetOwner( ), GetGuid( ) );
+		if (const auto Manager = UPersistenceManager::GetSubsystem( this ))
+			Manager->AddSpawnedActor( GetOwner( ), GetGuid( ) );
 	}
 }
 
@@ -77,8 +77,8 @@ void UPersistenceComponent::EndPlay( const EEndPlayReason::Type EndPlayReason )
 {
 	if (!bSpawned && bPersistDestruction && (EndPlayReason == EEndPlayReason::Destroyed))
 	{
-		const auto Manager = UPersistenceManager::GetSubsystem( this );
-		Manager->TrackActorAsDestroyed( PersistentGuid );
+		if (const auto Manager = UPersistenceManager::GetSubsystem( this ))
+			Manager->TrackActorAsDestroyed( PersistentGuid );
 	}
 
 	Super::EndPlay( EndPlayReason );
@@ -88,8 +88,8 @@ void UPersistenceComponent::UninitializeComponent( )
 {
 	if (bSpawned)
 	{
-		const auto Manager = UPersistenceManager::GetSubsystem( this );
-		Manager->RemoveSpawnedActor( PersistentGuid );
+		if (const auto Manager = UPersistenceManager::GetSubsystem( this ))
+			Manager->RemoveSpawnedActor( PersistentGuid );
 	}
 
 	Super::UninitializeComponent( );

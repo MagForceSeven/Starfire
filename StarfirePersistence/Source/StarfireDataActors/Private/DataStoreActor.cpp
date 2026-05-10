@@ -20,14 +20,14 @@ void ADataStoreActor::PostRegisterAllComponents( )
 {
 	Super::PostRegisterAllComponents( );
 
-	const auto DataStore = UPersistentDataStore::GetSubsystem( this );
-	DataStore->AddDataStoreActor( this, PersistenceComponent->GetGuid( ) );
+	if (const auto DataStore = UPersistentDataStore::GetSubsystem( this ))
+		DataStore->AddDataStoreActor( this, PersistenceComponent->GetGuid( ) );
 }
 
 void ADataStoreActor::Destroyed( )
 {
-	const auto DataStore = UPersistentDataStore::GetSubsystem( this );
-	DataStore->RemoveDataStoreActor( this, PersistenceComponent->GetGuid( ) );
+	if (const auto DataStore = UPersistentDataStore::GetSubsystem( this ))
+		DataStore->RemoveDataStoreActor( this, PersistenceComponent->GetGuid( ) );
 
 	Super::Destroyed( );
 }

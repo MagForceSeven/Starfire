@@ -9,18 +9,14 @@ void ADataStoreSingleton::PostRegisterAllComponents( )
 {
 	Super::PostRegisterAllComponents( );
 
-	const auto Subsystem = UPersistentDataStore::GetSubsystem( this );
-	check( Subsystem != nullptr );
-
-	Subsystem->AddSingleton( this );
+	if (const auto Subsystem = UPersistentDataStore::GetSubsystem( this ))
+		Subsystem->AddSingleton( this );
 }
 
 void ADataStoreSingleton::Destroyed( )
 {
-	const auto Subsystem = UPersistentDataStore::GetSubsystem( this );
-	check( Subsystem != nullptr );
-
-	Subsystem->RemoveSingleton( this );
+	if (const auto Subsystem = UPersistentDataStore::GetSubsystem( this ))
+		Subsystem->RemoveSingleton( this );
 	
 	Super::Destroyed( );
 }
