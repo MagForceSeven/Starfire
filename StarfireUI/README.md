@@ -109,6 +109,22 @@ Lastly is a utility that can be used to dynamically create `UWidget` class widge
 I found this to be a more practical solution than creating blueprint widgets that just wrap `UWidget` instances.
 The downside is the lack of the nice 'Expose On Spawn' initialization input pins, so it's not a universal replacement for anything. Just a handy, sometimes, tool.
 
+### Create Widget (Starfire)
+This is a custom node that can replace most uses of the standard Create Widget blueprint node. It does two things that I found myself doing repeatedly when building dynamic widget layouts:
+
+* Calls an 'Init' function after all the 'Expose On Spawn' members have been assigned the passed in values
+	* It's a little annoying that 'Expose On Spawn' members aren't set prior to OnInitialized, but that's just the order things happen
+	* Input parameters can be added to 'Init' as normal. They will be included in the set of input pins along with 'Expose On Spawn' properties
+	* This function lookup is treated as optional. Widgets being created with this node are not required to have such a named function
+* A Panel is an additional (optional) input parameter
+	* After 'Init' (if present) and 'Expose On Spawn' setting has occurred, the new widget will be automatically added to the panel
+	* The 'Panel Slot' output is the return value from 'Add Child to Panel'
+	* 'Panel Slot' is also the slot type that corresponds to the type passed in to 'Panel'
+		* i.e. if 'Panel' is a VerticalBox, 'Panel Slot' will be a 'Vertical Box Slot'
+
+![](./Resources/readme_createwidget_base.png)
+![](./Resources/readme_createwidget_example.png)
+
 ## Dependencies
 
 In addition to the dependencies on plugins from the Engine, Starfire Messenger is also dependent on the Starfire Utilities & Assets plugins found in this repository.
@@ -166,6 +182,10 @@ A function library with a few helpful functions.
 _K2Node_StarfireOpenDialog.h/cpp_
 
 The custom blueprint node that supports asynchronous interactions with Starfire Dialog classes.
+
+_K2Node_CreateWidget.h/cpp_
+
+The custom blueprint for the enhanced version of a Create Widget blueprint node.
 
 ### Editor
 There is currently nothing in this module, it is a placeholder for future features. This is a placeholder for future features that need this module type.

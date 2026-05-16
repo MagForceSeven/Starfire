@@ -29,8 +29,11 @@ public class StarfireUIDeveloper : ModuleRules
 				"KismetCompiler",
 				"GameplayTags",
 				"Engine",
+				"UMG",
 				"UnrealEd",
+
 				"CommonGame",
+
 				"StarfireUI",
 				"StarfireUtilitiesDeveloper",
 				// ... add private dependencies that you statically link with here ...	
