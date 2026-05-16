@@ -181,6 +181,21 @@ DEFINE_FUNCTION( UFeatureContentManager::execGetEnabledFeatures )
 	P_NATIVE_END;
 }
 
+TArray< UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures_BP( ) const
+{
+	return BlueprintCompatibilityCast( GetKnownFeatures( ) );
+}
+
+TArray< UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures_Tag_BP( FGameplayTag RequiredTag ) const
+{
+	return BlueprintCompatibilityCast( GetKnownFeatures( RequiredTag ) );
+}
+
+TArray< UStarfireFeatureData* > UFeatureContentManager::GetKnownFeatures_Query_BP( FGameplayTagQuery Query ) const
+{
+	return BlueprintCompatibilityCast( GetKnownFeatures( Query ) );
+}
+
 TArray< FString > UFeatureContentManager::GetEnabledFeatureNames( void ) const
 {
 	TArray< FString > Results;

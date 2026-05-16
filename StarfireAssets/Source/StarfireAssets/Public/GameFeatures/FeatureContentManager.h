@@ -59,7 +59,7 @@ public:
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( ) const;
 	// Find features with a particular gameplay tag (either as a content flag or content type)
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( const FGameplayTag &RequiredTag ) const;
-	// Find Features with content flags that match a given query`
+	// Find Features with content flags that match a given query
 	[[nodiscard]] TArray< const UStarfireFeatureData* > GetKnownFeatures( const FGameplayTagQuery &Query ) const;
 
 	// Turn on an entitlement so that it can affect gameplay
@@ -168,6 +168,16 @@ private:
 
 	DECLARE_FUNCTION( execGetOwnedFeatures );
 	DECLARE_FUNCTION( execGetEnabledFeatures );
+
+	// Get the entire collection of features that could be owned/enabled
+	UFUNCTION( BlueprintCallable, DisplayName = "Get Known Features", Category = "Feature Content" )
+	TArray< UStarfireFeatureData* > GetKnownFeatures_BP( ) const;
+	// Find features with a particular gameplay tag (either as a content flag or content type)
+	UFUNCTION( BlueprintCallable, DisplayName = "Get Known Features w/ Tag", Category = "Feature Content" )
+	TArray< UStarfireFeatureData* > GetKnownFeatures_Tag_BP( FGameplayTag RequiredTag ) const;
+	// Find Features with content flags that match a given query
+	UFUNCTION( BlueprintCallable, DisplayName = "Get Known Features (Query)", Category = "Feature Content" )
+	TArray< UStarfireFeatureData* > GetKnownFeatures_Query_BP( FGameplayTagQuery Query ) const;
 };
 
 // Developer settings that can be used for PIE sessions to configure the ownership of DLC content
