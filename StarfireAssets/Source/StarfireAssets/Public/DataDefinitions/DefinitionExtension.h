@@ -18,11 +18,14 @@ public:
 	FPrimaryAssetId GetPrimaryAssetId( ) const override;
 
 	// The set of assets that this extension should affect while it's active
-	UPROPERTY( EditDefaultsOnly, Category = "Data Definition Extension", meta = (DisplayThumbnail = false) )
+	UPROPERTY( EditDefaultsOnly, Category = "Data Definition Extension", meta = (DisplayThumbnail = false), AssetRegistrySearchable )
 	TArray< TSoftObjectPtr< const UDataDefinition > > AssetsToExtend;
 
-private:
 #if WITH_EDITORONLY_DATA
+	// The types of definitions the extension is valid for. If empty, extension is valid for any definition
+	[[nodiscard]] virtual TArray< TSubclassOf< UDataDefinition > > GetCompatibleDefinitionTypes( void ) const { return { }; }
+
+private:
 	friend class UDataDefinitionExtension_AssetDefinition;
 	TSharedPtr< FSlateBrush > IconBrush;
 
