@@ -31,12 +31,17 @@ static void CopyNonEditablePropertiesFromCDO( ULevelMetadata *Metadata, const UL
 
 	for (const auto& Property : TFieldRange< FProperty >( CDO->GetClass( ) ))
 	{
-		if (Property->HasAnyPropertyFlags( CPF_Edit | CPF_Transient | CPF_DuplicateTransient ))
+		if (Property->HasAnyPropertyFlags( CPF_Transient | CPF_DuplicateTransient ))
+			continue;
+		if (Property->HasAllPropertyFlags( CPF_Edit ) && !Property->HasAnyPropertyFlags( CPF_EditConst ))
 			continue;
 		if (IgnoreProperties.Contains( Property ))
 			continue;
 
-		Property->CopyCompleteValue( Metadata, CDO );
+		const uint8* SourceValueAddress = (uint8*)CDO + Property->GetOffset_ForInternal( );
+		uint8* TargetValueAddress = (uint8*)Metadata + Property->GetOffset_ForInternal( );
+
+		Property->CopyCompleteValue( TargetValueAddress, SourceValueAddress );
 	}
 }
 
