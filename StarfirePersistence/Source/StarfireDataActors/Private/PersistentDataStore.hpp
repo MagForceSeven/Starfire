@@ -32,3 +32,9 @@ type_t* UPersistentDataStore::GetSingleton( const UObject *WorldContext )
 {
 	return CastChecked< type_t >( GetDataStoreSingleton( WorldContext, type_t::StaticClass( ) ), ECastCheckedType::NullAllowed );
 }
+
+template < SFstd::derived_from< ADataStoreActor > type_t >
+TSubclassOf< type_t > UPersistentDataStore::GetOverrideClassFor( void )
+{
+	return GetOverrideClassFor( type_t::StaticClass( ) ).Get( );
+}

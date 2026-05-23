@@ -6,6 +6,7 @@
 
 #include "DataStoreSettings.generated.h"
 
+class ADataStoreActor;
 class ADataStoreSingleton;
 
 // Project configuration options for the Persistent Data Store Actors
@@ -14,9 +15,9 @@ class STARFIREDATAACTORS_API UDataStoreSettings : public UDeveloperSettings, pub
 {
 	GENERATED_BODY( )
 public:
-	// Blueprint Types
+	// Blueprint types that should be spawned instead of their closest native type
 	UPROPERTY( EditDefaultsOnly, Config )
-	TArray< TSoftClassPtr< ADataStoreSingleton > > SingletonTypes;
+	TArray< TSoftClassPtr< ADataStoreActor > >  BlueprintOverrides;
 	
 	// Developer Settings API
 	FName GetContainerName( ) const override;

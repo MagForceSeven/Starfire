@@ -11,16 +11,68 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(PersistentDataStore)
 
+TSharedPtr< FStreamableHandle > UPersistentDataStore::OverrideTypesLoading;
+TMap< TSubclassOf< ADataStoreActor >, TSubclassOf< ADataStoreActor > > UPersistentDataStore::ClassOverrides;
+
+[[nodiscard]] static UClass* GetFirstNativeParent( UClass* Type )
+{
+	check( Type != nullptr );
+
+	while (Type != nullptr)
+	{
+		if (Type->IsNative( ))
+			return Type;
+		
+		Type = Type->GetSuperClass();
+	}
+
+	UE_ASSUME( false );
+}
+
 void UPersistentDataStore::Initialize( FSubsystemCollectionBase &Collection )
 {
 	Super::Initialize( Collection );
 
 	Settings = GetDefault< UDataStoreSettings >( );
-	TArray< FSoftObjectPath > TypePaths;
-	Algo::Transform( Settings->SingletonTypes, TypePaths,
-		[ ]( const TSoftClassPtr< ADataStoreSingleton > &Type ) -> FSoftObjectPath { return Type.ToSoftObjectPath( ); } );
 
-	SingletonTypesLoading = UAssetManager::Get( ).GetStreamableManager( ).RequestAsyncLoad( TypePaths );
+	if (!Settings->BlueprintOverrides.IsEmpty( ) && !OverrideTypesLoading.IsValid( ))
+	{
+		TArray< FSoftObjectPath > TypePaths;
+		Algo::Transform( Settings->BlueprintOverrides, TypePaths,
+			[ ]( const TSoftClassPtr< ADataStoreActor > &Type ) -> FSoftObjectPath { return Type.ToSoftObjectPath( ); } );
+		TypePaths.RemoveAll( [ ]( const FSoftObjectPath& Path ) -> bool { return Path.IsNull( ); } );
+
+		const auto OnLoadComplete = [ WeakThis = TWeakObjectPtr(this) ]( ) -> void
+		{
+			static const auto DataActorClass = ADataStoreActor::StaticClass( );
+			static const auto SingletonActorClass = ADataStoreSingleton::StaticClass( );
+		
+			if (!WeakThis.IsValid( ))
+				return;
+		
+			for (const auto &Type : WeakThis->Settings->BlueprintOverrides)
+			{
+				if (!ensureAlwaysMsgf( !Type->IsNative( ), TEXT( "Native type '%s' found in Data Store Settings - Blueprint Overrides." ), *Type->GetName( ) ))
+					continue;
+
+				const auto NativeParent = GetFirstNativeParent( Type.Get( ) );
+				if (NativeParent == DataActorClass)
+					continue;
+				if (NativeParent == SingletonActorClass)
+					continue;
+
+				ensureAlwaysMsgf( ClassOverrides.Find( NativeParent ) == nullptr, TEXT( "Multiple Data Store Actor overrides found for class '%s'." ), *NativeParent->GetName( ) );
+				ClassOverrides.Add( NativeParent, Type.Get( ) );
+			}
+		};
+
+		OverrideTypesLoading = UAssetManager::Get( ).GetStreamableManager( ).RequestAsyncLoad( TypePaths, OnLoadComplete );
+	}
+}
+
+bool UPersistentDataStore::DoesSupportWorldType( const EWorldType::Type WorldType ) const
+{
+	return (WorldType == EWorldType::Game) || (WorldType == EWorldType::PIE);
 }
 
 void UPersistentDataStore::AddDataStoreActor( ADataStoreActor *Actor, const FGuid &Guid )
@@ -104,23 +156,14 @@ ADataStoreSingleton* UPersistentDataStore::SpawnSingleton( TSubclassOf< ADataSto
 {
 	if (!ensureAlways( SingletonType != nullptr ))
 		return nullptr;
-	
-	if (SingletonTypesLoading.IsValid( ) && !SingletonTypesLoading->HasLoadCompleted( ))
-		SingletonTypesLoading->WaitUntilComplete( );
+
+	if (OverrideTypesLoading.IsValid( ) && !OverrideTypesLoading->HasLoadCompleted( ))
+		OverrideTypesLoading->WaitUntilComplete( );
 
 	if (SingletonType->IsNative( ))
 	{
-		for (const auto &ClassPtr : Settings->SingletonTypes)
-		{
-			if (ClassPtr == nullptr)
-				continue;
-
-			if (ClassPtr->IsChildOf( SingletonType ))
-			{
-				SingletonType = ClassPtr.Get( );
-				break;
-			}
-		}
+		if (const auto Found = ClassOverrides.Find( SingletonType ))
+			SingletonType = *Found;
 	}
 
 	FActorSpawnParameters Params;
@@ -176,4 +219,15 @@ ADataStoreSingleton* UPersistentDataStore::GetDataStoreSingleton( const UObject 
 	check( Subsystem != nullptr );
 
 	return Subsystem->GetSingleton( SingletonType );
+}
+
+TSubclassOf<ADataStoreActor> UPersistentDataStore::GetOverrideClassFor( const TSubclassOf<ADataStoreActor> &BaseType )
+{
+	if (OverrideTypesLoading.IsValid( ) && !OverrideTypesLoading->HasLoadCompleted( ))
+		OverrideTypesLoading->WaitUntilComplete( );
+	
+	if (const auto Found = ClassOverrides.Find( BaseType ))
+		return *Found;
+
+	return BaseType;
 }

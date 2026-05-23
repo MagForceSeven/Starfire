@@ -40,8 +40,15 @@ public:
 	template < SFstd::derived_from< ADataStoreSingleton > type_t >
 	[[nodiscard]] static type_t* GetSingleton( const UObject* WorldContext );
 
+	// Get the data store actor class that should be spawned when planning to spawn a certain type
+	template < SFstd::derived_from< ADataStoreActor > type_t >
+	[[nodiscard]] static TSubclassOf< type_t > GetOverrideClassFor( void );
+
 	// Subsystem API
 	void Initialize( FSubsystemCollectionBase &Collection ) override;
+
+	// World Subsystem
+	bool DoesSupportWorldType(const EWorldType::Type WorldType) const override;
 
 private:
 	friend class ADataStoreActor;
@@ -94,8 +101,14 @@ private:
 	UFUNCTION( BlueprintCallable, meta = (DeterminesOutputType = SingletonType, WorldContext = "WorldContext") )
 	static ADataStoreSingleton* GetDataStoreSingleton( const UObject *WorldContext, TSubclassOf< ADataStoreSingleton > SingletonType );
 
+	// Get the data store actor class that should be spawned when planning to spawn a certain type
+	static TSubclassOf< ADataStoreActor > GetOverrideClassFor( const TSubclassOf< ADataStoreActor > &BaseType );
+
 	// Resource loading of the singleton types from the settings
-	TSharedPtr< FStreamableHandle > SingletonTypesLoading;
+	static TSharedPtr< FStreamableHandle > OverrideTypesLoading;
+
+	// The mapping of blueprint types from the native data store actor types they should replace
+	static TMap< TSubclassOf< ADataStoreActor >, TSubclassOf< ADataStoreActor > > ClassOverrides;
 };
 
 #if CPP

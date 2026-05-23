@@ -9,7 +9,7 @@
 
 void UDataStoreSettings::PreloadAll( const UWorld *World )
 {
-	Preload( SingletonTypes );
+	Preload( BlueprintOverrides );
 }
 
 FName UDataStoreSettings::GetContainerName( ) const
