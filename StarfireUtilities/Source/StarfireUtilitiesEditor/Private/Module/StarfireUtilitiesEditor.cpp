@@ -4,6 +4,9 @@
 #include "Tools/AssetSizeSettings.h"
 #include "Tools/SInlineAssetSize.h"
 
+// UMG
+#include "Components/Widget.h"
+
 #define LOCTEXT_NAMESPACE "StarfireUtilitiesEditor"
 
 static void OnAssetOpened_InlineSizeMapTool( UObject *Asset, IAssetEditorInstance *Editor )
@@ -14,19 +17,34 @@ static void OnAssetOpened_InlineSizeMapTool( UObject *Asset, IAssetEditorInstanc
 		return;
 
 	const auto Settings = GetDefault< UAssetSizeSettings >( );
+	const auto Blueprint = Cast< UBlueprint >( Asset );
 
-	UToolMenu* FoundMenu = nullptr;
-	if (Asset->IsA< UBlueprint >( ))
-    	FoundMenu = UToolMenus::Get( )->ExtendMenu( "AssetEditor.BlueprintEditor.ToolBar.GraphName" );
+	const auto AddSection = [ Blueprint, Asset ]( UToolMenu *Menu )
+	{
+		auto& Section = Menu->AddSection( "InlineAssetSize" );
+
+		if (Blueprint != nullptr)
+			Section.InsertPosition = FToolMenuInsert( "Compile", EToolMenuInsertType::After );
+		else
+			Section.InsertPosition = FToolMenuInsert( "Asset", EToolMenuInsertType::Before );
+
+		SInlineAssetSize::AddToMenuSection( Section, Asset );
+	};
+
+	if ((Blueprint != nullptr) && Blueprint->GeneratedClass->IsChildOf< UWidget >( ))
+	{
+		AddSection( UToolMenus::Get( )->ExtendMenu( "AssetEditor.WidgetBlueprintEditor.ToolBar.GraphName" ) );
+		AddSection( UToolMenus::Get( )->ExtendMenu( "AssetEditor.WidgetBlueprintEditor.ToolBar.DesignerName" ) );
+	}
+	else if (Blueprint != nullptr)
+	{
+		AddSection( UToolMenus::Get( )->ExtendMenu( "AssetEditor.BlueprintEditor.ToolBar.GraphName" ) );
+		AddSection( UToolMenus::Get( )->ExtendMenu( "AssetEditor.BlueprintEditor.ToolBar.DefaultsName" ) );
+	}
 	else if (Settings->SupportsClassExplicitly( Asset->GetClass( ) ))
-		FoundMenu = UToolMenus::Get( )->ExtendMenu( FName("AssetEditor." + Asset->GetClass( )->GetName( ) + "Editor.ToolBar") );
-	else
-		return;
-
-	auto& Section = FoundMenu->AddSection( "InlineAssetSize" );
-	Section.InsertPosition = FToolMenuInsert( "Asset", EToolMenuInsertType::Before );
-
-	SInlineAssetSize::AddToMenuSection( Section, Asset );
+	{
+		AddSection( UToolMenus::Get( )->ExtendMenu( FName("AssetEditor." + Asset->GetClass( )->GetName( ) + "Editor.ToolBar") ) );
+	}
 }
 
 void FStarfireUtilitiesEditor::StartupModule( )

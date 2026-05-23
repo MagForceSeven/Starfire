@@ -35,6 +35,7 @@ public class StarfireUtilitiesEditor : ModuleRules
 				"UnrealEd",
 				"ToolMenus",
 				"DeveloperSettings",
+				"UMG",
 
 				"StarfireUtilities",
 				// ... add private dependencies that you statically link with here ...	

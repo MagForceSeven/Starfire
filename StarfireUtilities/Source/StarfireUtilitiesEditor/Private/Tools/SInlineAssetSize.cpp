@@ -1,17 +1,21 @@
 
 #include "Tools/SInlineAssetSize.h"
 
+#include "AssetSizeSettings.h"
+
 #include "Lambdas/InvokedScope.h"
 
 // Asset Manager Editor
 #include "AssetManagerEditorModule.h"
 
+// Unreal Ed
+#include "Toolkits/AssetEditorToolkitMenuContext.h"
+
 // Engine
 #include "AssetCompilingManager.h"
+#include "Engine/AssetManager.h"
 
 // Core UObject
-#include "AssetSizeSettings.h"
-#include "Engine/AssetManager.h"
 #include "UObject/ObjectSaveContext.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SInlineAssetSize)
@@ -37,10 +41,13 @@ void SInlineAssetSize::AddToMenuSection( FToolMenuSection &Section, UObject *Ass
 	if (!Settings->EnableInlineAssetSizeWidget)
 		return;
 
-	Section.AddDynamicEntry("ProcessCommands", FNewToolMenuSectionDelegate::CreateLambda(
-		[ Asset ]( FToolMenuSection& InSection ) -> void
+	Section.AddDynamicEntry( "ProcessCommands", FNewToolMenuSectionDelegate::CreateLambda(
+		[ ]( FToolMenuSection& InSection ) -> void
 	{
-		auto Widget = SNew( SInlineAssetSize, Asset );
+		const auto* Context = InSection.FindContext< UAssetEditorToolkitMenuContext >( );
+		const auto& Objects = Context->GetEditingObjects( );
+			
+		auto Widget = SNew( SInlineAssetSize, Objects[ 0 ] );
 		InSection.AddEntry( FToolMenuEntry::InitWidget(
 			"AssetSize",
 			Widget,
@@ -49,15 +56,12 @@ void SInlineAssetSize::AddToMenuSection( FToolMenuSection &Section, UObject *Ass
 		InSection.AddEntry(FToolMenuEntry::InitToolBarButton(
 			"SizeMapButton",
 			FToolUIActionChoice(
-				FExecuteAction::CreateLambda( [ WAsset = TWeakObjectPtr(Asset) ]( ) -> void
+				FExecuteAction::CreateLambda( [ Objects ]( ) -> void
 				{
-					if (WAsset.IsValid( ))
-					{
-						const FAssetData AssetData( WAsset.Get( ) );
-						const TArray Assets = { AssetData.PackageName };
+					TArray< FName > AssetNames;
+					Algo::Transform( Objects, AssetNames, [ ]( const UObject* Obj ) -> FName { return Obj->GetPackage( )->GetFName( ); } );
 
-						IAssetManagerEditorModule::Get( ).OpenSizeMapUI( Assets );
-					}
+					IAssetManagerEditorModule::Get( ).OpenSizeMapUI( AssetNames );
 				} ) ),
 			INVTEXT("Size Map"),
 			INVTEXT("Open the Size Map UI"),
