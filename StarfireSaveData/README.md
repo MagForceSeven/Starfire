@@ -95,7 +95,7 @@ __ConfigureArchiveVersions__ is a utility for setting all the version data on an
 
 __SerializeToBytes__ & __SerializeFromBytes__ are simple utilities for converting between a known object and a bytestream. This can be handy for very simple objects and wraps the process of creating an archiver (`FObjectAndNameAsStringProxyArchive`), setting the version information and then serializing the object using the provided byte array. As with other serialization, this archiver is flagged to not use the binary serialization which makes backwards compatibility easier at the cost of saves that might be a little larger.
 
-__IsCompatible__ is a virtual that must be overridden by the derived type in order to check if a specific game version number can be loaded by the current game. This function is always called on the Class Default Object of the derived type so no actual save data can be used to make this determination, only the game version input and whatever values are available to determine min & max compatibility allowances.
+__IsCompatible__ is a virtual that must be overridden by the derived type in order to check if a specific save version number and changelist can be loaded by the current game. This function is always called on the Class Default Object of the derived type so no actual save data can be used to make this determination, only the game version input and whatever values are available to determine min & max compatibility allowances.
 
 #### Save Data Header
 _SaveDataHeader.h/cpp_

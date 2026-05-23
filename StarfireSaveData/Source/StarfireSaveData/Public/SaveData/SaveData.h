@@ -41,7 +41,7 @@ public:
 	void FillCoreData( const UObject *WorldContext, uint32 InGameVersion );
 
 	// Hooks for save game version-ing information
-	[[nodiscard]] virtual bool IsCompatible( uint32 InVersion ) const { return true; }
+	[[nodiscard]] virtual bool IsCompatible( uint32 InVersion, uint32 InChangelist ) const { return true; }
 
 	// Configure an archive with all the applicable version information
 	void ConfigureArchiveVersions( FArchive &Ar ) const;

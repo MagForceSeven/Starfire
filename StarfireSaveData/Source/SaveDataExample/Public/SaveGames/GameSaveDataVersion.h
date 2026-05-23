@@ -45,6 +45,8 @@ enum class EGameSaveDataVersion : uint32
 #endif
 };
 
+constexpr uint32 Minimum_Allowed_CL = 1;
+
 // Utility for stripping the RTM bit from a version so that versioning can be compared across build types
 constexpr EGameSaveDataVersion GameSaveData_StripRTM( EGameSaveDataVersion Version ) { return (EGameSaveDataVersion)((int)Version & ~(int)EGameSaveDataVersion::RTM); }
 

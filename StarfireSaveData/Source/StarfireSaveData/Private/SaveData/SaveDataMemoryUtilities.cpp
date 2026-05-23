@@ -295,7 +295,7 @@ ESaveDataLoadResult SaveDataMemoryUtilities::LoadDataFromMemory( const TArray< u
 	}
 
 	const auto SaveGameTypeCDO = SaveDataClass->GetDefaultObject< USaveData >( );
-	if (!SaveGameTypeCDO->IsCompatible( VersionData.SaveDataVersion ))
+	if (!SaveGameTypeCDO->IsCompatible( VersionData.SaveDataVersion, VersionData.BuildVersion ))
 		return ESaveDataLoadResult::IncompatibleVersion;
 
 	// Handle any failures to serialize the save game data
