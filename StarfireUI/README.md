@@ -53,6 +53,7 @@ A child of Starfire Screen, Starfire Dialog is a specialized widget that specifi
 They are intended to be modal and the UI.Layer.Modal is the default destination layer for them.
 
 A custom blueprint node is available which leverages any 'Expose on Spawn' and delegate properties or event delegates to provide a really convienent way to slot these sort of modal dialogs into the flow of a UI.
+This custom blueprint node also supports an optional function named 'Init'. The input parameters from 'Init' are added to the input pins of 'Open Dialog' and it is called after all 'Expose on Spawn' properties are set.
 
 This is an example of the custom blueprint node opening a dialog box with two options.
 

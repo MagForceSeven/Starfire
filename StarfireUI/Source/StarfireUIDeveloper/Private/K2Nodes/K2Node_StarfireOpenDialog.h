@@ -48,6 +48,9 @@ private:
 	static const FName BeforePushWidgetPinName;
 	static const FName AfterPushExecPinName;
 	static const FName AfterPushWidgetPinName;
+	
+	// The name of the function we'll be calling on the created widget as additional initialization to the 'expose-on-spawn- members
+	static const FName WidgetInitFunctionName;
 
 	// Determine if there are any configuration problems with this node instance
 	[[nodiscard]] bool CheckForErrors( const FKismetCompilerContext& CompilerContext ) const;

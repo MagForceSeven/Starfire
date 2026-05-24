@@ -15,6 +15,7 @@
 #include "K2Node_AsyncAction.h"
 #include "K2Node_ConvertAsset.h"
 #include "K2Node_DynamicCast.h"
+#include "K2Node_CallFunction.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(K2Node_StarfireOpenDialog)
 
@@ -27,6 +28,10 @@ const FName UK2Node_StarfireOpenDialog::BeforePushExecPinName( "BeforePush" );
 const FName UK2Node_StarfireOpenDialog::BeforePushWidgetPinName( "BeforeWidget" );
 const FName UK2Node_StarfireOpenDialog::AfterPushExecPinName( "AfterPush" );
 const FName UK2Node_StarfireOpenDialog::AfterPushWidgetPinName( "AfterWidget" );
+
+const FName UK2Node_StarfireOpenDialog::WidgetInitFunctionName( "Init" );
+
+const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
 
 UK2Node_StarfireOpenDialog::UK2Node_StarfireOpenDialog( void )
 {
@@ -86,6 +91,19 @@ void UK2Node_StarfireOpenDialog::CreatePinsForClass( UClass *InClass, TArray< UE
 	
 	Super::CreatePinsForClass( InClass, OutClassPins );
 
+	if (const auto InitFunc = InClass->FindFunctionByName( WidgetInitFunctionName ))
+	{
+		auto InitInputs = StarfireK2Utilities::CreateFunctionPins( this, InitFunc, EGPD_Input, false, PinNameLambda );
+
+		if (OutClassPins != nullptr)
+			OutClassPins->Append( InitInputs );
+
+		for (const auto Input : InitInputs)
+		{
+			StarfireK2Utilities::SetPinToolTip( Input, FText( ) );
+		}
+	}
+
 	StarfireK2Utilities::CreateEventDispatcherPins( InClass, this, OutClassPins, /*bMakeAdvanced*/ false, DispatchersToSkip );
 
 	// Update the exec output params to match the type of the result pin
@@ -137,6 +155,8 @@ void UK2Node_StarfireOpenDialog::ExpandNode( FKismetCompilerContext& CompilerCon
 	const auto Open_BeforePushWidget = FindPinChecked( BeforePushWidgetPinName );
 	const auto Open_AfterPushExec = FindPinChecked( AfterPushExecPinName );
 	const auto Open_AfterPushWidget = FindPinChecked( AfterPushWidgetPinName );
+
+	const auto ClassToSpawn = GetClassToSpawn( );
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// Call PushContentToLayerForPlayer
@@ -221,6 +241,31 @@ void UK2Node_StarfireOpenDialog::ExpandNode( FKismetCompilerContext& CompilerCon
 
 	CompilerContext.MovePinLinksToIntermediate( *Open_BeforePushWidget, *BeforeCast_Output );
 
+	///////////////////////////////////////////////////////////////////////////////////
+	// Call Init (maybe)
+	UEdGraphPin *CallInit_Exec = nullptr;
+	UEdGraphPin *CallInit_Then = nullptr;
+	if (const auto InitFunc = ClassToSpawn->FindFunctionByName( WidgetInitFunctionName ))
+	{
+		const auto CallInit = CompilerContext.SpawnIntermediateNode< UK2Node_CallFunction >( this, SourceGraph );
+		CallInit->FunctionReference.SetExternalMember( WidgetInitFunctionName, ClassToSpawn );
+		CallInit->AllocateDefaultPins( );
+
+		CallInit_Exec = CallInit->GetExecPin( );
+		CallInit_Then = CallInit->GetThenPin( );
+
+		const auto CallInit_Self = CallInit->FindPinChecked( StarfireK2Utilities::Self_ParamName );
+		BeforeCast_Output->MakeLinkTo( CallInit_Self );
+
+		const auto PinExpansionLambda = StarfireK2Utilities::FDoPinExpansion::CreateLambda( [ &CompilerContext, CallInit ]( const FProperty *Param, UEdGraphPin *NodePin )
+			{
+				const auto FuncPin = CallInit->FindPinChecked( Param->GetFName( ) );
+				CompilerContext.MovePinLinksToIntermediate( *NodePin, *FuncPin );
+			}
+		);
+		StarfireK2Utilities::ExpandFunctionPins( this, InitFunc, EGPD_Input, PinNameLambda, PinExpansionLambda );
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	// create the nodes for assigning to all the 'ExposeOnSpawn' members of the created object
 	const auto SpawnSetters_LastThen = FKismetCompilerUtilities::GenerateAssignmentNodes( CompilerContext, SourceGraph, BeforePushCast, this, BeforeCast_Output, GetClassToSpawn( ) );
@@ -231,8 +276,16 @@ void UK2Node_StarfireOpenDialog::ExpandNode( FKismetCompilerContext& CompilerCon
 	const auto EventDispatchers_LastThen = StarfireK2Utilities::ExpandDispatcherPins( CompilerContext, SourceGraph, this, SpawnSetters_LastThen, GetClassToSpawn( ), BeforeCast_Output, IsGenerated );
 
 	///////////////////////////////////////////////////////////////////////////////////
-	// Now "append" the execution from our node to the end of those two setup steps
-	CompilerContext.MovePinLinksToIntermediate( *Open_BeforePushExec, *EventDispatchers_LastThen );
+	// Now "append" the execution from our node to the end of those two setup steps (and maybe the init function)
+	if (CallInit_Exec == nullptr)
+	{
+		CompilerContext.MovePinLinksToIntermediate( *Open_BeforePushExec, *EventDispatchers_LastThen );
+	}
+	else
+	{
+		EventDispatchers_LastThen->MakeLinkTo( CallInit_Exec );
+		CompilerContext.MovePinLinksToIntermediate( *Open_BeforePushExec, *CallInit_Then );
+	}
 
 	///////////////////////////////////////////////////////////////////////////////////
 	// After Push Exec
