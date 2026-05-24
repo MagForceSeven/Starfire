@@ -4,10 +4,14 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "SaveData/SaveDataCommon.h"
+#include "StructUtils/StructView.h"
 
 #include "SaveDataUtilities.generated.h"
 
 DECLARE_STATS_GROUP( TEXT( "SaveDataAsync" ), STATGROUP_SaveDataAsync, STATCAT_Advanced );
+
+struct FSaveBlockerBase;
+struct FSaveBlockerHandle;
 
 // Utilities for saving game state to files
 UCLASS( )
@@ -48,6 +52,10 @@ public:
 
 	// Remove all the headers that may currently be cached
 	static void ClearHeaderCache( const UObject *WorldContext );
+
+	// Remove a reason that save data should be prevented
+	UFUNCTION( BlueprintCallable, Category = "Save Data", meta = (WorldContext = "WorldContext") )
+	static void RemoveSaveBlocker( const UObject *WorldContext, UPARAM( ref ) FSaveBlockerHandle &Handle );
 
 protected:
 	// The file extension applied to slot names that go through ISaveGameSystem
@@ -100,6 +108,12 @@ protected:
 	
 	// Collection of checks on the state of the application to tell if saves are appropriate (editor, commandlets, etc.)
 	[[nodiscard]] static bool SaveOperationsAreAllowed( void );
+
+	// Check if save data should be prevented for a certain type of save
+	[[nodiscard]] static bool IsSaveTypeBlocked( const UObject *WorldContext, const TSubclassOf< USaveData > &SaveType, TArray< FString > *OutReasons = nullptr );
+
+	// Add a new reason that save data should be prevented for a certain type of save
+	static FSaveBlockerHandle AddSaveBlocker( const UObject *WorldContext, const TSubclassOf< USaveData > &SaveType, const TConstStructView< FSaveBlockerBase > &NewBlocker );
 
 	// Determine all the slot names currently in use
 	[[nodiscard]] static TArray< FString > EnumerateSlotNames( int32 UserIndex);
@@ -176,7 +190,7 @@ protected:
 	[[nodiscard]] static ESaveDataLoadResult LoadDataFromSlot_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, USaveDataHeader *outHeader, USaveData *outSaveData );
 	[[nodiscard]] static const USaveDataHeader* LoadSlotHeaderOnly_Internal( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );
 
-	//
+	// Implementation functions for the process that is safe to call from anywhere, once some outer API has validated and controlled the execution
 	[[nodiscard]] static bool SaveDataToPath_Internal( const UObject *WorldContext, const USaveDataHeader *Header, const USaveData *SaveData, const FString &PathName );
 	[[nodiscard]] static ESaveDataLoadResult LoadDataFromPath_Internal( const UObject *WorldContext, const FString &PathName, USaveDataHeader *outHeader, USaveData *outSaveData );
 	[[nodiscard]] static const USaveDataHeader* LoadPathHeaderOnly_Internal( const UObject *WorldContext, const FString &PathName, const TSubclassOf< USaveDataHeader > &HeaderType, ESaveDataLoadResult &outResult );

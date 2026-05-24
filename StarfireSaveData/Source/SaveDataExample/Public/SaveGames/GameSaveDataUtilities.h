@@ -89,6 +89,12 @@ public:
 	UFUNCTION( BlueprintCallable, BlueprintPure = true, Category = "Save Games", meta = (WorldContext = "WorldContext") )
 	[[nodiscard]] static bool IsManualSavingAllowed( const UObject *WorldContext );
 
+	// Check if the game currently allows manual saves to be created
+	[[nodiscard]] static bool IsManualSavingAllowed( const UObject *WorldContext, TArray< FString > &OutBlockedReasons );
+
+	// Add a new reason that save game creation should be prevented
+	static FSaveBlockerHandle AddSaveGameBlocker( const UObject *WorldContext, const TConstStructView< FSaveBlockerBase > &NewBlocker );
+
 	// Explicit call to load headers for the available saves
 	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext") )
 	static void CacheSaveGameHeaders( const UObject *WorldContext, int UserIndex );
@@ -189,6 +195,10 @@ public:
 #endif
 
 protected:
+	// Add a new reason that save game creation should be prevented
+	UFUNCTION( BlueprintCallable, Category = "Save Games", meta = (WorldContext = "WorldContext") )
+	static FSaveBlockerHandle AddSaveGameBlocker( const UObject *WorldContext, const TInstancedStruct< FSaveBlockerBase > &NewBlocker );
+	
 	// Determine the best name for an auto save, either an unused slot name or the oldest save with the AutoSave type
 	[[nodiscard]] static FString FindBestAutoSaveSlotName( const UObject *WorldContext, int32 UserIndex );
 	// Determine the best name for an auto save asynchronously, either an unused slot name or the oldest save with the AutoSave type

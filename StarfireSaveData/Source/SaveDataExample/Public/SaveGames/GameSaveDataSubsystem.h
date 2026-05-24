@@ -10,7 +10,7 @@ class UGameSaveData;
 
 // A game instance subsystem for use by the save system for various application duration tracking needs
 UCLASS( )
-class UGameSaveDataSubsystem : public UGameInstanceSubsystem, public TSubsystemNativeAccessors< UGameSaveDataSubsystem >
+class SAVEDATAEXAMPLE_API UGameSaveDataSubsystem : public UGameInstanceSubsystem, public TSubsystemNativeAccessors< UGameSaveDataSubsystem >
 {
 	GENERATED_BODY( )
 public:
@@ -20,11 +20,24 @@ public:
 
 	// The slot name of the last save that was loaded
 	FString LastSaveSlotName;
+	
+	// Subsystem API
+	void Initialize( FSubsystemCollectionBase& Collection ) override;
+	void Deinitialize( ) override;
+
+private:
+	// Handle the transition from one world to the next
+	UFUNCTION( )
+	void HandleNewWorld( UGameInstance *GameInstance, UWorld *OldWorld, UWorld *NewWorld );
+
+	// Handle the start of gameplay in worlds
+	UFUNCTION( )
+	void HandleWorldBeginPlay( bool bBeginPlay );
 };
 
 // Configuration settings for project specific save data settings
 UCLASS( Config = "Game", DefaultConfig )
-class UGameSaveDataSettings : public UDeveloperSettings
+class SAVEDATAEXAMPLE_API UGameSaveDataSettings : public UDeveloperSettings
 {
 	GENERATED_BODY( )
 public:

@@ -4,6 +4,8 @@
 #include "SaveData/SaveData.h"
 #include "SaveData/SaveDataHeader.h"
 #include "SaveData/SaveDataMemoryUtilities.h"
+#include "SaveData/SaveBlockerBase.h"
+#include "SaveData/SaveBlockerSubsystem.h"
 
 // Engine
 #include "PlatformFeatures.h"
@@ -60,6 +62,36 @@ bool USaveDataUtilities::SaveOperationsAreAllowed( void )
 		return false;
 
 	return true;
+}
+
+bool USaveDataUtilities::IsSaveTypeBlocked( const UObject *WorldContext, const TSubclassOf< USaveData > &SaveType, TArray< FString > *OutReasons )
+{
+	const auto Subsystem = USaveBlockerSubsystem::GetSubsystem( WorldContext );
+	if (!ensureAlways( Subsystem != nullptr ))
+		return false;
+
+	return Subsystem->IsSaveTypeBlocked( SaveType, OutReasons );
+}
+
+FSaveBlockerHandle USaveDataUtilities::AddSaveBlocker( const UObject *WorldContext, const TSubclassOf< USaveData > &SaveType, const TConstStructView< FSaveBlockerBase > &NewBlocker )
+{
+	const auto Subsystem = USaveBlockerSubsystem::GetSubsystem( WorldContext );
+	if (!ensureAlways( Subsystem != nullptr ))
+		return { };
+
+	if (!ensureAlways( NewBlocker.IsValid( ) ))
+		return { };
+
+	return Subsystem->AddSaveBlocker( SaveType, NewBlocker );
+}
+
+void USaveDataUtilities::RemoveSaveBlocker( const UObject *WorldContext, FSaveBlockerHandle &Handle )
+{
+	const auto Subsystem = USaveBlockerSubsystem::GetSubsystem( WorldContext );
+	if (!ensureAlways( Subsystem != nullptr ))
+		return;
+
+	Subsystem->RemoveSaveBlocker( Handle );
 }
 
 void USaveDataUtilities::EnumerateSlotNames_Async( const UObject *WorldContext, int32 UserIndex, const FEnumerateSlotNamesComplete_Core &OnCompletion )

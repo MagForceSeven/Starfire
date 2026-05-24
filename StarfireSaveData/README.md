@@ -21,6 +21,7 @@ The plugin consists of 4 modules, though only two of them currently do anything.
 * At this point you should be able to successfully compile and use the features of the save data.
 * Evaluate the public API in the Utilities.h, BlueprintActions.h and ConsoleCmds.cpp to decide what is allowed to be done with the save data type that you are creating. You should also update the strings in ConsoleCmds.cpp to replace "Game.SaveData" with something more appropriate to your save data file. Consider any other elements of the public API that you wish to change the terminology of, ie "Checkpoint" → "InMemorySave".
 * Start adding data to your SaveData and Header objects, using the functions `UGameSaveDataUtilities::CreateSaveData`, `UGameSaveDataUtilities::FillAsyncSaveGameData` & `UGameSaveDataUtilities::CreateSaveGameHeader` to populate them with data from the running game. There are comments in each function to help direct you to where you can fill it out.
+* Take a look at the TODO in `HandleNewWorld` of your branched version of `UGameSaveDataSubsystem`. Uncomment the begin play binding after adding checks so that it's only called for your non-gameplay levels like your main menu. Or remove the functions entirely add prevent saves in your own way!
 * Add an implemenation to `UGameSaveData::ApplySaveData` to apply data from the save to the world after being loaded.
 * At this point you should have a fully capable save system limited only by the game data you've included in the save. The console commands available by default in ConsoleCmds.cpp should be sufficient for testing your new save until you are able to hook actual game systems that should trigger the save or until UI becomes available for the player to interact with them.
 * If the project supports a platform that doesn't have a matching _SaveDataUtilities_XXXXX.cpp_ supporting file, branch/duplicate _SaveDataUtilities_GenericPlatform.cpp_ to support your platform. Remove the #if/#endif.
@@ -51,6 +52,21 @@ Primarily, this tends to be data that can drive UI elements involved with listin
 The project's derived type is free to include whatever data it feels is necessary to save the state of game that is running. All data that is meant to be saved must be a `UPROPERTY` since the underlying UE serialization used is property based. Since this object is dedicated to save data, the SaveGame `UPROPERTY` markup is ignored and all properties are included when it is serialized.
 
 The serialization of the header does not use binary serialization, so adding and removing properties is safely backwards compatible. At least in general. How the project responds to default or missing data is left as an exercise for the project implementation. Changing the types of existing properties is a bit dicey and it's better to create a new property with a unique name and the desired type, unless you're also bumping the minimum version for the project save file to entirely prevent the loading of old data.
+
+### Save Data Blocker
+A subsystem that provides a way to register structures that can control if it is a safe time for the player/game to create save data. Like, you may not want to allow saves in the middle of a cutscene even though you allow access to the pause menu.
+Blockers are tracked per-save-data subclass so that multiple uses of SaveData as a base class don't interfere. For example, a save game might not be correct to make at the main menu, but a user profile save would still want to save.
+
+A base structure is provided that blockers must be derived from. This means new blocker types can only be created in C++, however as long as the blocker is a BlueprintType it can still be applied from blueprint.
+The base structure has a single function `IsSavingBlocked` which can be implemented to do whatever checks need to be made.
+
+Blockers can be designed and applied in two ways:
+* Blockers can be applied and removed over the course of the game. A handle is provided when applied to identify the specific blocker to be removed.
+* Blockers can be applied during `BeginPlay` and be present for the entire duration of a level.
+
+The subsystem that tracks the blockers is a World Subsystem, which means the set of blockers is wiped during level transitions. This has been done on purpose to simplify the cleanup process for most of the blockers that get applied.
+
+If a save has already been created successfully (and kept in memory), the save blockers will not prevent actually writing the save to disk
 
 ### Public Utilities
 
@@ -148,6 +164,10 @@ _SaveDataVersion.h/cpp_
 
 Contains the GUID used for the custom project versioning used when serializing the Header, Save Data and any other objects included in the save. As part of calling `USaveData::ConfigureArchiverVersions`, the custom version is assigned to the GUID version based on the __GameVersion__ member of the Save Data. During loads, the custom version can be checked using `GetSaveGameVersion` (from the project's version of _GameSaveDataVersion.h_) to modify the behavior to be compatible with the format from the older version.
 
+_SaveBlockerBase.h/cpp_
+
+Contains the structures for save blockers and the handle that can be used to track applied blockers.
+
 ### Private
 #### Async Task Manager
 _SaveDataAsyncManager.h/cpp_
@@ -173,6 +193,11 @@ Multiple compression types are supported, ZLib, GZip and Oodle (all using built 
 _SaveDataHeaderCache.h/cpp_
 
 This is a behind the scenes cache of any of the headers that have been request to load. This back-end is shared by all save data systems. The header is primarily populated by creating/saving new saves, loading full saves or loading headers. There is a utility, `USaveDataUtilities::CacheSaveGameHeaders`, that can be used to forcibly populate the cache at a specific time if desired (like when first entering the Main Menu). The cache is not considered authoritative though, a newer file that is on disk than what is in the cache will result in the header being loaded from the file instead of using what's in the cache. When doing a full load of a save file, the header from the file will always be used regardless of the contents of the cache.
+
+#### Save Blocker Subsystem
+_SaveBlockerSubsystem.h/cpp_
+
+The subsystem behind the save-blocker feature, tracking save blocker instances for different save data class types.
 
 ### Editor and Developer Modules
 The StarfireSaveData plugin has two modules: StarfireSaveDataDeveloper & StarfireSaveDataEditor. Developer is an UncookedOnly module for any tool support required by the cook or by uncooked standalone builds. Editor is an Editor module for any future Editor tools. Currently, these are strictly placeholder modules for future code.

@@ -5,6 +5,8 @@
 #include "SaveGames/GameSaveData.h"
 #include "SaveGames/GameSaveDataSubsystem.h"
 
+#include "SaveData/SaveBlockerBase.h"
+
 #include "GameFeatures/FeatureContentManager.h"
 
 // Engine
@@ -84,17 +86,27 @@ bool UGameSaveDataUtilities::DoesSaveGameExist( const FString &SlotName, int32 U
 
 bool UGameSaveDataUtilities::IsManualSavingAllowed( const UObject *WorldContext )
 {
-	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
-	if (World == nullptr)
-		return false;
+	return !Super::IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ) );
+}
 
-	/*if (const auto GameState = World->GetGameState< ACoreTechGameState >(  ))
-	{
-		if (!GameState->IsManualSavingAllowed( ))
-			return false;
-	}*/
+bool UGameSaveDataUtilities::IsManualSavingAllowed( const UObject *WorldContext, TArray<FString> &OutBlockedReasons )
+{
+	return !Super::IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &OutBlockedReasons );
+}
 
-	return true;
+FSaveBlockerHandle UGameSaveDataUtilities::AddSaveGameBlocker( const UObject *WorldContext, const TConstStructView< FSaveBlockerBase > &NewBlocker )
+{
+	return Super::AddSaveBlocker( WorldContext, UGameSaveData::StaticClass( ), NewBlocker );
+}
+
+FSaveBlockerHandle UGameSaveDataUtilities::AddSaveGameBlocker( const UObject *WorldContext, const TInstancedStruct< FSaveBlockerBase > &NewBlocker )
+{
+	if (!ensureAlways( NewBlocker.IsValid( ) ))
+	return { };
+	if (!ensureAlways( NewBlocker.GetScriptStruct( )->IsChildOf< FSaveBlockerBase >( ) ))
+		return { };
+
+	return Super::AddSaveBlocker( WorldContext, UGameSaveData::StaticClass( ), NewBlocker );
 }
 
 bool UGameSaveDataUtilities::SaveToSlot( const UObject *WorldContext, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride )
@@ -103,6 +115,17 @@ bool UGameSaveDataUtilities::SaveToSlot( const UObject *WorldContext, FString Sl
 
 	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
 		return false; // Ignore saving a developer save
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		return false;
+	}
 	
 	const auto SaveData = CreateAndFillSaveData( WorldContext, true );
 	if (!ensureAlways( SaveData != nullptr ))
@@ -126,6 +149,18 @@ void UGameSaveDataUtilities::SaveToSlot_Async( const UObject *WorldContext, FStr
 	{
 		OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
 		return; // Ignore saving a developer save
+	}
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
+		return;
 	}
 
 	const auto SaveData = CreateSaveData( WorldContext );
@@ -632,12 +667,35 @@ void UGameSaveDataUtilities::FindLeastRecentSave_Async( const UObject *WorldCont
 
 const UGameSaveData* UGameSaveDataUtilities::CreateCheckpointSave( const UObject *WorldContext )
 {
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		return nullptr;
+	}
+	
 	return CreateAndFillSaveData( WorldContext, false );
 }
 
 void UGameSaveDataUtilities::CreateCheckpointSave_Async( const UObject *WorldContext, const FCreateCheckpointComplete &OnCompletion )
 {
 	check( OnCompletion.IsBound( ) );
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		OnCompletion.Execute( WorldContext, nullptr, false );
+		return;
+	}
 
 	const auto CheckpointData = CreateSaveData( WorldContext );
 
@@ -711,6 +769,17 @@ bool UGameSaveDataUtilities::AutoSave( const UObject *WorldContext, int32 UserIn
 {
 	if (!ensureAlways( !AnyAsyncSaveTasksPending( WorldContext )))
 		return false;
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		return false;
+	}
 	
 	const auto SlotName = FindBestAutoSaveSlotName( WorldContext, UserIndex );
 
@@ -722,6 +791,18 @@ void UGameSaveDataUtilities::AutoSave_Async( const UObject *WorldContext, int32 
 	if (!ensureAlways( SaveOperationsAreAllowed( ) ))
 	{
 		OnCompletion.ExecuteIfBound( FString( ), 0, false );
+		return;
+	}
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		OnCompletion.Execute( FString( ), UserIndex, true );
 		return;
 	}
 
@@ -860,6 +941,17 @@ bool UGameSaveDataUtilities::SaveToPath( const UObject *WorldContext, const FStr
 	if (!CVar_AllowDeveloperSaves.GetValueOnAnyThread( ) && (SaveType == ESaveDataType::Developer))
 		return false; // Ignore saving a developer save
 
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		return false;
+	}
+
 	const auto SaveData = CreateAndFillSaveData( WorldContext, true );
 	if (!ensureAlways( SaveData != nullptr ))
 		return false;
@@ -887,6 +979,18 @@ void UGameSaveDataUtilities::SaveToPath_Async( const UObject *WorldContext, cons
 	{
 		OnCompletion.ExecuteIfBound( PathName, -1, false );
 		return; // Ignore saving a developer save
+	}
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		OnCompletion.ExecuteIfBound( PathName, -1, false );
+		return;
 	}
 
 	const auto SaveData = CreateSaveData( WorldContext );
@@ -1157,6 +1261,17 @@ bool UGameSaveDataUtilities::DeveloperSave( const UObject *WorldContext, const F
 	if (!ensureAlways( !SlotName.IsEmpty( ) ))
 		return false;
 
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
+		return false;
+	}
+
 	if (DisplayNameOverride.IsEmpty( ))
 		DisplayNameOverride = SlotName.Replace( TEXT( "_" ), TEXT( " " ) );
 	
@@ -1167,6 +1282,18 @@ void UGameSaveDataUtilities::DeveloperSave_Async( const UObject *WorldContext, c
 {
 	if (!ensureAlways( !SlotName.IsEmpty( ) ))
 	{
+		OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
+		return;
+	}
+
+	TArray< FString > BlockedReasons;
+	if (IsSaveTypeBlocked( WorldContext, UGameSaveData::StaticClass( ), &BlockedReasons ))
+	{
+		UE_LOG( LogStarfireSaveData, Log, TEXT( "Request to save blocked:" ) );
+
+		for (const auto &Reason : BlockedReasons)
+			UE_LOG( LogStarfireSaveData, Log, TEXT( "\t\t%s" ), *Reason );
+
 		OnCompletion.ExecuteIfBound( SlotName, UserIndex, false );
 		return;
 	}

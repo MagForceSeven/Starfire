@@ -8,7 +8,7 @@
 class USaveDataHeader;
 class USaveData;
 
-DECLARE_LOG_CATEGORY_EXTERN( LogStarfireSaveData, Log, All );
+STARFIRESAVEDATA_API DECLARE_LOG_CATEGORY_EXTERN( LogStarfireSaveData, Log, All );
 
 DECLARE_MULTICAST_DELEGATE( FSaveDataAccessStarted );
 DECLARE_MULTICAST_DELEGATE( FSaveDataAccessEnded );
