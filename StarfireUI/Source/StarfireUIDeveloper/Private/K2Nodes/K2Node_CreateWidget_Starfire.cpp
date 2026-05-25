@@ -28,7 +28,7 @@ const FName UK2Node_CreateWidget_Starfire::PanelPinName( "PanelPin" );
 const FName UK2Node_CreateWidget_Starfire::PanelSlotPinName( "PanelSlotPin" );
 const FName UK2Node_CreateWidget_Starfire::WidgetInitFunctionName( "Init" );
 
-const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
+static const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
 
 UK2Node_CreateWidget_Starfire::UK2Node_CreateWidget_Starfire( void )
 {

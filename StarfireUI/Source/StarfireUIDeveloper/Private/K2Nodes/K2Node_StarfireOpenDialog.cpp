@@ -31,7 +31,7 @@ const FName UK2Node_StarfireOpenDialog::AfterPushWidgetPinName( "AfterWidget" );
 
 const FName UK2Node_StarfireOpenDialog::WidgetInitFunctionName( "Init" );
 
-const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
+static const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
 
 UK2Node_StarfireOpenDialog::UK2Node_StarfireOpenDialog( void )
 {
