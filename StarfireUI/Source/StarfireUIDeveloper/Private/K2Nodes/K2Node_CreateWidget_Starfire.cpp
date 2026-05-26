@@ -28,7 +28,7 @@ const FName UK2Node_CreateWidget_Starfire::PanelPinName( "PanelPin" );
 const FName UK2Node_CreateWidget_Starfire::PanelSlotPinName( "PanelSlotPin" );
 const FName UK2Node_CreateWidget_Starfire::WidgetInitFunctionName( "Init" );
 
-static const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
+static const auto CreateWidget_PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
 
 UK2Node_CreateWidget_Starfire::UK2Node_CreateWidget_Starfire( void )
 {
@@ -62,7 +62,7 @@ void UK2Node_CreateWidget_Starfire::CreatePinsForClass( UClass *InClass, TArray<
 
 	if (const auto InitFunc = InClass->FindFunctionByName( WidgetInitFunctionName ))
 	{
-		auto InitInputs = StarfireK2Utilities::CreateFunctionPins( this, InitFunc, EGPD_Input, false, PinNameLambda );
+		auto InitInputs = StarfireK2Utilities::CreateFunctionPins( this, InitFunc, EGPD_Input, false, CreateWidget_PinNameLambda );
 
 		if (OutClassPins != nullptr)
 			OutClassPins->Append( InitInputs );
@@ -259,7 +259,7 @@ void UK2Node_CreateWidget_Starfire::ExpandNode( FKismetCompilerContext& Compiler
 				CompilerContext.MovePinLinksToIntermediate( *NodePin, *FuncPin );
 			}
 		);
-		StarfireK2Utilities::ExpandFunctionPins( this, InitFunc, EGPD_Input, PinNameLambda, PinExpansionLambda );
+		StarfireK2Utilities::ExpandFunctionPins( this, InitFunc, EGPD_Input, CreateWidget_PinNameLambda, PinExpansionLambda );
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////

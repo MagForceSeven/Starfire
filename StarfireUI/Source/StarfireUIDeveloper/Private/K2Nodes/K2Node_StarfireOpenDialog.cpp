@@ -31,7 +31,7 @@ const FName UK2Node_StarfireOpenDialog::AfterPushWidgetPinName( "AfterWidget" );
 
 const FName UK2Node_StarfireOpenDialog::WidgetInitFunctionName( "Init" );
 
-static const auto PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
+static const auto OpenDialog_PinNameLambda = StarfireK2Utilities::FGetPinName::CreateLambda( [ ]( const FProperty *Param ) -> FName { return Param->GetFName( ); } );
 
 UK2Node_StarfireOpenDialog::UK2Node_StarfireOpenDialog( void )
 {
@@ -93,7 +93,7 @@ void UK2Node_StarfireOpenDialog::CreatePinsForClass( UClass *InClass, TArray< UE
 
 	if (const auto InitFunc = InClass->FindFunctionByName( WidgetInitFunctionName ))
 	{
-		auto InitInputs = StarfireK2Utilities::CreateFunctionPins( this, InitFunc, EGPD_Input, false, PinNameLambda );
+		auto InitInputs = StarfireK2Utilities::CreateFunctionPins( this, InitFunc, EGPD_Input, false, OpenDialog_PinNameLambda );
 
 		if (OutClassPins != nullptr)
 			OutClassPins->Append( InitInputs );
@@ -263,7 +263,7 @@ void UK2Node_StarfireOpenDialog::ExpandNode( FKismetCompilerContext& CompilerCon
 				CompilerContext.MovePinLinksToIntermediate( *NodePin, *FuncPin );
 			}
 		);
-		StarfireK2Utilities::ExpandFunctionPins( this, InitFunc, EGPD_Input, PinNameLambda, PinExpansionLambda );
+		StarfireK2Utilities::ExpandFunctionPins( this, InitFunc, EGPD_Input, OpenDialog_PinNameLambda, PinExpansionLambda );
 	}
 
 	//////////////////////////////////////////////////////////////////////////
