@@ -350,15 +350,24 @@ static void PostSaveGameLoad( const UObject *WorldContext, const UGameSaveHeader
 	const auto SaveSubsystem = UGameSaveDataSubsystem::GetSubsystem( WorldContext );
 	check( SaveSubsystem != nullptr );
 
-	SaveSubsystem->SaveGame = SaveData;
 	SaveSubsystem->LastSaveSlotName = SlotName;
+
+	UGameSaveDataUtilities::LoadCheckpointSave( WorldContext, SaveData );
+}
+
+void UGameSaveDataUtilities::LoadCheckpointSave( const UObject *WorldContext, const UGameSaveData *CheckpointData )
+{
+	const auto SaveSubsystem = UGameSaveDataSubsystem::GetSubsystem( WorldContext );
+	check( SaveSubsystem != nullptr );
+
+	SaveSubsystem->SaveGame = CheckpointData;
 
 	const TArray< FName > Bundles;
 
 	const auto ContentEntitlements = UFeatureContentManager::GetSubsystem( WorldContext );
-	ContentEntitlements->SetEnabledFeatures( TSet( SaveData->ContentFeatures ), Bundles );
+	ContentEntitlements->SetEnabledFeatures( TSet( CheckpointData->ContentFeatures ), Bundles );
 
-	UGameplayStatics::OpenLevel( WorldContext, FName( SaveData->MapPath.GetAssetName( ) ), true );
+	UGameplayStatics::OpenLevel( WorldContext, FName( CheckpointData->MapPath.GetAssetName( ) ), true );
 }
 
 ESaveDataLoadResult UGameSaveDataUtilities::LoadSaveGameFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData )

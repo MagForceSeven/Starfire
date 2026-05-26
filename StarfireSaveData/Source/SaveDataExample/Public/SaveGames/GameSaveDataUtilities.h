@@ -109,6 +109,9 @@ public:
 	// save a pre-existing checkpoint to a file asynchronously
 	static void SaveCheckpointToSlot_Async( const UObject *WorldContext, const UGameSaveData *CheckpointData, FString SlotName, int32 UserIndex, ESaveDataType SaveType, FString DisplayNameOverride = { }, const FSaveAsyncCallback &OnCompletion = FSaveAsyncCallback( ) );
 
+	// Load an in-memory save as if it were a save from a slot
+	static void LoadCheckpointSave( const UObject *WorldContext, const UGameSaveData *CheckpointData );
+
 	// Try to load the data from a slot into the save game data structure
 	[[nodiscard]] static ESaveDataLoadResult LoadSaveGameFromSlot( const UObject *WorldContext, const FString &SlotName, int32 UserIndex, const UGameSaveHeader *& outHeader, const UGameSaveData *& outSaveData );
 	// Try to load the data from a slot asynchronously and report back when complete with the save data
