@@ -10,6 +10,8 @@
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DefaultEventsManager)
 
+DEFINE_LOG_CATEGORY_STATIC( LogStarfireDefaultEvents, Log, All );
+
 TArray< FClassDefaultEvents > UDefaultEventsManager::UpdateClasses;
 
 void UDefaultEventsManager::Initialize( FSubsystemCollectionBase &Collection )
@@ -79,6 +81,12 @@ void UDefaultEventsManager::OnEditorOpening( const TArray< UObject* > &Assets, I
 		const auto DefaultEvents = FindUpdateType( Type );
 		if (DefaultEvents == nullptr)
 			continue;
+
+		if (Type->HasAllClassFlags( CLASS_Const ))
+		{
+			UE_LOG( LogStarfireDefaultEvents, Warning, TEXT( "Skipping Default Events for class '%s'. Class is marked Const (no Event Graph for Default Events)" ), *Type->GetName( ) );
+			continue;
+		}
 
 		auto Events = TSet( DefaultEvents->DefaultEvents );
 		auto BlueprintEvents = CollateBlueprintEvents( BlueprintAsset );
