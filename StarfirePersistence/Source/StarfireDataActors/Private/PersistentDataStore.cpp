@@ -78,20 +78,6 @@ bool UPersistentDataStore::DoesSupportWorldType( const EWorldType::Type WorldTyp
 void UPersistentDataStore::AddDataStoreActor( ADataStoreActor *Actor, const FGuid &Guid )
 {
 	Actors.Add( Guid, Actor );
-
-#if WITH_EDITOR
-	const auto Label = Actor->GetCustomActorLabel( );
-	if (!Label.IsEmpty( ))
-		Actor->SetActorLabel( Label );
-
-	auto FolderPath = Actor->GetCustomOutlinerFolder( );
-	if (FolderPath.IsEmpty( ))
-		FolderPath = "Data Store";
-	else
-		FolderPath = "Data Store/" + FolderPath;
-
-	Actor->SetFolderPath( FName( FolderPath ) );
-#endif
 }
 
 void UPersistentDataStore::RemoveDataStoreActor( ADataStoreActor *Actor, const FGuid &Guid )

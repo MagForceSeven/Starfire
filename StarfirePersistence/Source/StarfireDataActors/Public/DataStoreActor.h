@@ -17,6 +17,7 @@ public:
 
 	// Actor API
 	void PostRegisterAllComponents( ) override;
+	void BeginPlay( ) override;
 	void Destroyed( ) override;
 
 #if WITH_EDITOR

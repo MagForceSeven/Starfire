@@ -24,6 +24,26 @@ void ADataStoreActor::PostRegisterAllComponents( )
 		DataStore->AddDataStoreActor( this, PersistenceComponent->GetGuid( ) );
 }
 
+void ADataStoreActor::BeginPlay( )
+{
+	Super::BeginPlay( );
+
+	// Update folder and actor label on Begin Play so that Actor that affects label can be configured during deferred spawning
+#if WITH_EDITOR
+	const auto Label = GetCustomActorLabel( );
+	if (!Label.IsEmpty( ))
+		SetActorLabel( Label );
+
+	auto CustomFolderPath = GetCustomOutlinerFolder( );
+	if (CustomFolderPath.IsEmpty( ))
+		CustomFolderPath = "Data Store";
+	else
+		CustomFolderPath = "Data Store/" + CustomFolderPath;
+
+	SetFolderPath( FName( CustomFolderPath ) );
+#endif
+}
+
 void ADataStoreActor::Destroyed( )
 {
 	if (const auto DataStore = UPersistentDataStore::GetSubsystem( this ))
