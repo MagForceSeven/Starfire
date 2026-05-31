@@ -8,7 +8,7 @@
 class UPersistenceComponent;
 
 // Base class for data store actors which can act as the back-end source of persistent gameplay data
-UCLASS( NotPlaceable, Abstract, Config = "Game" )
+UCLASS( NotPlaceable, Abstract, Config = "Game", HideCategories = (Transform, Tags, Activation, Cooking, Rendering, HLOD, Replication, Collision, Physics, Networking, Input, Actor, AssetUserData, Navigation, WorldPartition, LevelInstance, DataLayers) )
 class STARFIREDATAACTORS_API ADataStoreActor : public AActor
 {
 	GENERATED_BODY( )

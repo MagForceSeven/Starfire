@@ -14,6 +14,9 @@ ADataStoreActor::ADataStoreActor( )
 {
 	PersistenceComponent = CreateDefaultSubobject< UPersistenceComponent >( "PersistenceComponent" );
 	PersistenceComponent->SetUseSaveGameMeta( false );
+	PersistenceComponent->bPersistTransform = false;
+
+	SetCanBeDamaged( false );
 }
 
 void ADataStoreActor::PostRegisterAllComponents( )
