@@ -126,6 +126,18 @@ This is a custom node that can replace most uses of the standard Create Widget b
 ![](./Resources/readme_createwidget_base.png)
 ![](./Resources/readme_createwidget_example.png)
 
+### Actor View Models
+
+A separate module providing an extention of View Models for use with Actors. Two base classes are provided `ActorVMBase` and `ActorVMSingleton`. Singleton View Models are always associated with the Game State and there should only ever be one instance of the View Model type in existance at a time.
+
+The intention here is that instead of a single monolith View Model, the Actor's "view" is from a collection of smaller view models. Each of those smaller view models would correspond to something like a component or interface. This allows the view models to reusable across users of the same source component or interface. It is expected that a unique view model may also be created for an Actor that is custom for the data of the Actor not covered by components or interfaces.
+
+Three resolvers are provided to bind to Actor View Models in different ways. Each looks up an Actor in a different way and will return an existing View Model or create a new one. `ActorVMResolver` uses a custom interface, `ActorWidgetInterface`, to determine the Actor that is represented by the widget. `SingletonActorVMResolver` looks for an Actor by type with the expectation that there is only one instance of that Actor in the world. Finally, `SingletonVMResolver` is for View Models that specifically derive from `ActorVMSingleton`
+
+A utility component, `GameModeViewModels`, is provided which can be assigned to Game Modes to create Singleton View Models at the start of the mode.
+
+A utility view model, `DisplayParamsVM`, is provided which acts as a view model specifically for the `DisplayParamInterface` provided by the Starfire UI module of this plugin. As provided, the view model is not able to respond to changes to the Display Params after the view model has been created. If those values might change while the View Model exists, a custom or derived view model is needed to respond to those changes.
+
 ## Dependencies
 
 In addition to the dependencies on plugins from the Engine, Starfire Messenger is also dependent on the Starfire Utilities & Assets plugins found in this repository.
@@ -178,6 +190,35 @@ Implementations of EnhancedInputLocalPlayerSubsystem and EnhancedInputWorldSubsy
 _StarfireUIStatics.h/cpp_
 
 A function library with a few helpful functions.
+
+### Actor View Models
+_ActorVMBase.h/cpp, ActorVMSingleton.h/cpp_
+
+Base classes that support the Actor View Model utilities.
+
+_ActorWidgetInterface.h/cpp_
+
+Interface that allows widgets to specify the Actor they are meant to directly represent.
+
+_ActorVMResolver.h/cpp_
+
+Resolver that supports binding to Actor View Models by widgets that implement the Actor Widget Interface.
+
+_ActorVMUtilities.h/cpp/hpp_
+
+The public utilities that are provided for the general creation and lookup of Actor View Models.
+
+_GameModeViewModels.h/cpp_
+
+Utility component for creating `ActorVMSingleton` instances at Game Mode start.
+
+_DisplayParamsVM.h/cpp_
+
+A view model designed to expose the data from the Display Param Interface.
+
+_ActorVMCache.h/cpp_
+
+A private Actor Component that acts as a per-Actor cache of the view models created for it.
 
 ### Developer
 _K2Node_StarfireOpenDialog.h/cpp_

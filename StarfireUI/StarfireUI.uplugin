@@ -27,6 +27,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "ActorViewModels",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "StarfireUIDeveloper",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "Default"
