@@ -179,13 +179,24 @@ An abstract base class K2 node to aid in creating nodes that have an output pin 
 ### Bind Delegate
 ![](./Resources/bind_delegate.png)
 
-_K2Node_BindDelegate.h/cpp_, _K2Interface_SelectDelegate.h_, _SGraphNode_K2SelectDelegate.h/cpp_, Starfire K2 Utilities
+_K2Node_BindDelegate.h/cpp_, _K2Interface_SelectDelegate.h_, _SGraphNode_K2BindDelegate.h/cpp_, Starfire K2 Utilities
 
 I personally got tired of the workflow for delegate binding caused by the fact that individual blueprint nodes are created for binding to delegates. This node solves that problem by making the delegate to bind to a dropdown selection based on the Target input pin.
 
 The second dropdown is similar to the Create Event node and allows selecting the callback function from the Listener input. Also just like Create Event, it has options for creating a function or event that matches the required delegate signature.
 
 Double clicking on the node will jump the view to the function that will be called when the delegate is executed or broadcast.
+
+![](./Resources/bind_delegate_async.png)
+
+_K2Node_BindDelegate_Async.h/cpp_, _SGraphNode_K2BindDelegate_Async.h/cpp_
+
+I also made a version that does the callback inline, so after selecting the delegate you get async output pins for the parameters.
+
+A 'trigger once' property is available that will automatically unbind from the delegate after it happens.
+
+The delegate can be also unbound from as normal with the usual unbind nodes. Once unbound, the output exec will no longer happen.
+An advanced pin is available with the delegate pin for manual unbinding, or you can use the unbind all node instead.
 
 ### Is Valid Object
 ![](./Resources/is_valid.png)
