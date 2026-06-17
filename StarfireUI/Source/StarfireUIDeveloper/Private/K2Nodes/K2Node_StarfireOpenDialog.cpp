@@ -218,8 +218,11 @@ void UK2Node_StarfireOpenDialog::ExpandNode( FKismetCompilerContext& CompilerCon
 		Push_WidgetClass->DefaultValue = ClassPath.ToString( );
 	}
 
+	FGameplayTag DefaultTag; // convert from a string that may be in the form '(TagName="")' which is a valid string but not a valid tag
+	DefaultTag.FromExportString( Open_LayerName->DefaultValue );
+
 	// if the blueprint didn't specify a layer, use the default from the dialog being opened
-	if (Open_LayerName->LinkedTo.IsEmpty( ) && Open_LayerName->DefaultValue.IsEmpty( ))
+	if (Open_LayerName->LinkedTo.IsEmpty( ) && !DefaultTag.IsValid( ))
 		Push_LayerName->DefaultValue = DialogLayer.ToString();
 	else
 		CompilerContext.MovePinLinksToIntermediate( *Open_LayerName, *Push_LayerName );
