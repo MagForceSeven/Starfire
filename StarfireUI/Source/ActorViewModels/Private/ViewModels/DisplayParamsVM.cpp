@@ -9,7 +9,12 @@ void UDisplayParamsVM::HandleOnCreate( AActor *Actor )
 {
 	Super::HandleOnCreate( Actor );
 
-	if (const auto Interface = Cast< IDisplayParamInterface >( Actor ) )
+	InitFromObject( Actor );
+}
+
+void UDisplayParamsVM::InitFromObject( const UObject *Object )
+{
+	if (const auto Interface = Cast< IDisplayParamInterface >( Object ) )
 	{
 		UE_MVVM_SET_PROPERTY_VALUE( DisplayName, Interface->GetUIDisplayName( ) );
 		UE_MVVM_SET_PROPERTY_VALUE( DisplayName_Plural, Interface->GetUIDisplayName_Plural( ) );

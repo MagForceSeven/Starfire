@@ -42,4 +42,7 @@ public:
 protected:
 	// Actor VM Base
 	void HandleOnCreate( AActor *Actor ) override;
+
+	// Initialize the view from any object that might implement the Display Params Interface
+	void InitFromObject( const UObject *Object );
 };
