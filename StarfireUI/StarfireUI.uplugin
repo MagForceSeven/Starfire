@@ -58,6 +58,10 @@
 		{
 			"Name": "ModularGameplayActors",
 			"Enabled": true
+		},
+		{
+			"Name": "ModelViewViewModel",
+			"Enabled": true
 		}
 	]
 }
