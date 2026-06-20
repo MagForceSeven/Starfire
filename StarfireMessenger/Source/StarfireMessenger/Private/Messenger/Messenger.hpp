@@ -4,7 +4,7 @@
 	#error You shouldn't be including this file directly
 #endif
 
-#include "StructView.h"
+#include "StructUtils/StructView.h"
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 template < CImmediateWithContextType type_t, class in_context_t >

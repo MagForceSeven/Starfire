@@ -7,7 +7,7 @@
 #include "DetailCategoryBuilder.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
-#include "Engine/UserDefinedStruct.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "IDetailGroup.h"
 #include "K2Node_CustomEvent.h"

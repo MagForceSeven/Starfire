@@ -1,7 +1,7 @@
 # Starfire
 A collection of UE5 plugins that I've developed over the course of my hobby development. Some of which has also been used professionally in some version.
 
-Current Engine version supported: 5.7.0
+Current Engine version supported: 5.8.0
 
 Platform Support:
 * Windows, Linux. (May work on other platforms, but untested)

@@ -8,7 +8,7 @@
 #include "Customizations/MDMetaDataEditorCustomizationBase.h"
 #include "DetailLayoutBuilder.h"
 #include "DetailWidgetRow.h"
-#include "Engine/UserDefinedStruct.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "IDetailGroup.h"
 #include "K2Node_CustomEvent.h"
@@ -17,7 +17,6 @@
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "ScopedTransaction.h"
 #include "SlateOptMacros.h"
-#include "StructUtils/UserDefinedStruct.h"
 #include "Styling/AppStyle.h"
 #include "Types/MDMetaDataKey.h"
 #include "UObject/MetaData.h"
@@ -29,6 +28,14 @@
 #include "Widgets/SMDMetaDataGameplayTagPicker.h"
 #include "Widgets/SMDMetaDataStringComboBox.h"
 #include "Widgets/Text/STextBlock.h"
+
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,5,0)
+	#include "StructUtils/UserDefinedStruct.h"
+#else
+	#include "Engine/UserDefinedStruct.h"
+#endif
 
 namespace MDMDEFV_Private
 {

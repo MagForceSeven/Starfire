@@ -14,8 +14,8 @@
 // Kismet
 #include "BlueprintCompilationManager.h"
 
-// EditorWidgets
-#include "SSearchableComboBox.h"
+// Slate
+#include "Widgets/Input/SSearchableComboBox.h"
 
 #define LOCTEXT_NAMESPACE "GraphNode_K2SelectDelegate"
 

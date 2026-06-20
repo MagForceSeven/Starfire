@@ -3,8 +3,8 @@
 
 #include "K2Nodes/K2Node_BindDelegate.h"
 
-// Tool Widgets
-#include "SSearchableComboBox.h"
+// Slate
+#include "Widgets/Input/SSearchableComboBox.h"
 
 // Unreal Ed
 #include "ScopedTransaction.h"

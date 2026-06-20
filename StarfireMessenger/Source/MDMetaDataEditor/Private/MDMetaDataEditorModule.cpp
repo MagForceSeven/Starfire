@@ -8,7 +8,6 @@
 #include "Customizations/MDMetaDataEditorPropertyTypeCustomization.h"
 #include "Customizations/MDMetaDataEditorStructChangeHandler.h"
 #include "Customizations/MDMetaDataEditorVariableCustomization.h"
-#include "Engine/UserDefinedStruct.h"
 #include "K2Node_CustomEvent.h"
 #include "K2Node_FunctionEntry.h"
 #include "K2Node_Tunnel.h"
@@ -16,6 +15,13 @@
 #include "PropertyEditorModule.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/SMDUserStructMetaDataEditor.h"
+#include "Misc/EngineVersionComparison.h"
+
+#if UE_VERSION_NEWER_THAN_OR_EQUAL(5,5,0)
+	#include "StructUtils/UserDefinedStruct.h"
+#else
+	#include "Engine/UserDefinedStruct.h"
+#endif
 
 void FMDMetaDataEditorModule::StartupModule()
 {

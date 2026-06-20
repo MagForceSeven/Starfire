@@ -6,7 +6,7 @@
 #include "Animation/WidgetAnimation.h"
 #include "Components/Widget.h"
 #include "Engine/DataTable.h"
-#include "Engine/UserDefinedStruct.h"
+#include "StructUtils/UserDefinedStruct.h"
 #include "GameplayTagContainer.h"
 #include "MDMetaDataEditorModule.h"
 #include "Modules/ModuleManager.h"
