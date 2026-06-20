@@ -5,6 +5,8 @@
 
 #include "DisplayParamInterface.generated.h"
 
+class UTexture2D;
+
 // Static class for interface that provides an API for display information
 UINTERFACE( MinimalAPI, BlueprintType, meta = (DisplayName = "Display Param Object", CannotImplementInterfaceInBlueprint) )
 class UDisplayParamInterface : public UInterface
@@ -52,8 +54,8 @@ public:
 #define DISPLAY_PARAM_ROUTE_DESCRIPTION_TO_DEFINITION( )	[[nodiscard]] FText GetUIDescription( ) const override { return GetDefinition( )->GetUIDescription( ); }
 #define DISPLAY_PARAM_ROUTE_LARGE_TO_DEFINITION( )			[[nodiscard]] UTexture2D* GetUIImage_Large( ) const override { return GetDefinition( )->GetUIImage_Large( ); }
 #define DISPLAY_PARAM_ROUTE_SMALL_TO_DEFINITION( )			[[nodiscard]] UTexture2D* GetUIImage_Small( ) const override { return GetDefinition( )->GetUIImage_Small( ); }
-#define DISPLAY_PARAM_ROUTE_LARGE_SOFT_TO_DEFINITION( )		[[nodiscard]] UTexture2D* GetUIImage_Large_Soft( ) const override { return GetDefinition( )->GetUIImage_Large_Soft( ); }
-#define DISPLAY_PARAM_ROUTE_SMALL_SOFT_TO_DEFINITION( )		[[nodiscard]] UTexture2D* GetUIImage_Small_Soft( ) const override { return GetDefinition( )->GetUIImage_Small_Soft( ); }
+#define DISPLAY_PARAM_ROUTE_LARGE_SOFT_TO_DEFINITION( )		[[nodiscard]] TSoftObjectPtr< UTexture2D > GetUIImage_Large_Soft( ) const override { return GetDefinition( )->GetUIImage_Large_Soft( ); }
+#define DISPLAY_PARAM_ROUTE_SMALL_SOFT_TO_DEFINITION( )		[[nodiscard]] TSoftObjectPtr< UTexture2D > GetUIImage_Small_Soft( ) const override { return GetDefinition( )->GetUIImage_Small_Soft( ); }
 
 
 #define DISPLAY_PARAM_ROUTE_ALL_TO_DEFINITION( )	\
