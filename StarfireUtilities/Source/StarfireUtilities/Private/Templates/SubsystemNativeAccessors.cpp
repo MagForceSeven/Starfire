@@ -5,7 +5,16 @@
 #include "Components/Widget.h"
 
 // Engine
+#include "Engine/Engine.h"
+#include "Engine/LocalPlayer.h"
+#include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Subsystems/LocalPlayerSubsystem.h"
+
+#if WITH_EDITOR
+	// Unreal Ed
+	#include "Editor.h"
+#endif
 
 const UWorld* FSubsystemNativeAccessorsBase::GetWorldFromContext( const UObject *WorldContext )
 {

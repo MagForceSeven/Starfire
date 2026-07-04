@@ -3,6 +3,9 @@
 
 #include "UI/DisplayParamInterface.h"
 
+// Engine
+#include "GameFramework/Actor.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(DisplayParamsVM)
 
 void UDisplayParamsVM::HandleOnCreate( AActor *Actor )
