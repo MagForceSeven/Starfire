@@ -37,6 +37,7 @@ public class StarfireUI : ModuleRules
 				"CommonInput",
 				"EnhancedInput",
 				"Slate",
+				"InputCore",
 				
 				"StarfireAssets",
 				// ... add private dependencies that you statically link with here ...	

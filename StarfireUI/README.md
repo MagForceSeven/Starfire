@@ -84,6 +84,11 @@ For each Button delegate, there is an SF-suffixed version. The difference is tha
 This is useful when it is desirable to bind the same callback to multiple widget instances.
 It also has two helper functions for updating the image and tint that is applied to the button to all the different button states.
 
+`UStarfireComboBox` is a duplication of the `UComboBoxString` that supports associating data directly with each of the options.
+The combo box supports, `UObject`, `const UDataDefinition` and and Instanced Struct.
+This data is then provided back during selection changes for use by overall widget.
+This makes it unnecessary for UI's to maintain parallel data structures to convert the string option or index into the corresponding game data.
+
 `UStarfireActivatableWidget` is derived from `UCommonActivatableWidget` and provides an implementation of `UCommonActivatableWidget.GetDesiredInputConfig` with the help of a couple of new properties that allow the widget to configure the input behavior of the widget.
 
 ### Input Subsystems
@@ -190,6 +195,10 @@ Implementations of EnhancedInputLocalPlayerSubsystem and EnhancedInputWorldSubsy
 _StarfireUIStatics.h/cpp_
 
 A function library with a few helpful functions.
+
+_StarfireComboBox.h/cpp_
+
+A version of combobox that supports tying additional data to the options instead of maintaining parallel arrays or maps of data to use when options are selected.
 
 ### Actor View Models
 _ActorVMBase.h/cpp, ActorVMSingleton.h/cpp_
