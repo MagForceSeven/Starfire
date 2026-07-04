@@ -229,5 +229,9 @@ _K2Node_CreateWidget.h/cpp_
 
 The custom blueprint for the enhanced version of a Create Widget blueprint node.
 
+_StarfireUIPinFactory.h/cpp_, _SGraphPin_ScreenClass.h/cpp_
+
+Blueprint extensions that change the pin used for the screen class parameter of `OpenNewScreen` to disallow dialog box types in the class selector.
+
 ### Editor
 There is currently nothing in this module, it is a placeholder for future features. This is a placeholder for future features that need this module type.

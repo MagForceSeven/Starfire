@@ -14,13 +14,6 @@ class STARFIREUI_API UStarfireScreen : public UStarfireActivatableWidget
 	GENERATED_BODY( )
 public:
 	UStarfireScreen( );
-	
-	// User Widget API
-	void NativeConstruct( ) override;
-	void NativeDestruct( ) override;
-
-	// Common Activatable Widget
-	bool NativeOnHandleBackAction( ) override;
 
 	// Delegate type for the screen being closed
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnCloseEvent, UStarfireScreen*, Screen );
@@ -40,9 +33,17 @@ public:
 
 	// Create a new screen of a specified type and add it to the active canvas
 	UFUNCTION( BlueprintCallable, Category = "Starfire UI", meta = (WorldContext = "WorldContext") )
-	static UStarfireScreen* OpenNewScreen( const UObject *WorldContext, UPARAM( meta = (Categories = "UI.Layer") ) FGameplayTag LayerName, UPARAM( meta = (AllowAbstract = false) ) TSoftClassPtr< UStarfireScreen > ScreenType );
+	static UStarfireScreen* OpenNewScreen( const UObject *WorldContext, UPARAM( meta = (Categories = "UI.Layer") ) FGameplayTag LayerName, UPARAM( meta = (AllowAbstract = false, DisallowedClasses="/Script/StarfireUI.StarfireDialog") ) TSoftClassPtr< UStarfireScreen > ScreenType );
+	// DisallowedClasses is being supported by the custom SGraphPin_ScreenClass and the Starfire UI Pin Factory
 
 protected:
+	// User Widget API
+	void NativeConstruct( ) override;
+	void NativeDestruct( ) override;
+
+	// Common Activatable Widget
+	bool NativeOnHandleBackAction( ) override;
+	
 	// Hook allowing screen to execute any last changes required when being closed
 	UFUNCTION( BlueprintNativeEvent )
 	void HandleOnClose( );
