@@ -18,21 +18,19 @@ void UStarfireGameInstance::Init( )
 	const auto LoadDevSettingsPreload = IDevSettingsPreloader::PreloadAll( this );
 
 	// Temporarily disable this streaming frame delay so that the completion callback isn't shifted to Tick
-#if WITH_EDITOR
-	if (GetWorld( )->WorldType == EWorldType::PIE)
-		GEngine->Exec( GetWorld( ), TEXT( "s.StreamableDelegateDelayFrames 0" ) );
-#endif
-	
+	static auto StreamableDelegateDelay = IConsoleManager::Get( ).FindConsoleVariable( TEXT("s.StreamableDelegateDelayFrames") );
+	check( StreamableDelegateDelay != nullptr );
+
+	const auto CurrentFrameDelay = StreamableDelegateDelay->GetInt( );
+	StreamableDelegateDelay->Set( 0 );
+
 	if (LoadAlwaysLoaded.IsValid( ))
 		LoadAlwaysLoaded->WaitUntilComplete( );
 	if (LoadDevSettingsPreload.IsValid( ))
 		LoadDevSettingsPreload->WaitUntilComplete( );
 
 	// Restore the value back to the default
-#if WITH_EDITOR
-	if (GetWorld( )->WorldType == EWorldType::PIE)
-		GEngine->Exec( GetWorld( ), TEXT( "s.StreamableDelegateDelayFrames 1" ) );
-#endif
+	StreamableDelegateDelay->Set( CurrentFrameDelay );
 }
 
 void UStarfireGameInstance::Shutdown( )
