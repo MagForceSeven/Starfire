@@ -47,6 +47,44 @@ UStarfireComboBox::UStarfireComboBox( const FObjectInitializer& ObjectInitialize
 	ItemStyle.DropIndicator_Onto.TintColor = ItemStyle.DropIndicator_Onto.TintColor.GetSpecifiedColor( );
 	ItemStyle.DropIndicator_Below.TintColor = ItemStyle.DropIndicator_Below.TintColor.GetSpecifiedColor( );
 
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Normal.ImageSize = FVector2D( 32.f, 32.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Normal.TintColor = FLinearColor( 0.495466f, 0.495466f, 0.495466f, 1.00000f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Normal.OutlineSettings.Color = FLinearColor( 0.695111f, 0.695111f, 0.695111f,1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Normal.OutlineSettings.bUseBrushTransparency = true;
+
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Hovered.ImageSize = FVector2D( 32.f, 32.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Hovered.TintColor = FLinearColor(  0.724268f, 0.724268f, 0.724268f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Hovered.OutlineSettings.Color = FLinearColor( 0.724268f, 0.724268f, 0.724268f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Hovered.OutlineSettings.bUseBrushTransparency = true;
+
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Pressed.ImageSize = FVector2D( 32.f, 32.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Pressed.TintColor = FLinearColor( 0.384266f, 0.384266f, 0.384266f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Pressed.OutlineSettings.Color = FLinearColor( 0.724268f, 0.724268f, 0.724268f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Pressed.OutlineSettings.bUseBrushTransparency = true;
+
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Disabled.TintColor = FLinearColor( 1.f, 1.f, 1.f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.Disabled.DrawAs = ESlateBrushDrawType::NoDrawType;
+
+	WidgetStyle.ComboButtonStyle.ButtonStyle.NormalForeground = FLinearColor( 0.f, 1.f, 1.f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.HoveredForeground = FLinearColor( 0.f, 1.f, 1.f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.PressedForeground = FLinearColor( 0.f, 1.f, 1.f, 1.f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.DisabledForeground = FLinearColor( 0.527115f, 0.527115f, 0.527115f, 1.f );
+
+	WidgetStyle.ComboButtonStyle.ButtonStyle.NormalPadding = FMargin(12.f, 1.5f, 12.f, 1.5f );
+	WidgetStyle.ComboButtonStyle.ButtonStyle.PressedPadding = FMargin(12.f, 1.5f, 12.f, 1.5f );
+
+	WidgetStyle.ComboButtonStyle.DownArrowImage.ImageSize = FVector2D( 24.f, 24.f );
+
+	WidgetStyle.ComboButtonStyle.MenuBorderBrush.TintColor = FLinearColor( 0.f, 0.f, 0.f, 1.f );
+	WidgetStyle.ComboButtonStyle.MenuBorderBrush.DrawAs = ESlateBrushDrawType::Box;
+	WidgetStyle.ComboButtonStyle.MenuBorderBrush.Margin = FMargin( 0.125f, 0.125f, 0.125f, 0.125f );
+
+	WidgetStyle.ComboButtonStyle.MenuBorderPadding = FMargin(1.f, 1.f, 1.f, 1.f );
+	WidgetStyle.ComboButtonStyle.ContentPadding = FMargin(5.f, 5.f, 5.f, 5.f );
+
+	WidgetStyle.ContentPadding = FMargin(4.f, 2.f, 4.f, 2.f );
+	WidgetStyle.MenuRowPadding = FMargin(0.f, 0.f, 0.f, 0.f );
+
 	SetForegroundColor( FLinearColor::Black );
 	SetIsFocusable( true );
 
