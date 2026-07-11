@@ -108,6 +108,11 @@ bool UGameFeatureSubsystems_FeatureModules::ShouldAllowFeatureSubsystem( const T
 	const auto Module = GetClassModule( Class );
 
 	const auto FeatureModules = UGameFeatureSubsystems_FeatureModules::GetSubsystem( );
+
+	const auto FoundPluginName = FeatureModules->FeatureModuleToPlugin.Find( Module );
+	if (FoundPluginName == nullptr)
+		return true; // Not in a feature plugin, these should be allowed
+
 	return FeatureModules->IsFeatureModuleActive( Module );
 }
 
