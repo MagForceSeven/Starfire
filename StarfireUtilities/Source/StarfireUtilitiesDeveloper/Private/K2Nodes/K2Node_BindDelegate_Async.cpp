@@ -95,7 +95,7 @@ void UK2Node_BindDelegate_Async::ExpandNode( FKismetCompilerContext &CompilerCon
 	if (Bind_Target->LinkedTo.Num( ) == 0)
 		K2Schema->TryCreateConnection( Self, Add_Target );
 	else
-		CompilerContext.MovePinLinksToIntermediate( *Bind_Target, *Add_Target );
+		CompilerContext.CopyPinLinksToIntermediate( *Bind_Target, *Add_Target );
 
 	///////////////////////////////////////////////////////////////////////////////////
 	//
