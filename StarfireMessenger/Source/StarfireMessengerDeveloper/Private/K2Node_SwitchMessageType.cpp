@@ -10,11 +10,12 @@
 #include "StarfireK2Utilities.h"
 #include "Lambdas/InvokedScope.h"
 
+#include "Epic/K2Node_SetFieldsInStruct_Copy.h"
+
 // Blueprint Graph
 #include "K2Node_CallFunction.h"
 #include "K2Node_MakeArray.h"
 #include "K2Node_SwitchInteger.h"
-#include "K2Node_SetFieldsInStruct.h"
 #include "K2Node_DynamicCast.h"
 
 // Kismet Compiler
@@ -269,7 +270,7 @@ void UK2Node_SwitchMessageType::ExpandNode( FKismetCompilerContext &CompilerCont
 
 		///////////////////////////////////////////////////////////////////////////////////
 		// Use a set fields node as a way to coerce the result from the instanced struct to the message type
-		const auto Passthrough = CompilerContext.SpawnIntermediateNode< UK2Node_SetFieldsInStruct >( this, SourceGraph  );
+		const auto Passthrough = CompilerContext.SpawnIntermediateNode< UK2Node_SetFieldsInStruct_COPY >( this, SourceGraph  );
 		Passthrough->StructType = const_cast< UScriptStruct* >( Type.MessageType.Get( ) );
 		Passthrough->bMadeAfterOverridePinRemoval = true;
 		Passthrough->AllocateDefaultPins( );
@@ -329,7 +330,7 @@ void UK2Node_SwitchMessageType::ExpandNode( FKismetCompilerContext &CompilerCont
 
 		///////////////////////////////////////////////////////////////////////////////////
 		//
-		const auto Passthrough = CompilerContext.SpawnIntermediateNode< UK2Node_SetFieldsInStruct >( this, SourceGraph  );
+		const auto Passthrough = CompilerContext.SpawnIntermediateNode< UK2Node_SetFieldsInStruct_COPY >( this, SourceGraph  );
 		Passthrough->StructType = FSf_MessageBase::StaticStruct( );
 		Passthrough->bMadeAfterOverridePinRemoval = true;
 		Passthrough->AllocateDefaultPins( );
