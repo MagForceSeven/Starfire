@@ -23,7 +23,7 @@ TArray< const type_t* > UDataDefinitionLibrary::GetAllDefinitions( void ) const
 {
 	TArray< const type_t* > ReturnArray;
 
-	GetAllDefinitionsForType( GetStaticClass< type_t >( ), ArrayUpCast< UDataDefinition >( ReturnArray ) );
+	GetAllDefinitionsForType( TypeUtilitiesSF::GetStaticClass< type_t >( ), ArrayUpCast< UDataDefinition >( ReturnArray ) );
 
 	return ReturnArray;
 }
@@ -32,7 +32,7 @@ template < CInterfaceType type_t >
 [[nodiscard]] TArray< const type_t* > UDataDefinitionLibrary::GetAllDefinitions( void ) const
 {
 	TArray< const UDataDefinition* > BaseArray;
-	GetAllDefinitionsForType( GetStaticClass< type_t >( ), BaseArray );
+	GetAllDefinitionsForType( TypeUtilitiesSF::GetStaticClass< type_t >( ), BaseArray );
 
 	TArray< const type_t* > ReturnArray = InterfaceArrayCastChecked< type_t >( BaseArray );
 
@@ -44,7 +44,7 @@ TArray< FPrimaryAssetId > UDataDefinitionLibrary::GetAllDefinitionIDs( void ) co
 {
 	TArray< FPrimaryAssetId > ReturnArray;
 
-	GetAllDefinitionIDsForType( GetStaticClass< type_t >( ), ReturnArray );
+	GetAllDefinitionIDsForType( TypeUtilitiesSF::GetStaticClass< type_t >( ), ReturnArray );
 
 	return ReturnArray;
 }
@@ -56,7 +56,7 @@ const type_t* UDataDefinitionLibrary::DEBUG_FindDefinition( const FName &AssetNa
 }
 
 template < CDefinitionType type_t >
-TDataDefinitionIterator< type_t >::TDataDefinitionIterator( ): FDataDefinitionIterator( GetStaticClass< type_t >( ) )
+TDataDefinitionIterator< type_t >::TDataDefinitionIterator( ): FDataDefinitionIterator( TypeUtilitiesSF::GetStaticClass< type_t >( ) )
 {
 }
 

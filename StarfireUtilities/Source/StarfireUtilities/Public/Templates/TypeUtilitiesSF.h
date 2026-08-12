@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Templates/Casts.h"
+#include "Templates/Casts.h" // for TIsIInterface trait
 
 // PS5 is known to be missing these concepts
 // if another platform is missing concepts from its std implementation,
@@ -66,16 +66,19 @@ concept CObjectType = SFstd::derived_from< type_t, UObject >;
 template < class type_t >
 concept CActorType = SFstd::derived_from< type_t, AActor >;
 
-// Template utility for properly getting the the UClass for a type declaration
-// Copied from some other UE4 utility
-template < CInterfaceType type_t >
-UClass* GetStaticClass( );
+namespace TypeUtilitiesSF
+{
+	// Template utility for properly getting the the UClass for a type declaration
+	// Copied from some other UE4 utility
+	template < CInterfaceType type_t >
+	UClass* GetStaticClass( );
 
-template < CObjectType type_t >
-UClass* GetStaticClass( );
+	template < CObjectType type_t >
+	UClass* GetStaticClass( );
 
-// Utility function for checking if an object is a certain type (taking the difference in interface checks into account)
-[[nodiscard]] FORCEINLINE bool TypeMatch( const UObject *Object, const UClass *Type );
+	// Utility function for checking if an object is a certain type (taking the difference in interface checks into account)
+	[[nodiscard]] FORCEINLINE bool TypeMatch( const UObject *Object, const UClass *Type );
+}
 
 #if CPP
 #define TYPE_UTILITIES_SF_HPP

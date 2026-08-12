@@ -98,6 +98,8 @@ _TypeUtilities.h/hpp/cpp_
 
 A collection of type related helpers: concepts for interfaces, uobjects and actors, template accessors to StaticClass's and implementations of a few standard library concepts for platforms that don't properly support the ones that are desired for writing other concepts. The PS5 I know needs this so it enables it for that platform. Other platforms can be added directly or by adding "STARFIRE_PLATFORM_MISSING_CONCEPTS=1" as a project definition to your Target.cs.
 
+There's a function (not shipping) that acts as a unit test of sorts to double check the template compilation & behavior.
+
 _ArrayTypeUtilities.h/hpp/cpp_
 
 Typesafe casting options for up and down casting arrays of pointers and soft pointers. More user friendly than the TArrayCaster or direct reinterpret casts (though they are implemented through reinterpret casts). In the case of downcasts, the caller is still responsible for guaranteeing that all the elements of the array are of the expected type.
