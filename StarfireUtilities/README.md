@@ -106,6 +106,12 @@ Typesafe casting options for up and down casting arrays of pointers and soft poi
 
 Also provides some helper utilities for casting from arrays of uobject pointers to interface pointers. These will only work for interfaces that aren't blueprint implementatble. I want to figure out a way to check that out at compile time with a concept or something, but it's a bit of a trap right now. But at least it's only as much of a trap as any other cast-to-interface.
 
+_ObjectUtilities.h/hpp/cpp_
+
+Template function wrappers around the `GetObjectsOfClass` and `ForEachObjectOfClass` functions. More user friendly as the outputs are the actual types the client code is interested in.
+
+There's a function (not shipping) that acts as a unit test of sorts to double check the template compilation & behavior.
+
 ### Math Utilities
 _StarfireMath.h/cpp_
 
