@@ -88,7 +88,7 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 
 	check( ReferencedObjectList.IsEmpty( ) );
 
-	// Convert the object list into ObjectRecords
+	// Convert the object list into ObjectRecords & Transforms
 	for (const auto Obj : Objects)
 	{
 		auto& Entry = ReferencedObjectList.Emplace_GetRef( Obj );
@@ -104,6 +104,9 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 			Entry.bUseSaveGame = Component->ShouldUseMeta( );
 
 			Component->OnPreSerialize.Broadcast( );
+
+			if (Component->bPersistTransform)
+				ActorTransforms.Add( Entry.PersistentID, Actor->GetActorTransform( ) );
 		}
 
 		RecursiveCollectObjects( Entry.Object, Component, 0 );
@@ -116,6 +119,7 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 #endif
 
 	*this << ReferencedObjectList;
+	*this << ActorTransforms;
 
 	// Then write all the actual object data
 	for (const auto& Entry : ReferencedObjectList)
@@ -133,14 +137,6 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 		{
 			AActor* Owner = Actor->GetOwner( );
 			*this << Owner;
-
-			const auto Component = Actor ? Actor->GetComponentByClass< UPersistenceComponent >( ) : nullptr;
-
-			if (Component && Component->bPersistTransform)
-			{
-				FTransform ActorTransform = Actor->GetActorTransform( );
-				*this << ActorTransform;
-			}
 		}
 
 		// seek back & write the size then come back
@@ -340,6 +336,9 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 
 	*this << ReferencedObjectList;
 
+	if (Version >= EPersistenceVersion::ActorTransforms)
+		*this << ActorTransforms;
+
 	// Associate each entry with an object
 	// Spawn an Actor, create an object, find an existing actor/component/subsystem
 	TArray< FArchivedActor > ActorResults;
@@ -423,13 +422,46 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				ActorResults.Last( ).Actor = World->GetGameState( );
 				ActorResults.Last( ).Type = EArchivedActorType::Updated;
 			}
+			else if (LoadedClass->IsChildOf< APlayerController >( ))
+			{
+				TArray< APlayerController* > Controllers;
+				GetObjectsOfClass( APlayerController::StaticClass( ), ArrayUpCast< UObject >( Controllers ) );
+
+				if (!ensureAlways( !Controllers.IsEmpty( ) ))
+				{
+					UE_LOGFMT( LogStarfirePersistence, Warning, "Zero Player Controllers are present. Unable to map saved controllers to runtime instances." );
+					continue;
+				}
+
+				if (!ensureAlways( Controllers.Num( ) == 1 ))
+				{
+					UE_LOGFMT( LogStarfirePersistence, Warning, "Multiple Player Controllers are present. Unable to map saved controllers to runtime instances." );
+					continue;
+				}
+
+				Entry.Object = Controllers[ 0 ];
+				Entry.bWasSpawned = false; // technically it was spawned, but *this* process didn't spawn it, and we don't want to call FinishSpawning on the Controller in the next step
+
+				if (!Entry.Object->IsA( LoadedClass ))
+				{
+					Entry.Object = nullptr; // don't try to serialize into a different type
+					UE_LOGFMT( LogStarfirePersistence, Warning, "Active Player Controller is no longer the expected type of \"{0}\".", Entry.ClassPtr.ToString( ) );
+					continue;
+				}
+
+				ActorResults.AddUninitialized( );
+				ActorResults.Last( ).Actor = Controllers[ 0 ];
+				ActorResults.Last( ).Type = EArchivedActorType::Updated;
+			}
 			else if (LoadedClass->IsChildOf< AActor >( ))
 			{
 				FActorSpawnParameters SpawnInfo;
 				SpawnInfo.bDeferConstruction = true;
 				SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				
+				const auto ActorTransform = ActorTransforms.FindRef( Entry.PersistentID, FTransform::Identity );
 
-				const auto Actor = World->SpawnActor( LoadedClass, &FTransform::Identity, SpawnInfo );
+				const auto Actor = World->SpawnActor( LoadedClass, &ActorTransform, SpawnInfo );
 				Entry.Object = Actor;
 				
 				ActorResults.AddUninitialized( );
@@ -494,13 +526,12 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 	// A helpful debugging view of the serialized objects bucketed by type
 	TMap< const UClass*, TArray< UObject* > > DebuggingLookup;
 	// Debugging view of the serialized sizes (uncompressed) of the objects in the save
-	// Size key is the lower bound log10 of the BlockSize ([0:9] -> 1, [10:99] -> 10, [100:999] -> 100, etc)
+	// Size key is the lower bound log10 of the BlockSize ([0:9] -> 1, [10:99] -> 10, [100:999] -> 100, etc.)
 	TMap< int, TMap< TSoftClassPtr< UObject >, TArray< int > > > SizeBuckets;
 #endif
 	// Serialize each of the objects actual properties
 	// Done separately so that circular references are serialized properly
 	// (since those only need the object to exist, not be filled in)
-	TMap< UObject*, FTransform > ActorTransforms;
 	for (const FPersistentObjectRecord& Entry : ReferencedObjectList)
 	{
 		int64 BlockSize = 0;
@@ -531,18 +562,17 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				*this << Owner;
 
 				Actor->SetOwner( Owner );
-
-				const auto Component = Actor ? Actor->GetComponentByClass< UPersistenceComponent >( ) : nullptr;
-				if ((Component != nullptr) && (Component->bPersistTransform))
+				
+				if (Version < EPersistenceVersion::ActorTransforms)
 				{
-					FTransform ActorTransform;
-					*this << ActorTransform;
+					const auto Component = Actor ? Actor->GetComponentByClass< UPersistenceComponent >( ) : nullptr;
+					if ((Component != nullptr) && (Component->bPersistTransform))
+					{
+						FTransform ActorTransform;
+						*this << ActorTransform;
 
-					ActorTransforms.Add( Actor, ActorTransform );
-				}
-				else
-				{
-					ActorTransforms.Add( Actor, FTransform::Identity );
+						ActorTransforms.Add( Entry.PersistentID, ActorTransform );
+					}
 				}
 			}
 
@@ -565,7 +595,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 
 		if (const auto Actor = Cast< AActor >( Entry.Object ))
 		{
-			const auto& ActorTransform = ActorTransforms.FindRef( Entry.Object );
+			const auto ActorTransform = ActorTransforms.FindRef( Entry.PersistentID, FTransform::Identity );
 
 			if (Entry.bWasSpawned)
 				Actor->FinishSpawning( ActorTransform );

@@ -62,6 +62,10 @@ protected:
 
 	// A collection of the objects to serialize to or create from the provided archive
 	TArray< FPersistentObjectRecord > ReferencedObjectList;
+	
+	// Collect all the actor transforms that are desirable to be persisted
+	// Key'd with the persistence ID so that we can load it before spawning any of the Actors which use them
+	TMap< FGuid, FTransform > ActorTransforms;
 };
 
 // Archiver that can serialize all (or some set) of actors into an archive
