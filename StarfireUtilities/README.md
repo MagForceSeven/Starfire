@@ -93,7 +93,7 @@ A utility that leverages the self registering execs to provide another (sometime
 
 It has the downside that the input params aren't directly visible when triggering the exec and that the input is a string, but the code includes utilities to make that less painful and sufficiently typesafe. The conversion from string to value is also extensible through template "trickery" for any project/plugin specific types. See _Exec_DataDefinition.h/cpp_ in Starfire Assets for an example of such an extension.
 
-### Type Utilities
+### Utilities
 _TypeUtilities.h/hpp/cpp_
 
 A collection of type related helpers: concepts for interfaces, uobjects and actors, template accessors to StaticClass's and implementations of a few standard library concepts for platforms that don't properly support the ones that are desired for writing other concepts. The PS5 I know needs this so it enables it for that platform. Other platforms can be added directly or by adding "STARFIRE_PLATFORM_MISSING_CONCEPTS=1" as a project definition to your Target.cs.
@@ -111,6 +111,13 @@ _ObjectUtilities.h/hpp/cpp_
 Template function wrappers around the `GetObjectsOfClass` and `ForEachObjectOfClass` functions. More user friendly as the outputs are the actual types the client code is interested in.
 
 There's a function (not shipping) that acts as a unit test of sorts to double check the template compilation & behavior.
+
+_ArchiveUtilities.h/cpp_
+
+A utility structure that helps work with `FArchive`s to reserve space for a single instance of a type in the archive to be written to later.
+The type must be default constructable and the Archive type must support `Seek` & `Tell` methods to manage position within the stream.
+
+A specialization of that structure has also been written specifically to handle the pattern of reserving space for an unknown size, calculating the size based on what's written to the stream and then writing that size to the reserved space.
 
 ### Math Utilities
 _StarfireMath.h/cpp_

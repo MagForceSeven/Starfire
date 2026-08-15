@@ -12,6 +12,7 @@
 #include "Module/StarfirePersistence.h"
 
 #include "Templates/ArrayTypeUtilitiesSF.h"
+#include "Misc/ArchiveUtilities.h"
 
 // Engine
 #include "GameFramework/GameStateBase.h"
@@ -124,10 +125,8 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 	// Then write all the actual object data
 	for (const auto& Entry : ReferencedObjectList)
 	{
-		const int64 SizeStart = Tell( );
-
-		int64 Size = 0; // Reserve space for size information
-		*this << Size;
+		// Reserve space for size information
+		ArchiveUtilities::FArchiveSpanReservation SpanReservation( *this );
 
 		ArIsSaveGame = Entry.bUseSaveGame;
 
@@ -139,14 +138,8 @@ void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
 			*this << Owner;
 		}
 
-		// seek back & write the size then come back
-		const int64 FinalPos = Tell( );
-		Size = FinalPos - SizeStart - sizeof( Size );
-
-		Seek( SizeStart );
-		*this << Size;
-
-		Seek( FinalPos );
+		// Write the serialized data span to the reserved block
+		SpanReservation.WriteSpan( );
 
 		if (Entry.ClassPtr->IsAsset( ))
 			SavedObjectClasses.Add( Entry.ClassPtr );
@@ -165,15 +158,14 @@ void FPersistentActorWriter::SerializeDestroyedActors( UPersistenceManager *Mana
 	ESectionID SectionID = ESectionID::DestroyedActors;
 	*this << SectionID;
 
-	const auto SizeLocation = Tell( );
-
-	int Size = 0;
-	*this << Size;
-	const auto SizeStart = Tell( );
+	// Reserve space for size information
+	ArchiveUtilities::FArchiveSpanReservation SpanReservation( *this );
 
 	*this << Manager->DestroyedActors;
 
-	const auto FinalPos = Tell( );
+	// Write the serialized data span to the reserved block
+	SpanReservation.WriteSpan( );
+}
 
 	Seek( SizeLocation );
 	int FinalSize = FinalPos - SizeStart;
