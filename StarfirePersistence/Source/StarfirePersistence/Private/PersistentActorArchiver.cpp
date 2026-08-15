@@ -12,9 +12,11 @@
 #include "Module/StarfirePersistence.h"
 
 #include "Templates/ArrayTypeUtilitiesSF.h"
+#include "Templates/ObjectUtilitiesSF.h"
 #include "Misc/ArchiveUtilities.h"
 
 // Engine
+#include "EngineUtils.h"
 #include "GameFramework/GameStateBase.h"
 
 // Core
@@ -23,6 +25,7 @@
 enum class ESectionID : uint32
 {
 	DestroyedActors = 0,
+	PossessedPawns,
 };
 
 //*********************************************************************
@@ -80,6 +83,7 @@ void FPersistentActorWriter::Archive( const UObject *WorldContext )
 	Archive( ToArchive );
 
 	SerializeDestroyedActors( Manager );
+	SerializePossessedPawns( World );
 }
 
 void FPersistentActorWriter::Archive( const TArray< UObject* > &Objects )
@@ -167,11 +171,59 @@ void FPersistentActorWriter::SerializeDestroyedActors( UPersistenceManager *Mana
 	SpanReservation.WriteSpan( );
 }
 
-	Seek( SizeLocation );
-	int FinalSize = FinalPos - SizeStart;
-	*this << FinalSize;
+struct FPersistentPawnPossession
+{
+	FGuid ControllerID;
+	FGuid PawnID;
 
-	Seek( FinalPos );
+	friend FArchive& operator<<( FArchive &Ar, FPersistentPawnPossession &R )
+	{
+		Ar << R.ControllerID;
+		Ar << R.PawnID;
+
+		return Ar;
+	}
+};
+
+void FPersistentActorWriter::SerializePossessedPawns( const UWorld *World )
+{
+	bool bControllersPersistent = true;
+	TArray< FPersistentPawnPossession > PossessedPawns;
+	for (const auto Controller : TActorRange< APlayerController >( World ))
+	{
+		const auto Pawn = Controller->GetPawn( );
+		if (Pawn == nullptr)
+			continue;
+
+		const auto PawnID = UPersistenceComponent::GetGuid( Pawn );
+		if (!PawnID.IsValid( ))
+			return;
+
+		const auto ControllerID = UPersistenceComponent::GetGuid( Controller );
+		bControllersPersistent &= ControllerID.IsValid( );
+
+		PossessedPawns.Push( { .ControllerID = ControllerID, .PawnID = PawnID } );
+	}
+
+	if (PossessedPawns.IsEmpty( ))
+		return;
+	
+	if (!bControllersPersistent && (PossessedPawns.Num( ) > 1))
+	{
+		UE_LOGFMT( LogStarfirePersistence, Warning, "Multiple Possessed Pawns are persistent, but matching controllers are not. This will not be able to be loaded properly." );
+		return;
+	}
+
+	ESectionID SectionID = ESectionID::PossessedPawns;
+	*this << SectionID;
+
+	// Reserve space for size information
+	ArchiveUtilities::FArchiveSpanReservation SpanReservation( *this );
+
+	*this << PossessedPawns;
+
+	// Write the serialized data span to the reserved block
+	SpanReservation.WriteSpan( );
 }
 
 FArchive& FPersistentActorWriter::operator<<( FSoftObjectPtr &Value )
@@ -420,8 +472,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 			}
 			else if (LoadedClass->IsChildOf< APlayerController >( ))
 			{
-				TArray< APlayerController* > Controllers;
-				GetObjectsOfClass( APlayerController::StaticClass( ), ArrayUpCast< UObject >( Controllers ) );
+				TArray< APlayerController* > Controllers = ObjectUtilitiesSF::GetObjectsOfClass< APlayerController >( );
 
 				if (!ensureAlways( !Controllers.IsEmpty( ) ))
 				{
@@ -633,6 +684,10 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 			case ESectionID::DestroyedActors:
 				SerializeDestroyedActors(  );
 				break;
+				
+			case ESectionID::PossessedPawns:
+				SerializePossessedPawns( );
+				break;
 
 			default:
 				UE_LOGFMT( LogStarfirePersistence, Warning, "PersistentActorReader found unknown SectionID {0}. Skipping {1} bytes", static_cast< int >(SectionID), Size );
@@ -687,5 +742,46 @@ void FPersistentActorReader::SerializeDestroyedActors( )
 
 		if (const auto ActorPtr = Actor.Get( nullptr ))
 			ActorPtr->Destroy( );
+	}
+}
+
+void FPersistentActorReader::SerializePossessedPawns( )
+{
+	TArray< FPersistentPawnPossession > PossessedPawns;
+	*this << PossessedPawns;
+	
+	TArray< APlayerController* > Controllers = ObjectUtilitiesSF::GetObjectsOfClass< APlayerController >( );
+	if (Controllers.IsEmpty( ))
+	{
+		UE_LOGFMT( LogStarfirePersistence, Error, "Unable to find any controllers to repossess during loading." );
+		return;
+	}
+
+	if (Controllers.Num( ) != PossessedPawns.Num( ))
+		UE_LOGFMT( LogStarfirePersistence, Warning, "Number of Controllers doesn't match expected Pawns to possess." );
+
+	for (const auto &PawnData : PossessedPawns)
+	{
+		const auto MaybePawn = Manager->FindActorOfClass< APawn >( PawnData.PawnID );
+		if (MaybePawn.Get( nullptr ) == nullptr)
+		{
+			UE_LOGFMT( LogStarfirePersistence, Warning, "Unable to find Pawn '{0}' to repossess during loading.", PawnData.PawnID );
+			continue;
+		}
+
+		// Try and find a controller - mismatches should have already been warned about when archiving or the earlier warnings in this function
+		const auto MaybeController = PawnData.ControllerID.IsValid( ) ? Manager->FindActorOfClass< APlayerController >( PawnData.ControllerID ) : Controllers[ 0 ];
+		if (MaybeController.Get( nullptr ) == nullptr)
+		{
+			UE_LOGFMT( LogStarfirePersistence, Warning, "Unable to find Controller to repossess during loading (maybe with ID '{0}').", PawnData.PawnID );
+			continue;
+		}
+
+		const auto Pawn = MaybePawn.GetValue( );
+		const auto Controller = MaybeController.GetValue( );
+
+		Controllers.Remove( Controller );
+
+		Controller->Possess( Pawn );
 	}
 }

@@ -62,6 +62,8 @@ _PersistentActorArchiver.h/cpp_
 Implementations of FArchiver for serializing collections of persistent objects to and from a byte array.
 Saves property data marked up with the SaveGame meta (or the flag set on the property in Blueprint).
 Preserves owned subobjects and references to other actors in the same collection.
+Preserves pawn possession if the pawn is saved from having a persistence component.
+It does it's best to deal with controllers, but hasn't really been exercised in scenarios with more than one.
 
 _StarfirePersistenceSettings.h/cpp_
 

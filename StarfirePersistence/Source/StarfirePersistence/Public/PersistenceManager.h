@@ -14,6 +14,10 @@ class STARFIREPERSISTENCE_API UPersistenceManager : public UWorldSubsystem, publ
 public:
 	// Find an actor based on the GUID
 	[[nodiscard]] TOptional< AActor* > FindActor( const FGuid &ID ) const;
+	
+	// Find an actor of a specific type based on the GUID
+	template < CActorType type_t >
+	[[nodiscard]] TOptional< type_t* > FindActorOfClass( const FGuid &ID ) const;
 
 	// Track actors that have been destroyed and that state should be persisted on load
 	UFUNCTION( BlueprintCallable )
@@ -54,3 +58,19 @@ protected:
 	UPROPERTY( )
 	TMap< FGuid, TObjectPtr< AActor > > PersistentActors;
 };
+
+// *********************************************************************************************************************
+//									Template Implementations
+
+template < CActorType type_t >
+TOptional< type_t* > UPersistenceManager::FindActorOfClass( const FGuid &ID ) const
+{
+	const auto Found = PersistentActors.Find( ID );
+	if (Found == nullptr)
+		return { };
+
+	if (!Found->IsA< type_t >( ))
+		return { };
+
+	return CastChecked< type_t >( *Found );
+}

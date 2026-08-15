@@ -116,6 +116,9 @@ private:
 
 	// Add data for destroyed actors to the archive data
 	void SerializeDestroyedActors( UPersistenceManager *Manager );
+
+	// Add data for any possessed pawns which are persisted
+	void SerializePossessedPawns( const UWorld *World );
 };
 
 // Archiver that can deserializer actors from an archive
@@ -136,4 +139,7 @@ private:
 
 	// Read data for destroyed actors from the archive data
    	void SerializeDestroyedActors( void );
+
+	// Read data for possessed pawns from the archive data
+	void SerializePossessedPawns( void );
 };
