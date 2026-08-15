@@ -352,6 +352,8 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				continue;
 			}
 		}
+		
+		bool bSpawnedActorUpdate = false;
 
 		if (Entry.PersistentID.IsValid( ) && !Entry.bWasSpawned)
 		{
@@ -392,6 +394,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				ActorResults.AddUninitialized( );
 				ActorResults.Last( ).Actor = World->GetGameState( );
 				ActorResults.Last( ).Type = EArchivedActorType::Updated;
+				bSpawnedActorUpdate = true;
 			}
 			else if (LoadedClass->IsChildOf< AGameStateBase >( ))
 			{
@@ -413,6 +416,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				ActorResults.AddUninitialized( );
 				ActorResults.Last( ).Actor = World->GetGameState( );
 				ActorResults.Last( ).Type = EArchivedActorType::Updated;
+				bSpawnedActorUpdate = true;
 			}
 			else if (LoadedClass->IsChildOf< APlayerController >( ))
 			{
@@ -444,6 +448,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 				ActorResults.AddUninitialized( );
 				ActorResults.Last( ).Actor = Controllers[ 0 ];
 				ActorResults.Last( ).Type = EArchivedActorType::Updated;
+				bSpawnedActorUpdate = true;
 			}
 			else if (LoadedClass->IsChildOf< AActor >( ))
 			{
@@ -507,10 +512,14 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 
 			FReferenceFinder SubobjectCollector( Entry.Subobjects, Entry.Object, true, true, true, true );
 			SubobjectCollector.FindReferences( Entry.Object );
+
+			// When updating an Engine spawned actor, update the Manager's lookup of the actor to be the ID that will be serialized into the Persistence Component in the next step
+			if (bSpawnedActorUpdate)
+				Manager->UpdatePersistentActorIDMapping( ActorResults.Last( ).Actor, Entry.PersistentID );
 		}
 		else
 		{
-			UE_LOGFMT( LogStarfirePersistence, Error, "Unable to construct object of type \"{0}\" in PersistentActorReader", Entry.ClassPtr.ToString( ) );
+			UE_LOGFMT( LogStarfirePersistence, Error, "Unable to construct object of type \"{0}\" in PersistentActorReader. Failed to find loaded class.", Entry.ClassPtr.ToString( ) );
 		}
 	}
 
@@ -548,7 +557,7 @@ void FPersistentActorReader::Archive( const UObject *WorldContext )
 
 			Entry.Object->Serialize( *this );
 			
-			if (AActor* Actor = Cast< AActor >( Entry.Object ))
+			if (const auto Actor = Cast< AActor >( Entry.Object ))
 			{
 				AActor* Owner = nullptr;
 				*this << Owner;

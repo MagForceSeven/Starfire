@@ -26,7 +26,6 @@ public:
 
 	// World Subsystem API
 	void OnWorldBeginPlay( UWorld &InWorld ) override;
-	bool DoesSupportWorldType( const EWorldType::Type WorldType ) const override;
 
 	// Subsystem API
 	void Deinitialize( ) override;
@@ -35,10 +34,14 @@ protected:
 	friend class UPersistenceComponent;
 	friend class FPersistentActorWriter;
 	friend class FPersistentActorReader;
+	
+	// World Subsystem API
+	bool DoesSupportWorldType( const EWorldType::Type WorldType ) const override;
 
 	// Internal management of actor tracking
 	void AddSpawnedActor( AActor *Actor, const FGuid &ID );
 	void RemoveSpawnedActor( const FGuid &ID );
+	void UpdatePersistentActorIDMapping( AActor *Actor, const FGuid &NewID );
 
 	// Hooks into the level loading process
 	void OnLevelVisible( UWorld *World, const ULevelStreaming *StreamingLevel, ULevel *LoadedLevel );

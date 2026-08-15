@@ -71,6 +71,21 @@ void UPersistenceManager::RemoveSpawnedActor( const FGuid &ID )
 	PersistentActors.Remove( ID );
 }
 
+void UPersistenceManager::UpdatePersistentActorIDMapping( AActor *Actor, const FGuid &NewID )
+{
+	if (!ensureAlways( Actor != nullptr ))
+		return;
+	if (!ensureAlways( NewID.IsValid( ) ))
+		return;
+
+	const auto CurrentID = UPersistenceComponent::GetGuid( Actor );
+	if (!ensureAlways( CurrentID.IsValid( ) ))
+
+	PersistentActors.Remove( CurrentID );
+	PersistentActors.Add( NewID, Actor );
+	// The ID on the component itself will be updated when the component data is serialized
+}
+
 void UPersistenceManager::OnLevelVisible( UWorld *World, const ULevelStreaming *StreamingLevel, ULevel *LoadedLevel )
 {
 	for (const auto& A : LoadedLevel->Actors)

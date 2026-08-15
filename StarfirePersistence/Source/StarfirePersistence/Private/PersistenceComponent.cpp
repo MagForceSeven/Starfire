@@ -25,6 +25,18 @@ FGuid UPersistenceComponent::GetGuid() const
 	return PersistentGuid;
 }
 
+FGuid UPersistenceComponent::GetGuid( const AActor *Actor )
+{
+	if (!IsValid( Actor ))
+		return { };
+
+	const auto Component = Actor->GetComponentByClass< UPersistenceComponent >( );
+	if (Component == nullptr)
+		return { };
+
+	return Component->GetGuid( );
+}
+
 void UPersistenceComponent::SetUseSaveGameMeta( bool bUseMeta )
 {
 	ensureAlways( !HasBegunPlay( ) );

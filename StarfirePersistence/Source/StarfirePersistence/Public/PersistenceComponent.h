@@ -14,7 +14,7 @@ class STARFIREPERSISTENCE_API UPersistenceComponent final : public UActorCompone
 	GENERATED_BODY( )
 public:
 	UPersistenceComponent( );
-	
+
 	// UObject API
 	void PreSave( FObjectPreSaveContext SaveContext ) override;
 	void PostDuplicate( bool bDuplicateForPIE ) override;
@@ -25,7 +25,10 @@ public:
 	void UninitializeComponent( ) override;
 
 	// Get the GUID that uniquely identifies this actor across sessions
-	FGuid GetGuid( ) const;
+	[[nodiscard]] FGuid GetGuid( ) const;
+
+	// Get the GUID that uniquely identifies this actor across sessions
+	[[nodiscard]] static FGuid GetGuid( const AActor *Actor );
 
 	// Determine if this actor is from a level loading in or manual spawning
 	bool WasSpawned( ) const { return bSpawned; }
@@ -44,11 +47,11 @@ public:
 	// Automatically track destruction of the owning actor and persist that across archiving
 	UPROPERTY( BlueprintReadWrite, EditAnywhere )
 	bool bPersistDestruction = false;
-	
+
 	// Delegate that is called prior to being archived
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE( FPreSerializeDelegate );
 	UPROPERTY( BlueprintAssignable )
-	FPreSerializeDelegate OnPreSerialize; 
+	FPreSerializeDelegate OnPreSerialize;
 
 	// Delegate that is called after being loaded from an archive
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE( FPostDeserializeDelegate );
