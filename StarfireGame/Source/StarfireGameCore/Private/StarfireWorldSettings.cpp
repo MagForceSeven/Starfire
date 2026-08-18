@@ -13,3 +13,20 @@ AStarfireWorldSettings::AStarfireWorldSettings( )
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 }
+
+const AStarfireWorldSettings* AStarfireWorldSettings::GetWorldSettings( const UObject *WorldContext )
+{
+	if (!IsValid( WorldContext ))
+		return nullptr;
+
+	const auto World = GEngine->GetWorldFromContextObject( WorldContext, EGetWorldErrorMode::LogAndReturnNull );
+	return GetWorldSettings( World );
+}
+
+const AStarfireWorldSettings* AStarfireWorldSettings::GetWorldSettings( const UWorld *World )
+{
+	if (!IsValid( World ))
+		return nullptr;
+
+	return CastChecked< AStarfireWorldSettings >( World->GetWorldSettings( ) );
+}

@@ -18,6 +18,10 @@ public:
 
 	AStarfireWorldSettings( );
 
+	// Static accessors to the Starfire specific world settings type
+	[[nodiscard]] static const AStarfireWorldSettings* GetWorldSettings( const UObject *WorldContext );
+	[[nodiscard]] static const AStarfireWorldSettings* GetWorldSettings( const UWorld *World );
+
 	// Native Accessor to the world type
 	FGameplayTag GetWorldType( void ) const { return WorldType; }
 
