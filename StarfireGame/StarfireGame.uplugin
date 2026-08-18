@@ -27,6 +27,11 @@
 			"LoadingPhase": "Default"
 		},
 		{
+			"Name": "StarfireGameCoreEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		},
+		{
 			"Name": "ActorCollections",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"

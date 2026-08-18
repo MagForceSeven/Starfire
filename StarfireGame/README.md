@@ -137,6 +137,8 @@ The primary exception is Starfire Game Instance, which implements the common beh
 
 Starfire Game Mode does some minor setup to update the associated classes like `GameStateClass` to the Starfire versions. It also initializes the Redscreens debug system from Starfire Utilities.
 
+Starfire World Settings provides two piece of helpful built-in functionality: 1) a World Type identifier gameplay tag and 2) a method of extending with project specific data without requiring the World Settings to be dependent on that data. For those extensions, Instanced Structs are used instead so that structures can be derived from a common base structure and composed Editor-side as needed.
+
 ## Dependencies
 
 In addition to the dependencies on plugins from the Engine, Starfire Game is also dependent on the Starfire Assets, Utilities & UI plugins found in this repository.
