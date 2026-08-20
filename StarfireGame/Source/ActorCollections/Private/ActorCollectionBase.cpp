@@ -9,6 +9,11 @@ AActorCollectionBase::AActorCollectionBase( )
 {
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
+
+#if WITH_EDITOR
+	static const FName CustomFolderPath( "Actor Collections" );
+	SetFolderPath( CustomFolderPath );
+#endif
 }
 
 void AActorCollectionBase::AddActor( AActor *Actor )
