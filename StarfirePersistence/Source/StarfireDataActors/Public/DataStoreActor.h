@@ -17,7 +17,6 @@ public:
 
 	// Actor API
 	void PostRegisterAllComponents( ) override;
-	void BeginPlay( ) override;
 	void Destroyed( ) override;
 
 #if WITH_EDITOR
@@ -42,6 +41,9 @@ public:
 #endif
 
 protected:
+	// Actor API
+	void BeginPlay( ) override;
+	
 	// The type of Actor that should be used to visually represent this data actor
 	UPROPERTY( BlueprintReadOnly, EditAnywhere, Config, meta = (OnlyPlaceable, AllowAbstract = false) )
 	TSoftClassPtr< AActor > VisualizerClass;

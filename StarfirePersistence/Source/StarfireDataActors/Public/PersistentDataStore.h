@@ -47,6 +47,7 @@ public:
 	// Subsystem API
 	void Initialize( FSubsystemCollectionBase &Collection ) override;
 
+protected:
 	// World Subsystem
 	bool DoesSupportWorldType(const EWorldType::Type WorldType) const override;
 

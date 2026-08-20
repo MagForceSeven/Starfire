@@ -1,4 +1,5 @@
 
+// ReSharper disable once CppMissingIncludeGuard
 #ifndef PERSISTENT_DATA_STORE_HPP
 	#error You shouldn't be including this file directly
 #endif
