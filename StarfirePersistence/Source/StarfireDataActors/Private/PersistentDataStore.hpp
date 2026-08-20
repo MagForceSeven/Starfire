@@ -13,7 +13,7 @@ type_t* UPersistentDataStore::SpawnSingleton( bool bDeferredSpawning )
 template < SFstd::derived_from< ADataStoreSingleton > type_t >
 type_t* UPersistentDataStore::SpawnSingleton( const UObject *WorldContext, bool bDeferredSpawning )
 {
-	return CastChecked< type_t >( SpawnSingleton( WorldContext, type_t::StaticClass( ), bDeferredSpawning ) );
+	return CastChecked< type_t >( SpawnDataStoreSingleton( WorldContext, type_t::StaticClass( ), bDeferredSpawning ) );
 }
 
 template < SFstd::derived_from< ADataStoreActor > type_t >
