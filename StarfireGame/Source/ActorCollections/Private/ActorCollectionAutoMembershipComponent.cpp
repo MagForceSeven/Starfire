@@ -14,7 +14,7 @@ void UActorCollectionAutoMembershipComponent::BeginPlay( )
 	if (CollectionClass == nullptr)
 		CollectionClass = GetAssociatedCollectionClass( );
 
-	if (ensureAlways( CollectionClass != nullptr ))
+	if (!ensureAlways( CollectionClass != nullptr ))
 		return;
 
 	const auto Singleton = UActorCollectionUtilities::GetOrCreateSingletonCollection( this, CollectionClass );
