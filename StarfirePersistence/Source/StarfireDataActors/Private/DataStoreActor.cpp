@@ -25,6 +25,10 @@ void ADataStoreActor::PostRegisterAllComponents( )
 
 	if (const auto DataStore = UPersistentDataStore::GetSubsystem( this ))
 		DataStore->AddDataStoreActor( this, PersistenceComponent->GetGuid( ) );
+
+	PersistenceComponent->OnPreSerialize.AddDynamic( this, &ADataStoreActor::OnPreSerialize );
+	PersistenceComponent->OnPostDeserialize.AddDynamic( this, &ADataStoreActor::OnPostDeserialize );
+	PersistenceComponent->OnPostArchive.AddDynamic( this, &ADataStoreActor::OnPostArchive );
 }
 
 void ADataStoreActor::BeginPlay( )

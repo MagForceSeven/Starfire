@@ -5,6 +5,7 @@
 
 #include "DataStoreActor.generated.h"
 
+struct FArchivedActor;
 class UPersistenceComponent;
 
 // Base class for data store actors which can act as the back-end source of persistent gameplay data
@@ -47,6 +48,21 @@ protected:
 	// The type of Actor that should be used to visually represent this data actor
 	UPROPERTY( BlueprintReadOnly, EditAnywhere, Config, meta = (OnlyPlaceable, AllowAbstract = false) )
 	TSoftClassPtr< AActor > VisualizerClass;
+
+	// Hook for derived types to do pre-save game work
+	UFUNCTION( BlueprintNativeEvent, BlueprintCallable)
+	void OnPreSerialize( );
+	virtual void OnPreSerialize_Implementation( ) { }
+
+	// Hook for derived types to do post-load work after this object has been loaded
+	UFUNCTION( BlueprintNativeEvent, BlueprintCallable)
+	void OnPostDeserialize( );
+	virtual void OnPostDeserialize_Implementation( ) { }
+
+	// Hook for derived types to do work after all actors have been loaded
+	UFUNCTION( BlueprintNativeEvent, BlueprintCallable)
+	void OnPostArchive( const TArray< FArchivedActor > &ArchivedActors );
+	virtual void OnPostArchive_Implementation( const TArray< FArchivedActor > &ArchivedActors ) { }
 
 private:
 	friend class UDataStoreUtilities;
