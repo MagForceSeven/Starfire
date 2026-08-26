@@ -89,6 +89,11 @@
 			"Optional": true
 		},
 		{
+			"Name": "ModularGameplay",
+			"Enabled": true,
+			"Optional": true
+		},
+		{
 			"Name": "ModularGameplayActors",
 			"Enabled": true,
 			"Optional": true

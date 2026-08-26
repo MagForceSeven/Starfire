@@ -139,6 +139,11 @@ Starfire Game Mode does some minor setup to update the associated classes like `
 
 Starfire World Settings provides two piece of helpful built-in functionality: 1) a World Type identifier gameplay tag and 2) a method of extending with project specific data without requiring the World Settings to be dependent on that data. For those extensions, Instanced Structs are used instead so that structures can be derived from a common base structure and composed Editor-side as needed.
 
+Two extensions are provided to complement the ModularGameplayActors plugin from Lyra.
+The first extension is `AModularActor`. The Lyra plugin has quite a few `AActor` subtypes (like `ACharacter` and `APawn`), but not the base class. Which feels like a weird oversight.
+The second extension is `UModularActorComponent`, a component that can be used to easily hook any `AActor` type into the modular gameplay system if deriving from modular actors of some kind isn't available.
+In fact, the `AModularActor` is just an actor with the Modular Actor Component built in.
+
 ## Dependencies
 
 In addition to the dependencies on plugins from the Engine, Starfire Game is also dependent on the Starfire Assets, Utilities & UI plugins found in this repository.

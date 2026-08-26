@@ -31,6 +31,7 @@ public class StarfireGameCore : ModuleRules
 			new string[ ]
             {
 				"Core",
+				"ModularGameplay",
 				
 				"StarfireAssets",
 				"StarfireUI",
