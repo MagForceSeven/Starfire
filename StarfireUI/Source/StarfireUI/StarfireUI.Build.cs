@@ -20,7 +20,6 @@ public class StarfireUI : ModuleRules
 				"SlateCore",
 				
 				"CommonGame",
-				"ModularGameplayActors",
 
 				"StarfireUtilities",
 				// ... add other public dependencies that you statically link with here ...
@@ -31,13 +30,14 @@ public class StarfireUI : ModuleRules
             {
 				"Core",
 				"CoreUObject",
+				"CommonInput",
 				"CommonUI",
 				"Engine",
-				"UMG",
-				"CommonInput",
 				"EnhancedInput",
-				"Slate",
 				"InputCore",
+				"ModularGameplay",
+				"UMG",
+				"Slate",
 				
 				"StarfireAssets",
 				// ... add private dependencies that you statically link with here ...	

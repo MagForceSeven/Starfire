@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ModularHUD.h"
+#include "GameFramework/HUD.h"
 
 #include "GameplayTagContainer.h"
 
@@ -13,15 +13,18 @@ class UInputMappingContext;
 
 // Starfire layer hud implementation to handle shared details of the primary hud actor
 UCLASS( Abstract, HideCategories=("Actor Tick", Collision, HLOD, Physics, Events, WorldPartition, LevelInstance, Cooking, DataLayers) )
-class STARFIREUI_API AStarfireHUD : public AModularHUD
+class STARFIREUI_API AStarfireHUD : public AHUD
 {
 	GENERATED_BODY( )
 public:
 	// AActor API
-	void BeginPlay( void ) override;
-	void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+	void PreInitializeComponents( ) override;
 
 protected:
+	// AActor API
+	void BeginPlay( ) override;
+	void EndPlay( const EEndPlayReason::Type EndPlayReason ) override;
+
 	// Create the widget used by this HUD
 	UStarfireHUDWidget* CreateHUDWidget( const TSubclassOf< UStarfireHUDWidget > &WidgetType );
 

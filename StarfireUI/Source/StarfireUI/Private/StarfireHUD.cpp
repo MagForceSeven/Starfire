@@ -7,6 +7,9 @@
 
 #include "Input/StarfireInputSubsystems.h"
 
+// Modular Gameplay
+#include "Components/GameFrameworkComponentManager.h"
+
 // Common Input
 #include "ICommonInputModule.h"
 
@@ -23,11 +26,22 @@
 
 void AStarfireHUD::BeginPlay( void )
 {
+	UGameFrameworkComponentManager::SendGameFrameworkComponentExtensionEvent( this, UGameFrameworkComponentManager::NAME_GameActorReady );
+
 	Super::BeginPlay( );
+}
+
+void AStarfireHUD::PreInitializeComponents( )
+{
+	Super::PreInitializeComponents( );
+
+	UGameFrameworkComponentManager::AddGameFrameworkComponentReceiver( this );
 }
 
 void AStarfireHUD::EndPlay( const EEndPlayReason::Type EndPlayReason )
 {
+	UGameFrameworkComponentManager::RemoveGameFrameworkComponentReceiver( this );
+
 	if (StarfireHUDWidget != nullptr)
 	{
 		UCommonUIExtensions::PopContentFromLayer( StarfireHUDWidget );
