@@ -44,6 +44,29 @@ public:
 	double DangerSize = 1024.0 * 1024.0 * 1024.0; // 1 GB
 };
 
+// Information about an asset for use in informing size information for fixing bad references
+struct FAssetSizeEntry
+{
+	// The asset the information is about
+	FAssetIdentifier ID;
+
+	// All the assets that reference this one (limited to those in the dependency graph)
+	TArray< FAssetIdentifier > Referencers;
+
+	// The set of dependencies that are directly referenced by this asset
+	TArray< FAssetIdentifier > DirectDependencies;
+	// The collection of all dependencies that would be loaded for this asset
+	TSet< FAssetIdentifier > UniqueDependencies;
+
+	// Smallest number of references required to reach this asset from the source
+	int ReferenceDepth = 0;
+
+	// The size of this asset
+	uint64 ExclusiveSize = 0;
+	// The size of this asset + the sizes of the unique dependencies
+	uint64 InclusiveSize = 0;
+};
+
 // A widget that shows the combined size of the open asset + dependencies & a button for direct access to the size map window
 class STARFIREUTILITIESEDITOR_API SInlineAssetSize : public SCompoundWidget
 {
@@ -123,6 +146,7 @@ private:
 
 	// Calculate the size of the asset + dependencies based on current settings & update the tooltip text based on findings
 	uint64 DetermineAssetSize( const FAssetData &Asset );
-	// Utility for calculating the size of a collection of assets
-	TArray< FAssetData > GetDependenciesRecursive( const TArray< FAssetIdentifier > &Assets, TSet< FAssetIdentifier > &Visitations, const FAssetManagerEditorRegistrySource *Registry );
+
+	// Asset information for the direct and indirect dependencies of this asset
+	TMap< FAssetIdentifier, FAssetSizeEntry > AssetSizes;
 };

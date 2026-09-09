@@ -2,6 +2,7 @@
 #include "Tools/SInlineAssetSize.h"
 
 #include "AssetSizeSettings.h"
+#include "SInlineAssetTable.h"
 
 #include "Lambdas/InvokedScope.h"
 
@@ -18,11 +19,14 @@
 // Core UObject
 #include "UObject/ObjectSaveContext.h"
 
+// Core
+#include "Containers/Deque.h"
+
 #include UE_INLINE_GENERATED_CPP_BY_NAME(SInlineAssetSize)
 
 SLATE_IMPLEMENT_WIDGET( SInlineAssetSize )
 
-static FText FormattedSizeText( uint64 Size )
+FText FormattedSizeText( uint64 Size )
 {
 	if (Size < 1000)
 		return FText::AsMemory( Size, EMemoryUnitStandard::SI );
@@ -159,6 +163,18 @@ void SInlineAssetSize::AddToMenuSection( FToolMenuSection &Section, UObject *Ass
 								EUserInterfaceActionType::RadioButton );
 						} )
 					);
+					
+					Section.AddMenuEntry(
+						"SizeTable",
+						INVTEXT("Size Table"),
+						INVTEXT("Open the Size Table UI"),
+						FSlateIcon( FAppStyle::GetAppStyleSetName( ), "ContentBrowser.SizeMap" ),
+						FUIAction(
+						FExecuteAction::CreateLambda( [ Widget ]( ) -> void
+							{
+								SInlineAssetTable::OpenAssetTable( Widget->AssetSizes );
+							} )
+						) );
 				} ),
 			INVTEXT("Asset Size Options")
 		));
@@ -223,7 +239,8 @@ void SInlineAssetSize::Construct( const FArguments &InArgs, TWeakObjectPtr< UObj
 		]
 	];
 
-	UpdateSizeText( );
+	// Queue an update to the size data. Doing immediately seems to be too early for some dependency size information
+	bSizeDirty = true;
 }
 
 void SInlineAssetSize::Tick( const FGeometry &AllottedGeometry, const double InCurrentTime, const float InDeltaTime )
@@ -296,58 +313,166 @@ FText SInlineAssetSize::GetTooltip( void ) const
 	return Tooltip;
 }
 
-TArray< FAssetData > SInlineAssetSize::GetDependenciesRecursive( const TArray< FAssetIdentifier > &Assets, TSet< FAssetIdentifier > &Visitations, const FAssetManagerEditorRegistrySource *Registry )
+// Utility structure for building the FAssetSizeEntry data for all the dependencies of an asset
+struct FDependencyTreeData
 {
-	TArray< FAssetData > Dependencies;
-
-	auto DependencyQuery = FAssetManagerDependencyQuery::None( );
-	DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Hard;
-	DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Direct;
-
-	if (SizeType == EAssetSizeType::Game)
-		DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Game;
-	else if (SizeType == EAssetSizeType::Editor)
-		DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::EditorOnly;
-	
-	for (const auto &A : Assets)
+	FDependencyTreeData( IAssetManagerEditorModule &E, const FName &P, EAssetSizeType S, EAssetMemoryLocation M ) : EditorModule( E ), PackageName( P ),
+		SizeType( S ), MemoryLocation( M )
 	{
-		if (Visitations.Contains( A ) )
-			continue; // ignore things we've seen
+		Registry = EditorModule.GetCurrentRegistrySource( );
+		check( Registry != nullptr );
+		
+		ColumnName = (MemoryLocation == EAssetMemoryLocation::OnDisk) ? IAssetManagerEditorModule::DiskSizeName : IAssetManagerEditorModule::ResourceSizeName;
+		
+		DependencyQuery = FAssetManagerDependencyQuery::None( );
+		DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Hard;
+		DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Direct;
 
-		if (A.IsPackage( ) && A.PackageName.ToString( ).StartsWith( TEXT( "/Script/" ) ))
-			continue; // ignore code dependencies
+		if (SizeType == EAssetSizeType::Game)
+			DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::Game;
+		else if (SizeType == EAssetSizeType::Editor)
+			DependencyQuery.Flags |= UE::AssetRegistry::EDependencyQuery::EditorOnly;
+	}
 
-		Visitations.Add( A );
+	// Entry point for building the dependency data
+	void BuildTree( void );
 
-		DependencyQuery.Categories = A.IsPackage( ) ? UE::AssetRegistry::EDependencyCategory::Package : UE::AssetRegistry::EDependencyCategory::Manage;
+	// The inclusive size of the requested asset
+	uint64 AssetSize = 0;
 
-		TArray< FAssetIdentifier > References;
-		Registry->GetDependencies( A, References, DependencyQuery.Categories, DependencyQuery.Flags );
-		IAssetManagerEditorModule::Get( ).FilterAssetIdentifiersForCurrentRegistrySource( References, DependencyQuery, true );
+	// The Asset data for all the dependencies of the requested asset
+	TMap< FAssetIdentifier, FAssetSizeEntry > Assets;
 
-		auto NewDependencies = GetDependenciesRecursive( References, Visitations, Registry );
-		Dependencies.Append( NewDependencies );
+private:
+	// Internal helper for converting between these two structure types
+	FAssetData ConvertToAssetData( const FAssetIdentifier &ID ) const;
 
-		if (A.IsPackage( ))
+	// Engine object references
+	IAssetManagerEditorModule& EditorModule;
+	const FAssetManagerEditorRegistrySource *Registry;
+
+	// The package name of the root asset
+	FName PackageName;
+
+	// Configuration for calculating size values
+	EAssetSizeType SizeType;
+	EAssetMemoryLocation MemoryLocation;
+
+	// Cached/precalculated values for size lookups
+	FName ColumnName;
+	FAssetManagerDependencyQuery DependencyQuery;
+};
+
+FAssetData FDependencyTreeData::ConvertToAssetData( const FAssetIdentifier &ID ) const
+{
+	if (ID.IsPackage( ))
+	{
+		const auto AssetPathString = ID.PackageName.ToString( ) + TEXT(".") + FPackageName::GetLongPackageAssetName( ID.PackageName.ToString( ) );
+		const auto AssetData = Registry->GetAssetByObjectPath( FSoftObjectPath( AssetPathString ) );
+
+		return AssetData;
+	}
+
+	return IAssetManagerEditorModule::CreateFakeAssetDataFromPrimaryAssetId( ID.GetPrimaryAssetId( ) );
+}
+
+void FDependencyTreeData::BuildTree( )
+{
+	const TPair< FAssetIdentifier, FAssetIdentifier > Initial( NAME_None, PackageName );
+	TDeque< TPair< FAssetIdentifier, FAssetIdentifier > > PendingAssets;
+	PendingAssets.PushLast ( Initial );
+
+	// Add a placeholder "None" element so that the parent lookup can always be unconditional
+	Assets.Add( FAssetIdentifier( NAME_None ) ).ReferenceDepth = -1;
+
+	// Iteratively build up the set of all dependencies
+	while (!PendingAssets.IsEmpty( ))
+	{
+		const auto A = PendingAssets.First( );
+		PendingAssets.PopFirst( );
+
+		auto Entry = Assets.Find( A.Value );
+		if (Entry == nullptr)
 		{
-			const auto AssetPathString = A.PackageName.ToString( ) + TEXT(".") + FPackageName::GetLongPackageAssetName( A.PackageName.ToString( ) );
-			const auto AssetData = Registry->GetAssetByObjectPath( FSoftObjectPath( AssetPathString ) );
+			Entry = &Assets.Add( A.Value );
 
-			if (AssetData.IsValid( ))
-				Dependencies.Push( AssetData );
+			// Basic bookkeeping values for the new entry
+			Entry->ID = A.Value;
+
+			const auto &Parent = Assets.FindChecked( A.Key );
+			Entry->ReferenceDepth = Parent.ReferenceDepth + 1;
+
+			// Determine the individual size of the asset
+			const auto NewData = ConvertToAssetData( A.Value );
+			if (NewData.IsValid( ))
+			{
+				int64 FoundSize = 0;
+				if (EditorModule.GetIntegerValueForCustomColumn( NewData, ColumnName, FoundSize))
+					Entry->ExclusiveSize = FoundSize;
+			}
+
+			// Find this asset's direct dependencies
+			DependencyQuery.Categories = A.Value.IsPackage( ) ? UE::AssetRegistry::EDependencyCategory::Package : UE::AssetRegistry::EDependencyCategory::Manage;
+
+			Registry->GetDependencies( A.Value, Entry->DirectDependencies, DependencyQuery.Categories, DependencyQuery.Flags );
+			IAssetManagerEditorModule::Get( ).FilterAssetIdentifiersForCurrentRegistrySource( Entry->DirectDependencies, DependencyQuery, true );
+
+			// Ignore dependencies on native packages
+			Entry->DirectDependencies.RemoveAll( [ ]( const FAssetIdentifier &D ) -> bool
+			{
+				return (D.IsPackage( ) && D.PackageName.ToString( ).StartsWith( TEXT( "/Script/" ) ));
+			} );
+
+			// Add dependencies for further expansion
+			for (const auto &R : Entry->DirectDependencies)
+				PendingAssets.PushLast( TPair< FAssetIdentifier, FAssetIdentifier >( Entry->ID, R ) );
 		}
-		else
+
+		// Add whoever added this element as another reference source
+		Entry->Referencers.Push( A.Key );
+	}
+
+	// Determine the full set of unique dependencies for each asset
+	for (auto &[ ID, E ] : Assets)
+	{
+		auto Dependencies = E.DirectDependencies;
+		while (!Dependencies.IsEmpty( ))
 		{
-			Dependencies.Push( IAssetManagerEditorModule::CreateFakeAssetDataFromPrimaryAssetId( A.GetPrimaryAssetId( ) ) );
+			const auto D = Dependencies.Pop( );
+			if (E.UniqueDependencies.Contains( D ))
+				continue;
+			E.UniqueDependencies.Add( D );
+
+			const auto &Dependency = Assets.FindChecked( D );
+			Dependencies.Append( Dependency.DirectDependencies );
 		}
 	}
 
-	return Dependencies;
+	// Determine the size of each asset based on the collection of unique dependencies
+	// as a separate step so that dependencies aren't double counted if multiple dependencies share a dependency
+	for (auto &[ ID, E ] : Assets)
+	{
+		E.InclusiveSize += E.ExclusiveSize;
+		for (const auto D : E.UniqueDependencies)
+		{
+			const auto &Dependency = Assets.FindChecked( D );
+			E.InclusiveSize += Dependency.ExclusiveSize;
+		}
+	}
+
+	// Remove references to the "None" element
+	Assets.Remove( FAssetIdentifier( NAME_None ) );
+
+	const auto InitialEntry = Assets.Find( PackageName );
+	InitialEntry->Referencers.Remove( FAssetIdentifier( NAME_None ) );
+
+	AssetSize = InitialEntry->InclusiveSize;
 }
 
 uint64 SInlineAssetSize::DetermineAssetSize( const FAssetData &AssetData )
 {
-	const auto Registry = IAssetManagerEditorModule::Get( ).GetCurrentRegistrySource( );
+	auto &Editor = IAssetManagerEditorModule::Get( );
+	const auto Registry = Editor.GetCurrentRegistrySource( );
 	if (Registry == nullptr)
 	{
 		Tooltip = INVTEXT( "Error loading registry source." );
@@ -364,29 +489,18 @@ uint64 SInlineAssetSize::DetermineAssetSize( const FAssetData &AssetData )
 		return 0;
 	}
 
-	TSet< FAssetIdentifier > VisitedAssets;
-	auto Dependencies = GetDependenciesRecursive( { AssetData.PackageName }, VisitedAssets, Registry );
+	FDependencyTreeData AssetDependencyTree( Editor, AssetData.PackageName, SizeType, MemoryLocation );
+	AssetDependencyTree.BuildTree( );
 
-	const auto ColumnName = (MemoryLocation == EAssetMemoryLocation::OnDisk) ? IAssetManagerEditorModule::DiskSizeName : IAssetManagerEditorModule::ResourceSizeName;
-
-	uint64 AssetSize = 0;
-	auto &Editor = IAssetManagerEditorModule::Get( );
-	for (auto &D : Dependencies)
-	{
-		int64 FoundSize = 0;
-		if (!Editor.GetIntegerValueForCustomColumn( D, ColumnName, FoundSize))
-			continue;
-
-		AssetSize += FoundSize;
-	}
+	AssetSizes = MoveTemp( AssetDependencyTree.Assets );
 
 	const auto Type = (SizeType == EAssetSizeType::All) ? INVTEXT("All") : (SizeType == EAssetSizeType::Editor) ? INVTEXT("Editor") : INVTEXT("Game");
 	const auto Location = (MemoryLocation == EAssetMemoryLocation::OnDisk) ? INVTEXT("on Disk") : INVTEXT("in Memory");
-	const auto FormattedSize = FormattedSizeText( AssetSize );
+	const auto FormattedSize = FormattedSizeText( AssetDependencyTree.AssetSize );
 
 	const auto TooltipFormat = INVOKED_SCOPE
 	{
-		if (AssetSize >= WarningThresholds.DangerSize)
+		if (AssetDependencyTree.AssetSize >= WarningThresholds.DangerSize)
 		{
 			return INVTEXT(	"Total Size: {0}\n"
 							"Total Assets: {1}\n\n"
@@ -394,7 +508,7 @@ uint64 SInlineAssetSize::DetermineAssetSize( const FAssetData &AssetData )
 							"DANGER!! Size > {5}" );
 		}
 
-		if (AssetSize >= WarningThresholds.WarningSize)
+		if (AssetDependencyTree.AssetSize >= WarningThresholds.WarningSize)
 		{
 			return INVTEXT(	"Total Size: {0}\n"
 							"Total Assets: {1}\n\n"
@@ -410,9 +524,9 @@ uint64 SInlineAssetSize::DetermineAssetSize( const FAssetData &AssetData )
 	const auto FormattedWarningSize = FormattedSizeText( WarningThresholds.WarningSize );
 	const auto FormattedDangerSize = FormattedSizeText( WarningThresholds.DangerSize );
 
-	Tooltip = FText::Format( TooltipFormat, FormattedSize, Dependencies.Num( ), Type, Location, FormattedWarningSize, FormattedDangerSize );
+	Tooltip = FText::Format( TooltipFormat, FormattedSize, AssetSizes.Num( ), Type, Location, FormattedWarningSize, FormattedDangerSize );
 
-	return AssetSize;
+	return AssetDependencyTree.AssetSize;
 }
 
 void SInlineAssetSize::OnPreSave( UObject *Object, FObjectPreSaveContext Context )

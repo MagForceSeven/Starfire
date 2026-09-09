@@ -3,6 +3,7 @@
 
 #include "Tools/AssetSizeSettings.h"
 #include "Tools/SInlineAssetSize.h"
+#include "Tools/SInlineAssetTable.h"
 
 // UMG
 #include "Components/Widget.h"
@@ -56,12 +57,18 @@ void FStarfireUtilitiesEditor::StartupModule( )
 		if (const auto Subsystem = GEditor->GetEditorSubsystem< UAssetEditorSubsystem >( ))
 			Subsystem->OnAssetOpenedInEditor( ).AddStatic( &OnAssetOpened_InlineSizeMapTool );
 	}
+	
+	const auto GlobalTabManager = FGlobalTabmanager::Get( );
+
+	GlobalTabManager->RegisterNomadTabSpawner( SInlineAssetTable::AssetTableTabName, FOnSpawnTab::CreateStatic( &SInlineAssetTable::SpawnTab ) );
 }
 
 void FStarfireUtilitiesEditor::ShutdownModule( )
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
+	
+	FGlobalTabmanager::Get( )->UnregisterNomadTabSpawner( SInlineAssetTable::AssetTableTabName );
 }
 
 #undef LOCTEXT_NAMESPACE

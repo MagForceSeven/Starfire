@@ -32,6 +32,7 @@ public class StarfireUtilitiesEditor : ModuleRules
 				"BlueprintGraph",
 				"Core",
 				"CoreUObject",
+				"InputCore",
 				"UnrealEd",
 				"ToolMenus",
 				"DeveloperSettings",

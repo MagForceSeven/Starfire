@@ -256,3 +256,21 @@ By default this widget is not included in toolbars, but can be easily enabled th
 Once enabled, the widget will be included for all blueprints. The sizes that should be used to indicate warnings and danger can be configured through the developer settings. The widget will try to use settings as specific as possible for the blueprint that has been opened. This means settings for the exact blueprint type or the nearest parent. If none are present, the default size thresholds will be used.
 
 For data assets, the type must have size data configured in order to show up at all.
+
+![](./Resources/asset_size_table.png)
+
+_SInlineAssetTable.h/cpp_
+
+Accessible from the toolbar sub-menu, the Asset Size Table is a tab that lists all of the dependencies for the toolbar widget.
+
+Each row of the table provides:
+* the asset name
+* how far from the primary asset it is
+* the asset's individual size
+* the asset's full size (individual size plus dependencies)
+* the full path to the asset
+
+Rows then have sub-rows that show the dependency assets and the assets that depend on the asset.
+
+The goal of this table is to help identify places where references could be slimmed or trimmed.
+This is not meant to supplant the Size Map or Reference Viewer, but to be another tools that combines information from both for a certain type of problem solving.
