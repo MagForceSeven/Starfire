@@ -105,6 +105,9 @@ public:
 	// Slate Widget API
 	void Construct( const FArguments& InArgs, const TSharedRef< STableViewBase > &InOwnerTableView );
 
+	// Handle clicking the PackagePath hyperlink
+	void HandleHyperlinkNavigate( void ) const;
+
 	// SMultiColumnTableRow API
 	TSharedRef< SWidget > GenerateWidgetForColumn( const FName& ColumnName ) override;
 

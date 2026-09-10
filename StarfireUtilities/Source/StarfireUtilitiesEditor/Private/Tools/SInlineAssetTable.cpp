@@ -1,6 +1,9 @@
 
 #include "SInlineAssetTable.h"
 
+// Slate
+#include "Widgets/Input/SHyperlink.h"
+
 #define LOCTEXT_NAMESPACE "InlineAssetTable"
 
 const FName SInlineAssetTable::AssetTableTabName( "AssetTableSF" );
@@ -314,6 +317,13 @@ void SAssetTableRowItem::Construct( const FArguments& InArgs, const TSharedRef< 
 	SMultiColumnTableRow< TSharedRef< FAssetTableRow > >::Construct( SMultiColumnTableRow< TSharedRef< FAssetTableRow > >::FArguments( ).Padding( 0.f ), InOwnerTableView );
 }
 
+void SAssetTableRowItem::HandleHyperlinkNavigate( void ) const
+{
+#if WITH_EDITOR
+	return GEditor->GetEditorSubsystem< UAssetEditorSubsystem >( )->OpenEditorForAsset( RowInfo->AssetInfo->ID.PackageName.ToString( ) );
+#endif
+}
+
 extern FText FormattedSizeText( uint64 Size );
 
 TSharedRef< SWidget > SAssetTableRowItem::GenerateWidgetForColumn( const FName &ColumnName )
@@ -341,9 +351,9 @@ TSharedRef< SWidget > SAssetTableRowItem::GenerateWidgetForColumn( const FName &
 
 	if (ColumnName == COLUMN_PackagePath)
 	{
-		return SNew( STextBlock )
+		return SNew( SHyperlink )
 			.Text( FText::FromName( AssetInfo->ID.PackageName ) )
-			.Margin( FMargin( 3.0f, 3.0f, 7.0f, 0.0f ) );
+			.OnNavigate( this, &SAssetTableRowItem::HandleHyperlinkNavigate );
 	}
 
 	if (ColumnName == COLUMN_Distance)
