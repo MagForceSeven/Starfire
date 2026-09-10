@@ -30,12 +30,12 @@ void UEnumerateSaveDataHeaders_AsyncAction::Activate( void )
 	{
 		OnComplete.Broadcast( UserIndex, Headers );
 
-		EndAction( );
+		SetReadyToDestroy( );
 	});
 
 	UGameSaveDataUtilities::EnumerateSaveHeaders_Async( this, UserIndex, OnUtilityComplete, SaveFilter );
 
-	StartAction( this, false );
+	RegisterWithGameInstance( this );
 }
 
 UForEachSaveDataHeaders_AsyncAction* UForEachSaveDataHeaders_AsyncAction::ForEachSaveHeader( int UserIndex, UObject *WorldContext )
@@ -58,12 +58,12 @@ void UForEachSaveDataHeaders_AsyncAction::Activate( void )
 	{
 		OnComplete.Broadcast( );
 
-		EndAction( );
+		SetReadyToDestroy( );
 	});
 
 	UGameSaveDataUtilities::EnumerateSaveHeaders_Async( this, UserIndex, OnUtilityComplete, { }, OnSingleHeader );
 
-	StartAction( this, false );
+	RegisterWithGameInstance( this );
 }
 
 ULoadSaveData_AsyncAction* ULoadSaveData_AsyncAction::LoadSaveGame( const FString &SlotName, int UserIndex, UObject *WorldContext )
@@ -94,14 +94,14 @@ void ULoadSaveData_AsyncAction::Activate( void )
 	else
 		UGameSaveDataUtilities::LoadSaveGameFromPath_Async( this, SlotName, FLoadAsyncCallback::CreateUObject( this, &ULoadSaveData_AsyncAction::AsyncLoadComplete ) );
 
-	StartAction( this, false );
+	RegisterWithGameInstance( this );
 }
 
 void ULoadSaveData_AsyncAction::AsyncLoadComplete( const FString &AsyncSlotName, int32 AsyncUserIndex, ESaveDataLoadResult Result, const UGameSaveHeader *Header, const UGameSaveData *SaveData )
 {
 	OnComplete.Broadcast( Result, SlotName, UserIndex );
 
-	EndAction( );
+	SetReadyToDestroy( );
 }
 
 USaveSaveData_AsyncAction* USaveSaveData_AsyncAction::SaveGameToSlot( const FString &SlotName, int UserIndex, const FString &DisplayNameOverride, UObject *WorldContext )
@@ -176,7 +176,7 @@ void USaveSaveData_AsyncAction::Activate( void )
 	else // default save case where all the params can be forwarded directly to a generic save call
 		UGameSaveDataUtilities::SaveToSlot_Async( this, SlotName, UserIndex, SaveType, DisplayNameOverride, CompletionDelegate );
 
-	StartAction( this, false );
+	RegisterWithGameInstance( this );
 }
 
 void USaveSaveData_AsyncAction::AsyncSaveComplete( const FString &AsyncSlotName, int32 AsyncUserIndex, bool Success )
@@ -186,7 +186,7 @@ void USaveSaveData_AsyncAction::AsyncSaveComplete( const FString &AsyncSlotName,
 	else
 		OnFailure.Broadcast( );
 
-	EndAction( );
+	SetReadyToDestroy( );
 }
 
 UCreateCheckpointData_AsyncAction* UCreateCheckpointData_AsyncAction::CreateCheckpoint( UObject *WorldContext )
@@ -198,12 +198,12 @@ void UCreateCheckpointData_AsyncAction::Activate( void )
 {
 	UGameSaveDataUtilities::CreateCheckpointSave_Async( this, FCreateCheckpointComplete::CreateUObject( this, &UCreateCheckpointData_AsyncAction::AsyncCheckpointComplete ) );
 	
-	StartAction( this, false );
+	RegisterWithGameInstance( this );
 }
 
 void UCreateCheckpointData_AsyncAction::AsyncCheckpointComplete( const UObject *WorldContext, const UGameSaveData *CheckpointData, bool Success )
 {
 	OnComplete.Broadcast( Success, CheckpointData );
 
-	EndAction( );
+	SetReadyToDestroy( );
 }

@@ -1,13 +1,13 @@
 
 #pragma once
 
-#include "Kismet/BlueprintAsyncActionSF.h"
+#include "Kismet/BlueprintAsyncActionBase.h"
 
 #include "GameSaveDataBlueprintUtilities.generated.h"
 
 // Blueprint utility for asynchronously enumerating the collection of save games
 UCLASS( )
-class SAVEDATAEXAMPLE_API UEnumerateSaveDataHeaders_AsyncAction : public UBlueprintAsyncAction_SF
+class SAVEDATAEXAMPLE_API UEnumerateSaveDataHeaders_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY( )
 public:
@@ -37,7 +37,7 @@ private:
 
 // Blueprint utility for asynchronously enumerating the collection of save games
 UCLASS( )
-class SAVEDATAEXAMPLE_API UForEachSaveDataHeaders_AsyncAction : public UBlueprintAsyncAction_SF
+class SAVEDATAEXAMPLE_API UForEachSaveDataHeaders_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY( )
 public:
@@ -68,7 +68,7 @@ private:
 
 // Blueprint Utility for asynchronously loading a save game
 UCLASS( )
-class SAVEDATAEXAMPLE_API ULoadSaveData_AsyncAction : public UBlueprintAsyncAction_SF
+class SAVEDATAEXAMPLE_API ULoadSaveData_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY( )
 public:
@@ -107,7 +107,7 @@ class UGameSaveData;
 
 // Blueprint utility for creating & writing a save game to disk
 UCLASS( )
-class SAVEDATAEXAMPLE_API USaveSaveData_AsyncAction : public UBlueprintAsyncAction_SF
+class SAVEDATAEXAMPLE_API USaveSaveData_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY( )
 public:
@@ -176,7 +176,7 @@ private:
 
 // Async operations for creating and working with checkpoints
 UCLASS( )
-class UCreateCheckpointData_AsyncAction : public UBlueprintAsyncAction_SF
+class UCreateCheckpointData_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY( )
 public:
