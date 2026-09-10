@@ -22,6 +22,7 @@ void SInlineAssetTable::OpenAssetTable( const TMap< FAssetIdentifier, FAssetSize
 
 		const auto AssetTable = StaticCastSharedRef< SInlineAssetTable >( NewTab->GetContent( ) );
 		AssetTable->ContentSizes = AssetSizes;
+		AssetTable->Entries.Empty( );
 
 		AssetTable->Entries.Reserve( AssetSizes.Num( ) );
 		for (const auto &[ ID, E ] : AssetTable->ContentSizes)
