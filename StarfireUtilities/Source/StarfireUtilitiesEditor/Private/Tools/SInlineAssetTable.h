@@ -20,6 +20,8 @@ enum class EAssetTableRowType
 	SharedDependenciesHeader,
 	// Header row for list of referencing assets
 	ReferencersHeader,
+	// Header row for assets which create circular references
+	CircularReferencesHeader,
 };
 
 // Information about a single asset row

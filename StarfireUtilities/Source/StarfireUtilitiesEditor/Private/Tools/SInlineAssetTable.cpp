@@ -180,6 +180,7 @@ void SInlineAssetTable::BuildRowChildren( FAssetTableRow &Row )
 			{
 				Row.Children.Push( MakeShared< FAssetTableRow >( Row.AssetInfo, EAssetTableRowType::UniqueDependenciesHeader ) );
 				Row.Children.Push( MakeShared< FAssetTableRow >( Row.AssetInfo, EAssetTableRowType::SharedDependenciesHeader ) );
+				Row.Children.Push( MakeShared< FAssetTableRow >( Row.AssetInfo, EAssetTableRowType::CircularReferencesHeader ) );
 			}
 			break;
 
@@ -203,6 +204,19 @@ void SInlineAssetTable::BuildRowChildren( FAssetTableRow &Row )
 				const auto &A = ContentSizes.FindChecked( ID );
 
 				if (A.Referencers.Num( ) != 1)
+					continue;
+
+				Row.Children.Push( MakeShared< FAssetTableRow >( &A, EAssetTableRowType::SubAsset ) );
+			}
+			break;
+
+		case EAssetTableRowType::CircularReferencesHeader:
+			Row.Children.Reserve( Row.AssetInfo->DirectDependencies.Num( ) );
+			for (const auto &ID : Row.AssetInfo->DirectDependencies)
+			{
+				const auto &A = ContentSizes.FindChecked( ID );
+
+				if (!A.UniqueDependencies.Contains( Row.AssetInfo->ID ))
 					continue;
 
 				Row.Children.Push( MakeShared< FAssetTableRow >( &A, EAssetTableRowType::SubAsset ) );
@@ -280,6 +294,20 @@ TSharedRef< ITableRow > SInlineAssetTable::MakeContentsRowWidget( TSharedRef< FA
 							]
 				];
 
+		case EAssetTableRowType::CircularReferencesHeader:
+			return SNew( STableRow< TSharedRef< FAssetTableRow > >, OwnerTable )
+				.ShowSelection( false )
+				.ToolTipText( LOCTEXT( "CIRCLE_HEADER_TOOLTIP", "Direct dependencies which are also a dependent" ) )
+				[
+					SNew( SHorizontalBox )
+						+ SHorizontalBox::Slot( )
+							.AutoWidth( )
+							[
+								SNew( STextBlock )
+									.Text( FText::Format( LOCTEXT( "CIRCLE_HEADER_TITLE", "Circular Dependencies - Count: {0}" ), TreeNode->Children.Num( ) ) )
+									.Margin( FMargin( 3.0f, 3.0f, 7.0f, 0.0f ) )
+							]
+				];
 
 		case EAssetTableRowType::ReferencersHeader:
 			return SNew( STableRow< TSharedRef< FAssetTableRow > >, OwnerTable )
