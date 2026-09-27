@@ -162,6 +162,16 @@ _GameplayTagK2Statics.h/cpp_
 
 A private function library with utility functions to power custom blueprint nodes from the Developer module.
 
+### Finite State Machine
+_FiniteStateMachine.h/cpp_
+
+A simple struct that can be derived from to drive a simple FiniteStateMachine.
+States are Gameplay Tags. Start, End and Tick functions can be bound to each State.
+
+Functions are provided for `GotoState`, `GetCurrentState`, and `IsInState`.
+
+You'll need to manually call `StateMachineTick` in the derived class's `Tick`.
+
 ## Developer
 
 ### Starfire K2 Utilities
