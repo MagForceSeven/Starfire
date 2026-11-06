@@ -18,7 +18,7 @@ public:
 	[[nodiscard]] bool IsNull( void ) const { return MessageType == nullptr; }
 	
 	// Whether this instance references a struct that meets all the configured criteria
-	STARFIREMESSENGER_API [[nodiscard]] bool IsValid( FString *ErrorMsg = nullptr ) const;
+	[[nodiscard]] STARFIREMESSENGER_API bool IsValid( FString *ErrorMsg = nullptr ) const;
 
 	// The type of message this listener should handle
 	UPROPERTY( EditDefaultsOnly )
